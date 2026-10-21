@@ -152,6 +152,14 @@ class EvidenceBindPayload(BaseModel):
     sample_id: str = Field(min_length=1, max_length=128)
 
 
+class LitKGAskPayload(BaseModel):
+    question: str = Field(min_length=1, max_length=2000)
+    knowledge_base_ids: list[int] = Field(default_factory=list, max_length=50)
+    limit: int = Field(default=12, ge=1, le=30)
+    hops: int = Field(default=1, ge=0, le=2)
+    generate: bool = True
+
+
 class ModelServicePayload(BaseModel):
     provider: str = Field(default="openai-compatible", pattern="^(openai-compatible|local)$")
     base_url: str = Field(default="http://127.0.0.1:11434/v1", max_length=500)
@@ -1019,6 +1027,27 @@ async def _litkg_get(path: str, params: dict[str, Any] | None = None) -> dict[st
     return payload
 
 
+async def _litkg_post(path: str, body: dict[str, Any]) -> dict[str, Any]:
+    settings = get_settings()
+    headers = {"Accept": "application/json"}
+    if settings.claim_api_token:
+        headers["Authorization"] = f"Bearer {settings.claim_api_token}"
+    try:
+        async with httpx.AsyncClient(
+            base_url=settings.claim_api_url.rstrip("/"),
+            headers=headers,
+            timeout=max(90.0, settings.claim_api_timeout),
+        ) as client:
+            response = await client.post(path, json=body)
+            response.raise_for_status()
+            payload = response.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        raise HTTPException(502, f"LitKG 接口暂不可用：{exc}") from exc
+    if not isinstance(payload, dict):
+        raise HTTPException(502, "LitKG 接口返回了无法识别的数据格式。")
+    return payload
+
+
 async def _litkg_selection(requested_ids: str = "") -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     settings = get_settings()
     payload = await _litkg_get("/knowledge-bases")
@@ -1174,6 +1203,64 @@ async def litkg_claims(
     return {"count": len(results), "claims": results, "source": _litkg_source(selected)}
 
 
+@app.post("/api/knowledge/remote/ask")
+async def litkg_ask(payload: LitKGAskPayload) -> dict[str, Any]:
+    requested_ids = ",".join(str(item) for item in payload.knowledge_base_ids)
+    _, selected = await _litkg_selection(requested_ids)
+    answers: list[dict[str, Any]] = []
+    citations: list[dict[str, Any]] = []
+    facts: list[dict[str, Any]] = []
+    warnings: list[str] = []
+    for knowledge_base in selected:
+        kb = int(knowledge_base["id"])
+        try:
+            result = await _litkg_post(
+                f"/knowledge-bases/{kb}/ask",
+                {
+                    "question": payload.question.strip(),
+                    "limit": payload.limit,
+                    "hops": payload.hops,
+                    "generate": payload.generate,
+                },
+            )
+        except HTTPException as exc:
+            warnings.append(f"KB {kb} ({knowledge_base['name']}): {exc.detail}")
+            continue
+        answer = {
+            **result,
+            "knowledge_base_id": kb,
+            "knowledge_base_name": knowledge_base["name"],
+        }
+        answers.append(answer)
+        citations.extend(
+            {**item, "knowledge_base_id": kb, "knowledge_base_name": knowledge_base["name"]}
+            for item in result.get("citations", []) if isinstance(item, dict)
+        )
+        facts.extend(
+            {**item, "knowledge_base_id": kb, "knowledge_base_name": knowledge_base["name"]}
+            for item in result.get("facts", []) if isinstance(item, dict)
+        )
+        warnings.extend(str(item) for item in result.get("warnings", []) if item)
+    if not answers:
+        raise HTTPException(502, "所选知识库均未能完成证据问答。" + (f" {'; '.join(warnings)}" if warnings else ""))
+    if len(answers) == 1:
+        combined_answer = str(answers[0].get("answer") or "")
+    else:
+        combined_answer = "\n\n".join(
+            f"## {item['knowledge_base_name']}（KB {item['knowledge_base_id']}）\n\n{item.get('answer') or '未生成答案。'}"
+            for item in answers
+        )
+    return {
+        "status": "answered" if any(item.get("status") == "answered" for item in answers) else "evidence_only",
+        "answer": combined_answer,
+        "answers": answers,
+        "citations": citations,
+        "facts": facts,
+        "warnings": list(dict.fromkeys(warnings)),
+        "source": _litkg_source(selected),
+    }
+
+
 @app.post("/api/knowledge/remote/claims/{claim_id}/bind")
 async def bind_litkg_claim(
     claim_id: int,
@@ -1224,6 +1311,7 @@ async def litkg_graph(
     min_document_count: int = Query(default=1, ge=1, le=100),
     include_negated: bool = False,
     include_speculative: bool = True,
+    q: str = Query(default="", max_length=200),
     knowledge_base_ids: str = Query(default="", max_length=1000),
 ) -> dict[str, Any]:
     _, selected = await _litkg_selection(knowledge_base_ids)
@@ -1239,6 +1327,7 @@ async def litkg_graph(
         })
         if entity_type.strip(): params["entity_type"] = entity_type.strip()
         if predicate.strip(): params["predicate"] = predicate.strip()
+        if q.strip(): params["query"] = q.strip()
         targets = [(int(item["id"]), f"/knowledge-bases/{int(item['id'])}/graph") for item in selected]
     else:
         targets = [(int(selected[0]["id"]) if selected else 0, f"/documents/{document_id}/graph")]

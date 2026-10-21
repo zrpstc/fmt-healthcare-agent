@@ -76,6 +76,10 @@ export interface KnowledgeGraph {
   nodes:GraphNode[]; edges:GraphEdge[]; summary:{node_count:number;relation_count:number;represented_document_count:number};
   knowledge_base_id?:number|null;knowledge_base_ids:number[];document_id?:number|null;source:LitkgSource;
 }
+export interface LitkgAskResult {
+  status:string;answer:string;answers:Array<Record<string,any>>;citations:Array<Record<string,any>>;
+  facts:Array<Record<string,any>>;warnings:string[];source:LitkgSource;
+}
 
 const BASE = "/backend/api";
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -138,6 +142,7 @@ export const api = {
   litkgKnowledgeBases: (ids:number[]=[] ) => request<{knowledge_bases:LitkgKnowledgeBase[];selected_knowledge_base_ids:number[];source:LitkgSource}>(`/knowledge/remote/knowledge-bases${ids.length?`?knowledge_base_ids=${ids.join(",")}`:""}`),
   litkgDocuments: (ids:number[]=[] ) => request<{knowledge_base_ids:number[];documents:LitkgDocument[];source:LitkgSource}>(`/knowledge/remote/documents${ids.length?`?knowledge_base_ids=${ids.join(",")}`:""}`),
   litkgClaims: (q:string,limit=30,ids:number[]=[] ) => request<{count:number;claims:Array<Record<string,any>>;source:LitkgSource}>(`/knowledge/remote/claims?q=${encodeURIComponent(q)}&limit=${limit}${ids.length?`&knowledge_base_ids=${ids.join(",")}`:""}`),
+  litkgAsk: (value:{question:string;knowledge_base_ids:number[];limit?:number;hops?:number;generate?:boolean}) => request<LitkgAskResult>("/knowledge/remote/ask",{method:"POST",body:JSON.stringify(value)}),
   bindLitkgClaim: (claimId:number|string,sampleId:string,knowledgeBaseId?:number) => request(`/knowledge/remote/claims/${encodeURIComponent(String(claimId))}/bind${knowledgeBaseId?`?knowledge_base_id=${knowledgeBaseId}`:""}`, {method:"POST",body:JSON.stringify({sample_id:sampleId})}),
   knowledgeGraph: (params:Record<string,string|number|boolean|undefined>) => {
     const query=new URLSearchParams(); Object.entries(params).forEach(([key,value])=>{if(value!==undefined&&value!=="")query.set(key,String(value))});
