@@ -1,0 +1,2019 @@
+{
+  "sample_id": "SRR13844456",
+  "species": {
+    "sample_id": "SRR13844456",
+    "n_total": 50,
+    "n_normal": 0,
+    "n_high": 27,
+    "n_low": 16,
+    "n_unknown": 7,
+    "species_list": [
+      {
+        "species": "Blautia marasmi",
+        "chinese_name": "",
+        "abundance": 4.7358,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.281,
+        "deviation": 32.77
+      },
+      {
+        "species": "Blautia marasmi",
+        "chinese_name": "",
+        "abundance": 4.7358,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.281,
+        "deviation": 32.77
+      },
+      {
+        "species": "Lactobacillus acidophilus",
+        "chinese_name": "",
+        "abundance": 7.957,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.7571,
+        "deviation": 20.03
+      },
+      {
+        "species": "Lactobacillus acidophilus",
+        "chinese_name": "",
+        "abundance": 7.957,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.7571,
+        "deviation": 20.03
+      },
+      {
+        "species": "Roseburia inulinivorans",
+        "chinese_name": "",
+        "abundance": 20.5287,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0059,
+        "p95": 2.1337,
+        "deviation": 18.29
+      },
+      {
+        "species": "Roseburia inulinivorans",
+        "chinese_name": "",
+        "abundance": 20.5287,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0059,
+        "p95": 2.1337,
+        "deviation": 18.29
+      },
+      {
+        "species": "Evtepia gabavorous",
+        "chinese_name": "",
+        "abundance": 4.9352,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0057,
+        "p95": 0.5876,
+        "deviation": 15.94
+      },
+      {
+        "species": "Evtepia gabavorous",
+        "chinese_name": "",
+        "abundance": 4.9352,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0057,
+        "p95": 0.5876,
+        "deviation": 15.94
+      },
+      {
+        "species": "Ruthenibacterium lactatiformans",
+        "chinese_name": "",
+        "abundance": 7.4412,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0034,
+        "p95": 0.9215,
+        "deviation": 15.2
+      },
+      {
+        "species": "Ruthenibacterium lactatiformans",
+        "chinese_name": "",
+        "abundance": 7.4412,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0034,
+        "p95": 0.9215,
+        "deviation": 15.2
+      },
+      {
+        "species": "Thomasclavelia ramosa",
+        "chinese_name": "",
+        "abundance": 12.0163,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 1.704,
+        "deviation": 13.12
+      },
+      {
+        "species": "Thomasclavelia ramosa",
+        "chinese_name": "",
+        "abundance": 12.0163,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 1.704,
+        "deviation": 13.12
+      },
+      {
+        "species": "Mediterraneibacter glycyrrhizinilyticus",
+        "chinese_name": "",
+        "abundance": 2.3193,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0008,
+        "p95": 0.3368,
+        "deviation": 12.8
+      },
+      {
+        "species": "Mediterraneibacter glycyrrhizinilyticus",
+        "chinese_name": "",
+        "abundance": 2.3193,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0008,
+        "p95": 0.3368,
+        "deviation": 12.8
+      },
+      {
+        "species": "Anaerostipes caccae",
+        "chinese_name": "",
+        "abundance": 3.0461,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 0.8403,
+        "deviation": 6.26
+      },
+      {
+        "species": "Anaerostipes caccae",
+        "chinese_name": "",
+        "abundance": 3.0461,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 0.8403,
+        "deviation": 6.26
+      },
+      {
+        "species": "Merdimonas faecis",
+        "chinese_name": "",
+        "abundance": 1.9987,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 0.5655,
+        "deviation": 6.08
+      },
+      {
+        "species": "Merdimonas faecis",
+        "chinese_name": "",
+        "abundance": 1.9987,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 0.5655,
+        "deviation": 6.08
+      },
+      {
+        "species": "Mediterraneibacter gnavus",
+        "chinese_name": "",
+        "abundance": 8.4884,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0026,
+        "p95": 3.8769,
+        "deviation": 3.38
+      },
+      {
+        "species": "Mediterraneibacter gnavus",
+        "chinese_name": "",
+        "abundance": 8.4884,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0026,
+        "p95": 3.8769,
+        "deviation": 3.38
+      },
+      {
+        "species": "Thomasclavelia spiroformis",
+        "chinese_name": "",
+        "abundance": 0.362,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0013,
+        "p95": 0.1974,
+        "deviation": 2.68
+      },
+      {
+        "species": "Thomasclavelia spiroformis",
+        "chinese_name": "",
+        "abundance": 0.362,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0013,
+        "p95": 0.1974,
+        "deviation": 2.68
+      },
+      {
+        "species": "Faecalimonas umbilicata",
+        "chinese_name": "",
+        "abundance": 2.3137,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0037,
+        "p95": 2.0674,
+        "deviation": 1.24
+      },
+      {
+        "species": "Faecalimonas umbilicata",
+        "chinese_name": "",
+        "abundance": 2.3137,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0037,
+        "p95": 2.0674,
+        "deviation": 1.24
+      },
+      {
+        "species": "Enterococcus gallinarum",
+        "chinese_name": "",
+        "abundance": 1.863,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 1.7295,
+        "deviation": 1.15
+      },
+      {
+        "species": "Enterococcus gallinarum",
+        "chinese_name": "",
+        "abundance": 1.863,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 1.7295,
+        "deviation": 1.15
+      },
+      {
+        "species": "Rothia mucilaginosa",
+        "chinese_name": "",
+        "abundance": 0.1104,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0003,
+        "p95": 0.1096,
+        "deviation": 1.01
+      },
+      {
+        "species": "Actinomyces graevenitzii",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.029,
+        "p95": 5.358,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus oralis",
+        "chinese_name": "",
+        "abundance": 0.0361,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0732,
+        "p95": 7.745,
+        "deviation": -1.01
+      },
+      {
+        "species": "Actinomyces graevenitzii",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.029,
+        "p95": 5.358,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus oralis",
+        "chinese_name": "",
+        "abundance": 0.0361,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0732,
+        "p95": 7.745,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus infantis",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0235,
+        "p95": 3.218,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus infantis",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0235,
+        "p95": 3.218,
+        "deviation": -1.01
+      },
+      {
+        "species": "Dakarella massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0013,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0091,
+        "p95": 2.2236,
+        "deviation": -1.01
+      },
+      {
+        "species": "Dakarella massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0013,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0091,
+        "p95": 2.2236,
+        "deviation": -1.01
+      },
+      {
+        "species": "Agathobacter rectalis",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0248,
+        "p95": 11.2655,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia wexlerae",
+        "chinese_name": "",
+        "abundance": 0.0077,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0109,
+        "p95": 7.4201,
+        "deviation": -1.0
+      },
+      {
+        "species": "Enterocloster bolteae",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0011,
+        "p95": 0.666,
+        "deviation": -1.0
+      },
+      {
+        "species": "Agathobacter rectalis",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0248,
+        "p95": 11.2655,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia wexlerae",
+        "chinese_name": "",
+        "abundance": 0.0077,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0109,
+        "p95": 7.4201,
+        "deviation": -1.0
+      },
+      {
+        "species": "Enterocloster bolteae",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0011,
+        "p95": 0.666,
+        "deviation": -1.0
+      },
+      {
+        "species": "Clostridium cuniculi",
+        "chinese_name": "",
+        "abundance": 0.0083,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0388,
+        "p95": 14.0734,
+        "deviation": -1.0
+      },
+      {
+        "species": "Clostridium cuniculi",
+        "chinese_name": "",
+        "abundance": 0.0083,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0388,
+        "p95": 14.0734,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia massiliensis ex Durand et al 2017",
+        "chinese_name": "",
+        "abundance": 0.0001,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Clostridium scindens",
+        "chinese_name": "",
+        "abundance": 1.2859,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Blautia massiliensis ex Durand et al 2017",
+        "chinese_name": "",
+        "abundance": 0.0001,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Clostridium scindens",
+        "chinese_name": "",
+        "abundance": 1.2859,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Veillonella nakazawae",
+        "chinese_name": "",
+        "abundance": 0.0179,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Veillonella nakazawae",
+        "chinese_name": "",
+        "abundance": 0.0179,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Isoptericola variabilis",
+        "chinese_name": "",
+        "abundance": 0.0018,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      }
+    ],
+    "abnormal_species": [
+      {
+        "species": "Blautia marasmi",
+        "chinese_name": "",
+        "abundance": 4.7358,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.281,
+        "deviation": 32.77
+      },
+      {
+        "species": "Blautia marasmi",
+        "chinese_name": "",
+        "abundance": 4.7358,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.281,
+        "deviation": 32.77
+      },
+      {
+        "species": "Lactobacillus acidophilus",
+        "chinese_name": "",
+        "abundance": 7.957,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.7571,
+        "deviation": 20.03
+      },
+      {
+        "species": "Lactobacillus acidophilus",
+        "chinese_name": "",
+        "abundance": 7.957,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.7571,
+        "deviation": 20.03
+      },
+      {
+        "species": "Roseburia inulinivorans",
+        "chinese_name": "",
+        "abundance": 20.5287,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0059,
+        "p95": 2.1337,
+        "deviation": 18.29
+      },
+      {
+        "species": "Roseburia inulinivorans",
+        "chinese_name": "",
+        "abundance": 20.5287,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0059,
+        "p95": 2.1337,
+        "deviation": 18.29
+      },
+      {
+        "species": "Evtepia gabavorous",
+        "chinese_name": "",
+        "abundance": 4.9352,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0057,
+        "p95": 0.5876,
+        "deviation": 15.94
+      },
+      {
+        "species": "Evtepia gabavorous",
+        "chinese_name": "",
+        "abundance": 4.9352,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0057,
+        "p95": 0.5876,
+        "deviation": 15.94
+      },
+      {
+        "species": "Ruthenibacterium lactatiformans",
+        "chinese_name": "",
+        "abundance": 7.4412,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0034,
+        "p95": 0.9215,
+        "deviation": 15.2
+      },
+      {
+        "species": "Ruthenibacterium lactatiformans",
+        "chinese_name": "",
+        "abundance": 7.4412,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0034,
+        "p95": 0.9215,
+        "deviation": 15.2
+      },
+      {
+        "species": "Thomasclavelia ramosa",
+        "chinese_name": "",
+        "abundance": 12.0163,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 1.704,
+        "deviation": 13.12
+      },
+      {
+        "species": "Thomasclavelia ramosa",
+        "chinese_name": "",
+        "abundance": 12.0163,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 1.704,
+        "deviation": 13.12
+      },
+      {
+        "species": "Mediterraneibacter glycyrrhizinilyticus",
+        "chinese_name": "",
+        "abundance": 2.3193,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0008,
+        "p95": 0.3368,
+        "deviation": 12.8
+      },
+      {
+        "species": "Mediterraneibacter glycyrrhizinilyticus",
+        "chinese_name": "",
+        "abundance": 2.3193,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0008,
+        "p95": 0.3368,
+        "deviation": 12.8
+      },
+      {
+        "species": "Anaerostipes caccae",
+        "chinese_name": "",
+        "abundance": 3.0461,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 0.8403,
+        "deviation": 6.26
+      },
+      {
+        "species": "Anaerostipes caccae",
+        "chinese_name": "",
+        "abundance": 3.0461,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 0.8403,
+        "deviation": 6.26
+      },
+      {
+        "species": "Merdimonas faecis",
+        "chinese_name": "",
+        "abundance": 1.9987,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 0.5655,
+        "deviation": 6.08
+      },
+      {
+        "species": "Merdimonas faecis",
+        "chinese_name": "",
+        "abundance": 1.9987,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 0.5655,
+        "deviation": 6.08
+      },
+      {
+        "species": "Mediterraneibacter gnavus",
+        "chinese_name": "",
+        "abundance": 8.4884,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0026,
+        "p95": 3.8769,
+        "deviation": 3.38
+      },
+      {
+        "species": "Mediterraneibacter gnavus",
+        "chinese_name": "",
+        "abundance": 8.4884,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0026,
+        "p95": 3.8769,
+        "deviation": 3.38
+      },
+      {
+        "species": "Thomasclavelia spiroformis",
+        "chinese_name": "",
+        "abundance": 0.362,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0013,
+        "p95": 0.1974,
+        "deviation": 2.68
+      },
+      {
+        "species": "Thomasclavelia spiroformis",
+        "chinese_name": "",
+        "abundance": 0.362,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0013,
+        "p95": 0.1974,
+        "deviation": 2.68
+      },
+      {
+        "species": "Faecalimonas umbilicata",
+        "chinese_name": "",
+        "abundance": 2.3137,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0037,
+        "p95": 2.0674,
+        "deviation": 1.24
+      },
+      {
+        "species": "Faecalimonas umbilicata",
+        "chinese_name": "",
+        "abundance": 2.3137,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0037,
+        "p95": 2.0674,
+        "deviation": 1.24
+      },
+      {
+        "species": "Enterococcus gallinarum",
+        "chinese_name": "",
+        "abundance": 1.863,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 1.7295,
+        "deviation": 1.15
+      },
+      {
+        "species": "Enterococcus gallinarum",
+        "chinese_name": "",
+        "abundance": 1.863,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 1.7295,
+        "deviation": 1.15
+      },
+      {
+        "species": "Rothia mucilaginosa",
+        "chinese_name": "",
+        "abundance": 0.1104,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0003,
+        "p95": 0.1096,
+        "deviation": 1.01
+      },
+      {
+        "species": "Actinomyces graevenitzii",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.029,
+        "p95": 5.358,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus oralis",
+        "chinese_name": "",
+        "abundance": 0.0361,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0732,
+        "p95": 7.745,
+        "deviation": -1.01
+      },
+      {
+        "species": "Actinomyces graevenitzii",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.029,
+        "p95": 5.358,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus oralis",
+        "chinese_name": "",
+        "abundance": 0.0361,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0732,
+        "p95": 7.745,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus infantis",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0235,
+        "p95": 3.218,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus infantis",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0235,
+        "p95": 3.218,
+        "deviation": -1.01
+      },
+      {
+        "species": "Dakarella massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0013,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0091,
+        "p95": 2.2236,
+        "deviation": -1.01
+      },
+      {
+        "species": "Dakarella massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0013,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0091,
+        "p95": 2.2236,
+        "deviation": -1.01
+      },
+      {
+        "species": "Agathobacter rectalis",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0248,
+        "p95": 11.2655,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia wexlerae",
+        "chinese_name": "",
+        "abundance": 0.0077,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0109,
+        "p95": 7.4201,
+        "deviation": -1.0
+      },
+      {
+        "species": "Enterocloster bolteae",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0011,
+        "p95": 0.666,
+        "deviation": -1.0
+      },
+      {
+        "species": "Agathobacter rectalis",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0248,
+        "p95": 11.2655,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia wexlerae",
+        "chinese_name": "",
+        "abundance": 0.0077,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0109,
+        "p95": 7.4201,
+        "deviation": -1.0
+      },
+      {
+        "species": "Enterocloster bolteae",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0011,
+        "p95": 0.666,
+        "deviation": -1.0
+      },
+      {
+        "species": "Clostridium cuniculi",
+        "chinese_name": "",
+        "abundance": 0.0083,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0388,
+        "p95": 14.0734,
+        "deviation": -1.0
+      },
+      {
+        "species": "Clostridium cuniculi",
+        "chinese_name": "",
+        "abundance": 0.0083,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0388,
+        "p95": 14.0734,
+        "deviation": -1.0
+      }
+    ]
+  },
+  "compare": {
+    "sample_id": "SRR13844456",
+    "abnormal_species": [
+      {
+        "species": "Blautia marasmi",
+        "chinese_name": "",
+        "abundance": 4.7358,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.281,
+        "deviation": 32.77
+      },
+      {
+        "species": "Blautia marasmi",
+        "chinese_name": "",
+        "abundance": 4.7358,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.281,
+        "deviation": 32.77
+      },
+      {
+        "species": "Lactobacillus acidophilus",
+        "chinese_name": "",
+        "abundance": 7.957,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.7571,
+        "deviation": 20.03
+      },
+      {
+        "species": "Lactobacillus acidophilus",
+        "chinese_name": "",
+        "abundance": 7.957,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0006,
+        "p95": 0.7571,
+        "deviation": 20.03
+      },
+      {
+        "species": "Roseburia inulinivorans",
+        "chinese_name": "",
+        "abundance": 20.5287,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0059,
+        "p95": 2.1337,
+        "deviation": 18.29
+      },
+      {
+        "species": "Roseburia inulinivorans",
+        "chinese_name": "",
+        "abundance": 20.5287,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0059,
+        "p95": 2.1337,
+        "deviation": 18.29
+      },
+      {
+        "species": "Evtepia gabavorous",
+        "chinese_name": "",
+        "abundance": 4.9352,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0057,
+        "p95": 0.5876,
+        "deviation": 15.94
+      },
+      {
+        "species": "Evtepia gabavorous",
+        "chinese_name": "",
+        "abundance": 4.9352,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0057,
+        "p95": 0.5876,
+        "deviation": 15.94
+      },
+      {
+        "species": "Ruthenibacterium lactatiformans",
+        "chinese_name": "",
+        "abundance": 7.4412,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0034,
+        "p95": 0.9215,
+        "deviation": 15.2
+      },
+      {
+        "species": "Ruthenibacterium lactatiformans",
+        "chinese_name": "",
+        "abundance": 7.4412,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0034,
+        "p95": 0.9215,
+        "deviation": 15.2
+      },
+      {
+        "species": "Thomasclavelia ramosa",
+        "chinese_name": "",
+        "abundance": 12.0163,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 1.704,
+        "deviation": 13.12
+      },
+      {
+        "species": "Thomasclavelia ramosa",
+        "chinese_name": "",
+        "abundance": 12.0163,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 1.704,
+        "deviation": 13.12
+      },
+      {
+        "species": "Mediterraneibacter glycyrrhizinilyticus",
+        "chinese_name": "",
+        "abundance": 2.3193,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0008,
+        "p95": 0.3368,
+        "deviation": 12.8
+      },
+      {
+        "species": "Mediterraneibacter glycyrrhizinilyticus",
+        "chinese_name": "",
+        "abundance": 2.3193,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0008,
+        "p95": 0.3368,
+        "deviation": 12.8
+      },
+      {
+        "species": "Anaerostipes caccae",
+        "chinese_name": "",
+        "abundance": 3.0461,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 0.8403,
+        "deviation": 6.26
+      },
+      {
+        "species": "Anaerostipes caccae",
+        "chinese_name": "",
+        "abundance": 3.0461,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 0.8403,
+        "deviation": 6.26
+      },
+      {
+        "species": "Merdimonas faecis",
+        "chinese_name": "",
+        "abundance": 1.9987,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 0.5655,
+        "deviation": 6.08
+      },
+      {
+        "species": "Merdimonas faecis",
+        "chinese_name": "",
+        "abundance": 1.9987,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0016,
+        "p95": 0.5655,
+        "deviation": 6.08
+      },
+      {
+        "species": "Mediterraneibacter gnavus",
+        "chinese_name": "",
+        "abundance": 8.4884,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0026,
+        "p95": 3.8769,
+        "deviation": 3.38
+      },
+      {
+        "species": "Mediterraneibacter gnavus",
+        "chinese_name": "",
+        "abundance": 8.4884,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0026,
+        "p95": 3.8769,
+        "deviation": 3.38
+      },
+      {
+        "species": "Thomasclavelia spiroformis",
+        "chinese_name": "",
+        "abundance": 0.362,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0013,
+        "p95": 0.1974,
+        "deviation": 2.68
+      },
+      {
+        "species": "Thomasclavelia spiroformis",
+        "chinese_name": "",
+        "abundance": 0.362,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0013,
+        "p95": 0.1974,
+        "deviation": 2.68
+      },
+      {
+        "species": "Faecalimonas umbilicata",
+        "chinese_name": "",
+        "abundance": 2.3137,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0037,
+        "p95": 2.0674,
+        "deviation": 1.24
+      },
+      {
+        "species": "Faecalimonas umbilicata",
+        "chinese_name": "",
+        "abundance": 2.3137,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0037,
+        "p95": 2.0674,
+        "deviation": 1.24
+      },
+      {
+        "species": "Enterococcus gallinarum",
+        "chinese_name": "",
+        "abundance": 1.863,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 1.7295,
+        "deviation": 1.15
+      },
+      {
+        "species": "Enterococcus gallinarum",
+        "chinese_name": "",
+        "abundance": 1.863,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.001,
+        "p95": 1.7295,
+        "deviation": 1.15
+      },
+      {
+        "species": "Rothia mucilaginosa",
+        "chinese_name": "",
+        "abundance": 0.1104,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0003,
+        "p95": 0.1096,
+        "deviation": 1.01
+      },
+      {
+        "species": "Actinomyces graevenitzii",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.029,
+        "p95": 5.358,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus oralis",
+        "chinese_name": "",
+        "abundance": 0.0361,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0732,
+        "p95": 7.745,
+        "deviation": -1.01
+      },
+      {
+        "species": "Actinomyces graevenitzii",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.029,
+        "p95": 5.358,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus oralis",
+        "chinese_name": "",
+        "abundance": 0.0361,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0732,
+        "p95": 7.745,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus infantis",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0235,
+        "p95": 3.218,
+        "deviation": -1.01
+      },
+      {
+        "species": "Streptococcus infantis",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0235,
+        "p95": 3.218,
+        "deviation": -1.01
+      },
+      {
+        "species": "Dakarella massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0013,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0091,
+        "p95": 2.2236,
+        "deviation": -1.01
+      },
+      {
+        "species": "Dakarella massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0013,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0091,
+        "p95": 2.2236,
+        "deviation": -1.01
+      },
+      {
+        "species": "Agathobacter rectalis",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0248,
+        "p95": 11.2655,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia wexlerae",
+        "chinese_name": "",
+        "abundance": 0.0077,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0109,
+        "p95": 7.4201,
+        "deviation": -1.0
+      },
+      {
+        "species": "Enterocloster bolteae",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0011,
+        "p95": 0.666,
+        "deviation": -1.0
+      },
+      {
+        "species": "Agathobacter rectalis",
+        "chinese_name": "",
+        "abundance": 0.0115,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0248,
+        "p95": 11.2655,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia wexlerae",
+        "chinese_name": "",
+        "abundance": 0.0077,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0109,
+        "p95": 7.4201,
+        "deviation": -1.0
+      },
+      {
+        "species": "Enterocloster bolteae",
+        "chinese_name": "",
+        "abundance": 0.0007,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0011,
+        "p95": 0.666,
+        "deviation": -1.0
+      },
+      {
+        "species": "Clostridium cuniculi",
+        "chinese_name": "",
+        "abundance": 0.0083,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0388,
+        "p95": 14.0734,
+        "deviation": -1.0
+      },
+      {
+        "species": "Clostridium cuniculi",
+        "chinese_name": "",
+        "abundance": 0.0083,
+        "status": "low",
+        "status_cn": "偏低",
+        "p5": 0.0388,
+        "p95": 14.0734,
+        "deviation": -1.0
+      }
+    ],
+    "total_species": 50,
+    "n_abnormal": 43
+  },
+  "enterotype": {
+    "sample_id": "SRR13844456",
+    "enterotype": "Ruminococcus型（肠型3）",
+    "confidence": 9.8,
+    "details": {
+      "type": "Ruminococcus型（肠型3）",
+      "confidence": 9.8,
+      "Bacteroides_ratio": 0.0,
+      "Prevotella_ratio": 0.0,
+      "Faecalibacterium_ratio": 1.97,
+      "summary": "混合型肠型，通常与高多样性相关",
+      "top_genus": [
+        [
+          "Roseburia",
+          20.5287
+        ],
+        [
+          "Thomasclavelia",
+          12.90268
+        ],
+        [
+          "Mediterraneibacter",
+          10.80765
+        ],
+        [
+          "Lactobacillus",
+          7.95705
+        ],
+        [
+          "Ruthenibacterium",
+          7.44119
+        ]
+      ]
+    }
+  },
+  "pathways": {
+    "sample_id": "SRR13844456",
+    "pathways": [
+      {
+        "name": "sucrose biosynthesis II",
+        "abundance": 8452.0947
+      },
+      {
+        "name": "glycolysis IV",
+        "abundance": 7560.7616
+      },
+      {
+        "name": "glycogen biosynthesis I (from ADP-D-Glucose)",
+        "abundance": 7131.1004
+      },
+      {
+        "name": "pyruvate fermentation to isobutanol (engineered)",
+        "abundance": 6556.2291
+      },
+      {
+        "name": "L-valine biosynthesis",
+        "abundance": 6355.56
+      },
+      {
+        "name": "purine ribonucleosides degradation",
+        "abundance": 6278.6907
+      },
+      {
+        "name": "superpathway of aromatic amino acid biosynthesis",
+        "abundance": 6163.91
+      },
+      {
+        "name": "UDP-N-acetylmuramoyl-pentapeptide biosynthesis II (lysine-containing)",
+        "abundance": 6129.5389
+      },
+      {
+        "name": "UDP-N-acetylmuramoyl-pentapeptide biosynthesis I (meso-diaminopimelate containing)",
+        "abundance": 6087.2875
+      },
+      {
+        "name": "UMP biosynthesis III",
+        "abundance": 5984.8207
+      },
+      {
+        "name": "UMP biosynthesis I",
+        "abundance": 5984.8207
+      },
+      {
+        "name": "UMP biosynthesis II",
+        "abundance": 5984.8207
+      },
+      {
+        "name": "UDP-N-acetylmuramoyl-pentapeptide biosynthesis III (meso-diaminopimelate containing)",
+        "abundance": 5980.9245
+      },
+      {
+        "name": "pentose phosphate pathway (non-oxidative branch) II",
+        "abundance": 5978.6958
+      },
+      {
+        "name": "Calvin-Benson-Bassham cycle",
+        "abundance": 5929.2051
+      },
+      {
+        "name": "chorismate biosynthesis from 3-dehydroquinate",
+        "abundance": 5883.9033
+      },
+      {
+        "name": "peptidoglycan biosynthesis I (meso-diaminopimelate containing)",
+        "abundance": 5875.4054
+      },
+      {
+        "name": "chorismate biosynthesis I",
+        "abundance": 5862.8181
+      },
+      {
+        "name": "L-isoleucine biosynthesis I (from threonine)",
+        "abundance": 5823.5894
+      },
+      {
+        "name": "peptidoglycan biosynthesis III (mycobacteria)",
+        "abundance": 5770.5927
+      }
+    ],
+    "n_total_pathways": 390
+  },
+  "metabolites": {
+    "sample_id": "SRR13844456",
+    "metabolites": [
+      {
+        "name": "ATP",
+        "abundance": 146500.2652
+      },
+      {
+        "name": "pyruvate",
+        "abundance": 114968.0809
+      },
+      {
+        "name": "glutamine",
+        "abundance": 91744.4128
+      },
+      {
+        "name": "aspartate",
+        "abundance": 88390.2755
+      },
+      {
+        "name": "PRPP",
+        "abundance": 80725.8004
+      },
+      {
+        "name": "glutamate",
+        "abundance": 78880.833
+      },
+      {
+        "name": "NADPH",
+        "abundance": 56183.7475
+      },
+      {
+        "name": "fructose-6-phosphate",
+        "abundance": 56082.1124
+      },
+      {
+        "name": "CO2",
+        "abundance": 55003.953
+      },
+      {
+        "name": "NADH",
+        "abundance": 53990.4951
+      },
+      {
+        "name": "NAD+",
+        "abundance": 52783.0245
+      },
+      {
+        "name": "glucose",
+        "abundance": 46335.4817
+      },
+      {
+        "name": "formate",
+        "abundance": 44920.0116
+      },
+      {
+        "name": "UDP",
+        "abundance": 42959.7821
+      },
+      {
+        "name": "ADP",
+        "abundance": 42277.2731
+      },
+      {
+        "name": "glycine",
+        "abundance": 40072.2287
+      },
+      {
+        "name": "pyrophosphate",
+        "abundance": 37466.0212
+      },
+      {
+        "name": "threonine",
+        "abundance": 32264.3104
+      },
+      {
+        "name": "cysteine",
+        "abundance": 28577.5799
+      },
+      {
+        "name": "2-oxoglutarate",
+        "abundance": 27464.6636
+      }
+    ],
+    "n_total_metabolites": 282
+  },
+  "drugs": {
+    "sample_id": "SRR13844456",
+    "drugs": [
+      {
+        "drug": "Amoxicillin",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Ceftriaxone",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Penicillin",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Meropenem",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "二甲双胍 (Metformin)",
+        "score": 47703.9,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Acetaminophen",
+        "score": 27043.6,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Sulfamethoxazole",
+        "score": 25603.5,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Irinotecan",
+        "score": 24425.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Sn-38",
+        "score": 24425.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Morphine",
+        "score": 24425.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Rifampicin",
+        "score": 22928.1,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Rifaximin",
+        "score": 22928.1,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Trimethoprim",
+        "score": 21156.5,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Methotrexate",
+        "score": 21156.5,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Moxifloxacin",
+        "score": 21026.7,
+        "is_high_risk": false
+      },
+      {
+        "drug": "SN-38",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "amoxicillin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "ceftriaxone",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "ciprofloxacin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "acetaminophen",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "levofloxacin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "meropenem",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "methotrexate",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "morphine",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "penicillin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "rifampicin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "rifaximin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "irinotecan",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "sulfamethoxazole",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "trimethoprim",
+        "score": 0.0,
+        "is_high_risk": false
+      }
+    ],
+    "high_risk_drugs": [
+      {
+        "drug": "Amoxicillin",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Ceftriaxone",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Penicillin",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Meropenem",
+        "score": 76986.0,
+        "is_high_risk": true
+      }
+    ],
+    "n_total": 44,
+    "n_high_risk": 4
+  },
+  "diseases": {
+    "sample_id": "SRR13844456",
+    "diseases": [
+      {
+        "disease": "非酒精性脂肪肝(NAFLD)",
+        "risk_score": 100,
+        "matched_species": 1,
+        "agree_count": 1,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Lactobacillus acidophilus",
+            "direction": "高",
+            "status": "high",
+            "role": "有害菌"
+          }
+        ],
+        "risk_level": "high"
+      },
+      {
+        "disease": "Autism Spectrum Disorder",
+        "risk_score": 65,
+        "matched_species": 15,
+        "agree_count": 10,
+        "conflict_count": 1,
+        "key_species": [
+          {
+            "species": "Blautia wexlerae",
+            "direction": "变化",
+            "status": "low",
+            "role": "有益菌"
+          },
+          {
+            "species": "Mediterraneibacter gnavus",
+            "direction": "变化",
+            "status": "high",
+            "role": "有益菌"
+          },
+          {
+            "species": "Ruthenibacterium lactatiformans",
+            "direction": "高",
+            "status": "high",
+            "role": "有害菌"
+          },
+          {
+            "species": "Enterocloster bolteae",
+            "direction": "高",
+            "status": "low",
+            "role": "有害菌"
+          },
+          {
+            "species": "Thomasclavelia ramosa",
+            "direction": "高",
+            "status": "high",
+            "role": "有害菌"
+          }
+        ],
+        "risk_level": "medium"
+      }
+    ],
+    "n_total": 2,
+    "n_high_risk": 1,
+    "n_mid_risk": 1
+  },
+  "knowledge": {
+    "matched_docs": [
+      {
+        "title": "非酒精性脂肪肝(NAFLD) gut microbiome",
+        "snippet": "知识库搜索结果 (3 条, 查询: '非酒精性脂肪肝(NAFLD) gut microbiome'):\n\n---\n[1] 33542131 2021 Fecal microbiota transplant overcomes resistance to anti PD 1 therapy in melanom\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/FMT/33542131_2021_Fecal_microbiota_transplant_overcomes_resistance_to_anti-PD-1_therapy_in_melanom.md\n匹配数: 2\n# Fecal microbiota transplant overcomes resistance to anti-PD-1 therapy in melanoma patients.\n\n## 文献信息\n\n- **PMID**: [33542131](https://pubmed.ncbi.nlm.nih.go"
+      }
+    ],
+    "pubmed_results": [
+      {
+        "query": "非酒精性脂肪肝(NAFLD) gut microbiome",
+        "abstract": "PubMed 搜索结果 (3 篇, 查询: '非酒精性脂肪肝(NAFLD) gut microbiome'):\n\n---\n[1] PMID: 37673036\n标题: Resistant starch decreases intrahepatic triglycerides in patients with NAFLD via gut microbiome alterations.\n作者: Ni Yueqiong, Qian Lingling, Siliceo Sara Leal, Long Xiaoxue, Nychas Emmanouil\n期刊: Cell metabolism (2023)\n摘要: Non-alcoholic fatty liver disease (NAFLD) is a hepatic manifestation of metabolic dysfunction for which effective interventions are lacking. To investigate the effects of resistant starch (RS) as a microbiota-directed dietary supplement for NAFLD treatment, we coupled a 4-month randomized placebo-controlled clinical trial in individuals with NAFLD (ChiCTR-IOR-15007519) with metagenomics and metabo...\n---\n[2] PMID: 33346905\n标题: The role of the gut microbiome and its metabolites in metabolic"
+      }
+    ]
+  },
+  "fmt_matching": {
+    "status": "ok",
+    "message": "三元组对比模型完成 51 个候选供体排序，返回 Top 10",
+    "top_k_matches": [
+      {
+        "rank": 1,
+        "donor_id": "SRR13844454",
+        "score": 0.6612,
+        "score_type": "relative_embedding_similarity",
+        "distance": 21.876634,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 2,
+        "donor_id": "SRR13844382",
+        "score": 0.6459,
+        "score_type": "relative_embedding_similarity",
+        "distance": 23.113821,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 3,
+        "donor_id": "SRR15123487",
+        "score": 0.6427,
+        "score_type": "relative_embedding_similarity",
+        "distance": 23.377374,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 4,
+        "donor_id": "SRR13844426",
+        "score": 0.6205,
+        "score_type": "relative_embedding_similarity",
+        "distance": 25.232831,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 5,
+        "donor_id": "SRR13844457",
+        "score": 0.6091,
+        "score_type": "relative_embedding_similarity",
+        "distance": 26.219599,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 6,
+        "donor_id": "SRR13844401",
+        "score": 0.5753,
+        "score_type": "relative_embedding_similarity",
+        "distance": 29.233805,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 7,
+        "donor_id": "SRR15123564",
+        "score": 0.5588,
+        "score_type": "relative_embedding_similarity",
+        "distance": 30.77007,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 8,
+        "donor_id": "SRR15123542",
+        "score": 0.5413,
+        "score_type": "relative_embedding_similarity",
+        "distance": 32.454756,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 9,
+        "donor_id": "SRR13844434",
+        "score": 0.5406,
+        "score_type": "relative_embedding_similarity",
+        "distance": 32.522081,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      },
+      {
+        "rank": 10,
+        "donor_id": "SRR13844396",
+        "score": 0.5236,
+        "score_type": "relative_embedding_similarity",
+        "distance": 34.214263,
+        "label": "historical_donor",
+        "historical_recipient_count": 1,
+        "known_outcome_count": 1,
+        "responder_count": 1,
+        "nonresponder_count": 0,
+        "historical_response_rate": 1.0
+      }
+    ],
+    "tsne_plot_path": "/storage/main/users/zhangrongpeng/data/fmt/apps/WGS-FMT-Agent-v2/data/results/figures/SRR13844456_fmt_tsne.png",
+    "plot_method": "PCA",
+    "sample_embedding": [
+      1.7287252108398814,
+      1.5029733733206234,
+      1.4341915528716354,
+      -1.2421332067177846,
+      -0.2429920458968042,
+      -1.5801756632653392,
+      1.0492979239496907,
+      0.2521802969478591,
+      -0.6354915663449302,
+      0.451036170137574,
+      0.13338854921662846,
+      -1.0107970661875842,
+      1.0128481028267369,
+      2.0825632431293273,
+      -0.2586940658578051,
+      -1.1407434407406893
+    ],
+    "feature_audit": {
+      "sample_id": "SRR13844456",
+      "input_feature_count": 1973,
+      "required_feature_count": 128,
+      "present_required_count": 128,
+      "feature_name_coverage": 1.0,
+      "abundance_coverage": 0.6717425656514869,
+      "extra_feature_count": 1845,
+      "missing_feature_count": 0,
+      "input_total_percent": 100.00002
+    },
+    "candidate_count": 51,
+    "query_source": "baseline_species",
+    "model_name": "fmt-triplet-contrastive",
+    "model_version": "1.0.0",
+    "method": "CLR + train-fold scaling + triplet projection + squared embedding distance",
+    "warnings": []
+  }
+}

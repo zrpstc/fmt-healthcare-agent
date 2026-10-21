@@ -1,0 +1,38 @@
+{
+  "matched_docs": [
+    {
+      "title": "Coprococcus eutactus gut microbiome health",
+      "snippet": "知识库搜索结果 (2 条, 查询: 'Coprococcus eutactus gut microbiome health'):\n\n---\n[1] 35105664 2022 Gut microbiome and health mechanistic insights.\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/T2DM/35105664_2022_Gut_microbiome_and_health_mechanistic_insights..md\n匹配数: 3\n# Gut microbiome and health: mechanistic insights.\n\n## 文献信息\n\n- **PMID**: [35105664](https://pubmed.ncbi.nlm.n"
+    },
+    {
+      "title": "Agathobaculum butyriciproducens gut microbiome health",
+      "snippet": "知识库搜索结果 (2 条, 查询: 'Agathobaculum butyriciproducens gut microbiome health'):\n\n---\n[1] 35105664 2022 Gut microbiome and health mechanistic insights.\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/T2DM/35105664_2022_Gut_microbiome_and_health_mechanistic_insights..md\n匹配数: 3\n# Gut microbiome and health: mechanistic insights.\n\n## 文献信息\n\n- **PMID**: [35105664](https://pubmed"
+    },
+    {
+      "title": "Roseburia faecis gut microbiome health",
+      "snippet": "知识库搜索结果 (2 条, 查询: 'Roseburia faecis gut microbiome health'):\n\n---\n[1] 39284033 2024 The interplay between gut microbiota, short chain fatty acids, and implications \n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/SCFA/39284033_2024_The_interplay_between_gut_microbiota,_short-chain_fatty_acids,_and_implications_.md\n匹配数: 4\nse of gram-positive targeted antibiotics. We re"
+    },
+    {
+      "title": "Amoxicillin gut microbiota interaction",
+      "snippet": "知识库搜索结果 (2 条, 查询: 'Amoxicillin gut microbiota interaction'):\n\n---\n[1] 37263983 2023 Role of the Gut Microbiota and Its Metabolites in Tumorigenesis or Development o\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/CRC/37263983_2023_Role_of_the_Gut_Microbiota_and_Its_Metabolites_in_Tumorigenesis_or_Development_o.md\n匹配数: 3\n# Role of the Gut Microbiota and Its Metabolites"
+    }
+  ],
+  "pubmed_results": [
+    {
+      "query": "Coprococcus eutactus gut microbiome health",
+      "abstract": "PubMed 搜索结果 (2 篇, 查询: 'Coprococcus eutactus gut microbiome health'):\n\n---\n[1] PMID: 38649105\n标题: Coprococcus eutactus screened from healthy adolescent attenuates chronic restraint stress-induced depression-like changes in adolescent mice: Potential roles in the microbiome and neurotransmitter modulation.\n作者: Xu Liuting, Wang Sizhe, Wu Linlin, Cao Hui, Fan Yichun\n期刊: Journal of affective disorders (2024)\n摘要: The onset of depression commonly occurs in adolescence; therefore, depressive prevention and intervention are pivotal during this period. It is becoming evident that neurotransmitter imbala"
+    },
+    {
+      "query": "Agathobaculum butyriciproducens gut microbiome health",
+      "abstract": "PubMed 搜索结果 (2 篇, 查询: 'Agathobaculum butyriciproducens gut microbiome health'):\n\n---\n[1] PMID: 38219919\n标题: Agathobaculum butyriciproducens improves ageing-associated cognitive impairment in mice.\n作者: Go Jun, Maeng So-Young, Chang Dong-Ho, Park Hye-Yeon, Min Kyeong-Seon\n期刊: Life sciences (2024)\n摘要: The gut microbiota is increasingly recognised as a pivotal regulator of immune system homeostasis and brain health. Recent research has implicated the gut microbiota in age-related cognitive impairment and dementia. Agathobaculum butyriciproducens SR79 ...\n---\n[2] PMID: 41408356\n标题: Gut microbiome-m"
+    },
+    {
+      "query": "Roseburia faecis gut microbiome health",
+      "abstract": "PubMed 搜索结果 (2 篇, 查询: 'Roseburia faecis gut microbiome health'):\n\n---\n[1] PMID: 39028343\n标题: Gut microbiota and metabolites of cirrhotic portal hypertension: a novel target on the therapeutic regulation.\n作者: Hao Yarong, Hao Zhiyuan, Zeng Xin, Lin Yong\n期刊: Journal of gastroenterology (2024)\n摘要: The regulatory role of gut microbiota and gut-derived metabolites through the gut-liver axis in the development of cirrhotic portal hypertension (PH) has received increasing attention....\n---\n[2] PMID: 40711452\n标题: Emerging probiotics: future therapeutics for human gut health.\n作者: Duncan Sylvia H, Sabate"
+    },
+    {
+      "query": "Amoxicillin gut microbiota interaction",
+      "abstract": "PubMed 搜索结果 (2 篇, 查询: 'Amoxicillin gut microbiota interaction'):\n\n---\n[1] PMID: 31700098\n标题: Gut Microbiota-Mediated Drug-Drug Interaction between Amoxicillin and Aspirin.\n作者: Zhang Juanhong, Sun Yuemei, Wang Rong, Zhang Junmin\n期刊: Scientific reports (2019)\n摘要: The effects of antibiotics on the intestinal flora can create potential drug-drug interactions. The combination of amoxicillin and aspirin is high and there is a high probability of interaction. We used 16S rRNA, incubation experiments and liquid chromatography-tandem mass spectrometry to analyze rat biological samples to characterize t"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "matched_docs": [
+    {
+      "title": "Amoxicillin gut microbiota interaction",
+      "snippet": "知识库搜索结果 (2 条, 查询: 'Amoxicillin gut microbiota interaction'):\n\n---\n[1] 37263983 2023 Role of the Gut Microbiota and Its Metabolites in Tumorigenesis or Development o\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/CRC/37263983_2023_Role_of_the_Gut_Microbiota_and_Its_Metabolites_in_Tumorigenesis_or_Development_o.md\n匹配数: 3\n# Role of the Gut Microbiota and Its Metabolites"
+    },
+    {
+      "title": "Ceftriaxone gut microbiota interaction",
+      "snippet": "知识库搜索结果 (2 条, 查询: 'Ceftriaxone gut microbiota interaction'):\n\n---\n[1] 37263983 2023 Role of the Gut Microbiota and Its Metabolites in Tumorigenesis or Development o\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/CRC/37263983_2023_Role_of_the_Gut_Microbiota_and_Its_Metabolites_in_Tumorigenesis_or_Development_o.md\n匹配数: 3\n# Role of the Gut Microbiota and Its Metabolites"
+    },
+    {
+      "title": "Penicillin gut microbiota interaction",
+      "snippet": "知识库搜索结果 (2 条, 查询: 'Penicillin gut microbiota interaction'):\n\n---\n[1] 37263983 2023 Role of the Gut Microbiota and Its Metabolites in Tumorigenesis or Development o\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/CRC/37263983_2023_Role_of_the_Gut_Microbiota_and_Its_Metabolites_in_Tumorigenesis_or_Development_o.md\n匹配数: 3\n# Role of the Gut Microbiota and Its Metabolites "
+    },
+    {
+      "title": "ATP gut microbiota metabolism",
+      "snippet": "知识库搜索结果 (2 条, 查询: 'ATP gut microbiota metabolism'):\n\n---\n[1] 35105664 2022 Gut microbiome and health mechanistic insights.\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/T2DM/35105664_2022_Gut_microbiome_and_health_mechanistic_insights..md\n匹配数: 3\n# Gut microbiome and health: mechanistic insights.\n\n## 文献信息\n\n- **PMID**: [35105664](https://pubmed.ncbi.nlm.nih.gov/351056"
+    }
+  ],
+  "pubmed_results": [
+    {
+      "query": "Amoxicillin gut microbiota interaction",
+      "abstract": "PubMed 搜索结果 (2 篇, 查询: 'Amoxicillin gut microbiota interaction'):\n\n---\n[1] PMID: 31700098\n标题: Gut Microbiota-Mediated Drug-Drug Interaction between Amoxicillin and Aspirin.\n作者: Zhang Juanhong, Sun Yuemei, Wang Rong, Zhang Junmin\n期刊: Scientific reports (2019)\n摘要: The effects of antibiotics on the intestinal flora can create potential drug-drug interactions. The combination of amoxicillin and aspirin is high and there is a high probability of interaction. We used 16S rRNA, incubation experiments and liquid chromatography-tandem mass spectrometry to analyze rat biological samples to characterize t"
+    },
+    {
+      "query": "Ceftriaxone gut microbiota interaction",
+      "abstract": "PubMed 搜索结果 (2 篇, 查询: 'Ceftriaxone gut microbiota interaction'):\n\n---\n[1] PMID: 40504338\n标题: Antibiotic-related dysbiosis of gut microbiota in healthy volunteers: a comparative study of ceftazidime-avibactam, piperacillin-tazobactam, and ceftriaxone.\n作者: Huang Guohang, Cai Lili, Guo Jinlin, Zhu Ruyi, Zhu Lina\n期刊: European journal of clinical microbiology & infectious diseases : official publication of the European Society of Clinical Microbiology (2025)\n摘要: The administration of antibiotics can induce gut microbiota dysbiosis leading to Clostridium difficile infection and has been linked to co"
+    },
+    {
+      "query": "Penicillin gut microbiota interaction",
+      "abstract": "PubMed 搜索结果 (2 篇, 查询: 'Penicillin gut microbiota interaction'):\n\n---\n[1] PMID: 31700098\n标题: Gut Microbiota-Mediated Drug-Drug Interaction between Amoxicillin and Aspirin.\n作者: Zhang Juanhong, Sun Yuemei, Wang Rong, Zhang Junmin\n期刊: Scientific reports (2019)\n摘要: The effects of antibiotics on the intestinal flora can create potential drug-drug interactions. The combination of amoxicillin and aspirin is high and there is a high probability of interaction. We used 16S rRNA, incubation experiments and liquid chromatography-tandem mass spectrometry to analyze rat biological samples to characterize th"
+    },
+    {
+      "query": "ATP gut microbiota metabolism",
+      "abstract": "PubMed 搜索结果 (2 篇, 查询: 'ATP gut microbiota metabolism'):\n\n---\n[1] PMID: 39284033\n标题: The interplay between gut microbiota, short-chain fatty acids, and implications for host health and disease.\n作者: Hays Kallie E, Pfaffinger Jacob M, Ryznar Rebecca\n期刊: Gut microbes (2024)\n摘要: Short-chain fatty acids (SCFAs) - acetate, propionate, and butyrate - are important bacterial fermentation metabolites regulating many important aspects of human physiology. Decreases in the concentrations of any or multiple SCFAs are associated with various detrimental effects to the host. Previous research has broadly foc"
+    }
+  ]
+}

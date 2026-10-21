@@ -1,0 +1,4686 @@
+{
+  "sample_id": "SRR13068821",
+  "species": {
+    "sample_id": "SRR13068821",
+    "n_total": 296,
+    "n_normal": 251,
+    "n_high": 37,
+    "n_low": 0,
+    "n_unknown": 8,
+    "species_list": [
+      {
+        "species": "Bifidobacterium pseudocatenulatum",
+        "chinese_name": "",
+        "abundance": 6.8261,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.8317,
+        "deviation": 6.45
+      },
+      {
+        "species": "Bifidobacterium pseudocatenulatum",
+        "chinese_name": "",
+        "abundance": 6.8261,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.8317,
+        "deviation": 6.45
+      },
+      {
+        "species": "Ruminococcaceae bacterium AM53 2BH",
+        "chinese_name": "",
+        "abundance": 1.7568,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.51,
+        "deviation": 5.89
+      },
+      {
+        "species": "Ruminococcaceae bacterium AM53 2BH",
+        "chinese_name": "",
+        "abundance": 1.7568,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.51,
+        "deviation": 5.89
+      },
+      {
+        "species": "Coprococcus eutactus",
+        "chinese_name": "",
+        "abundance": 7.3699,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 2.34,
+        "deviation": 5.3
+      },
+      {
+        "species": "Coprococcus eutactus",
+        "chinese_name": "",
+        "abundance": 7.3684,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 2.34,
+        "deviation": 5.3
+      },
+      {
+        "species": "Anaerosacchariphilus hominis",
+        "chinese_name": "",
+        "abundance": 0.0074,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0024,
+        "deviation": 5.28
+      },
+      {
+        "species": "Anaerosacchariphilus hominis",
+        "chinese_name": "",
+        "abundance": 0.0074,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0024,
+        "deviation": 5.28
+      },
+      {
+        "species": "Lachnospira hominis ex Liu et al 2021",
+        "chinese_name": "",
+        "abundance": 0.5565,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2122,
+        "deviation": 4.25
+      },
+      {
+        "species": "Lachnospira hominis ex Liu et al 2021",
+        "chinese_name": "",
+        "abundance": 0.5565,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2122,
+        "deviation": 4.25
+      },
+      {
+        "species": "Blautia luti",
+        "chinese_name": "",
+        "abundance": 0.9317,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.398,
+        "deviation": 3.68
+      },
+      {
+        "species": "Ruminococcaceae bacterium AF68 02b2A",
+        "chinese_name": "",
+        "abundance": 0.866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.3839,
+        "deviation": 3.51
+      },
+      {
+        "species": "Ruminococcaceae bacterium AF68 02b2A",
+        "chinese_name": "",
+        "abundance": 0.866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.3839,
+        "deviation": 3.51
+      },
+      {
+        "species": "Roseburia yibonii",
+        "chinese_name": "",
+        "abundance": 0.1466,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0653,
+        "deviation": 3.49
+      },
+      {
+        "species": "Roseburia yibonii",
+        "chinese_name": "",
+        "abundance": 0.1466,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0653,
+        "deviation": 3.49
+      },
+      {
+        "species": "Blautia luti",
+        "chinese_name": "",
+        "abundance": 0.8866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.398,
+        "deviation": 3.46
+      },
+      {
+        "species": "Duodenibacillus massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0148,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.007,
+        "deviation": 3.22
+      },
+      {
+        "species": "Duodenibacillus massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0148,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.007,
+        "deviation": 3.22
+      },
+      {
+        "species": "Hominifimenecus microfluidus",
+        "chinese_name": "",
+        "abundance": 0.1056,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0738,
+        "deviation": 1.86
+      },
+      {
+        "species": "Hominifimenecus microfluidus",
+        "chinese_name": "",
+        "abundance": 0.1056,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0738,
+        "deviation": 1.86
+      },
+      {
+        "species": "Slackia isoflavoniconvertens",
+        "chinese_name": "",
+        "abundance": 0.213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1592,
+        "deviation": 1.67
+      },
+      {
+        "species": "Fusicatenibacter faecihominis",
+        "chinese_name": "",
+        "abundance": 0.3066,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2296,
+        "deviation": 1.67
+      },
+      {
+        "species": "Slackia isoflavoniconvertens",
+        "chinese_name": "",
+        "abundance": 0.213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1592,
+        "deviation": 1.67
+      },
+      {
+        "species": "Fusicatenibacter faecihominis",
+        "chinese_name": "",
+        "abundance": 0.3066,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2296,
+        "deviation": 1.67
+      },
+      {
+        "species": "Agathobaculum butyriciproducens",
+        "chinese_name": "",
+        "abundance": 1.5213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.2317,
+        "deviation": 1.47
+      },
+      {
+        "species": "Roseburia sp AM59 24XD",
+        "chinese_name": "",
+        "abundance": 0.1489,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1244,
+        "deviation": 1.39
+      },
+      {
+        "species": "Roseburia sp AM59 24XD",
+        "chinese_name": "",
+        "abundance": 0.1489,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1244,
+        "deviation": 1.39
+      },
+      {
+        "species": "Roseburia faecis",
+        "chinese_name": "",
+        "abundance": 6.2263,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 5.3772,
+        "deviation": 1.32
+      },
+      {
+        "species": "Roseburia faecis",
+        "chinese_name": "",
+        "abundance": 6.2263,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 5.3772,
+        "deviation": 1.32
+      },
+      {
+        "species": "Brotocaccenecus cirricatena",
+        "chinese_name": "",
+        "abundance": 0.6337,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.551,
+        "deviation": 1.3
+      },
+      {
+        "species": "Brotocaccenecus cirricatena",
+        "chinese_name": "",
+        "abundance": 0.6337,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.551,
+        "deviation": 1.3
+      },
+      {
+        "species": "Lactobacillus paragasseri",
+        "chinese_name": "",
+        "abundance": 0.025,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0221,
+        "deviation": 1.27
+      },
+      {
+        "species": "Lactobacillus paragasseri",
+        "chinese_name": "",
+        "abundance": 0.025,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0221,
+        "deviation": 1.27
+      },
+      {
+        "species": "Mesosutterella multiformis",
+        "chinese_name": "",
+        "abundance": 0.13,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1168,
+        "deviation": 1.23
+      },
+      {
+        "species": "Mesosutterella multiformis",
+        "chinese_name": "",
+        "abundance": 0.13,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1168,
+        "deviation": 1.23
+      },
+      {
+        "species": "Alistipes hominis",
+        "chinese_name": "",
+        "abundance": 0.0482,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0467,
+        "deviation": 1.07
+      },
+      {
+        "species": "Alistipes hominis",
+        "chinese_name": "",
+        "abundance": 0.0482,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0467,
+        "deviation": 1.07
+      },
+      {
+        "species": "Ruminococcus bovis",
+        "chinese_name": "",
+        "abundance": 2.207,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Atopobiaceae bacterium AF16 23AC",
+        "chinese_name": "",
+        "abundance": 0.3145,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Lactobacillus gasseri",
+        "chinese_name": "",
+        "abundance": 0.0185,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Sutterella faecalis",
+        "chinese_name": "",
+        "abundance": 0.0101,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Ruminococcus bovis",
+        "chinese_name": "",
+        "abundance": 2.207,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Atopobiaceae bacterium AF16 23AC",
+        "chinese_name": "",
+        "abundance": 0.3145,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Lactobacillus gasseri",
+        "chinese_name": "",
+        "abundance": 0.0185,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Sutterella faecalis",
+        "chinese_name": "",
+        "abundance": 0.0101,
+        "status": "unknown",
+        "status_cn": "无参考",
+        "p5": 0,
+        "p95": 0,
+        "deviation": 0
+      },
+      {
+        "species": "Bacteroides cellulosilyticus",
+        "chinese_name": "",
+        "abundance": 0.004,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.8883,
+        "deviation": -1.0
+      },
+      {
+        "species": "Dysosmobacter welbionis",
+        "chinese_name": "",
+        "abundance": 0.0015,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7675,
+        "deviation": -1.0
+      },
+      {
+        "species": "Ruthenibacterium lactatiformans",
+        "chinese_name": "",
+        "abundance": 0.0002,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.0848,
+        "deviation": -1.0
+      },
+      {
+        "species": "Bacteroides ovatus",
+        "chinese_name": "",
+        "abundance": 0.0127,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 6.1766,
+        "deviation": -1.0
+      },
+      {
+        "species": "Bacteroides cellulosilyticus",
+        "chinese_name": "",
+        "abundance": 0.004,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.8883,
+        "deviation": -1.0
+      },
+      {
+        "species": "Dysosmobacter welbionis",
+        "chinese_name": "",
+        "abundance": 0.0015,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7675,
+        "deviation": -1.0
+      },
+      {
+        "species": "Ruthenibacterium lactatiformans",
+        "chinese_name": "",
+        "abundance": 0.0002,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.0848,
+        "deviation": -1.0
+      },
+      {
+        "species": "Bacteroides ovatus",
+        "chinese_name": "",
+        "abundance": 0.0127,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 6.1766,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia sp MCC283",
+        "chinese_name": "",
+        "abundance": 0.0022,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.1098,
+        "deviation": -1.0
+      },
+      {
+        "species": "Escherichia coli",
+        "chinese_name": "",
+        "abundance": 0.0055,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 18.6718,
+        "deviation": -1.0
+      },
+      {
+        "species": "Blautia sp MCC283",
+        "chinese_name": "",
+        "abundance": 0.0022,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.1098,
+        "deviation": -1.0
+      },
+      {
+        "species": "Escherichia coli",
+        "chinese_name": "",
+        "abundance": 0.0055,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 18.6718,
+        "deviation": -1.0
+      },
+      {
+        "species": "Segatella copri",
+        "chinese_name": "",
+        "abundance": 0.0009,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 8.6035,
+        "deviation": -1.0
+      },
+      {
+        "species": "Segatella copri",
+        "chinese_name": "",
+        "abundance": 0.0009,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 8.6035,
+        "deviation": -1.0
+      },
+      {
+        "species": "Coprococcus eutactus",
+        "chinese_name": "",
+        "abundance": 0.0015,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.34,
+        "deviation": -1.0
+      },
+      {
+        "species": "Enterococcus faecium",
+        "chinese_name": "",
+        "abundance": 0.0027,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 6.758,
+        "deviation": -1.0
+      },
+      {
+        "species": "Enterococcus faecium",
+        "chinese_name": "",
+        "abundance": 0.0027,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 6.758,
+        "deviation": -1.0
+      },
+      {
+        "species": "Simiaoa sunii",
+        "chinese_name": "",
+        "abundance": 0.0096,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.5107,
+        "deviation": -0.99
+      },
+      {
+        "species": "Simiaoa sunii",
+        "chinese_name": "",
+        "abundance": 0.0096,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.5107,
+        "deviation": -0.99
+      },
+      {
+        "species": "Vescimonas coprocola",
+        "chinese_name": "",
+        "abundance": 0.0047,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7519,
+        "deviation": -0.99
+      },
+      {
+        "species": "Anaerobutyricum soehngenii",
+        "chinese_name": "",
+        "abundance": 0.0065,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.6951,
+        "deviation": -0.99
+      },
+      {
+        "species": "Streptococcus salivarius",
+        "chinese_name": "",
+        "abundance": 0.0153,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.5558,
+        "deviation": -0.99
+      },
+      {
+        "species": "Vescimonas coprocola",
+        "chinese_name": "",
+        "abundance": 0.0047,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7519,
+        "deviation": -0.99
+      },
+      {
+        "species": "Anaerobutyricum soehngenii",
+        "chinese_name": "",
+        "abundance": 0.0065,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.6951,
+        "deviation": -0.99
+      },
+      {
+        "species": "Streptococcus salivarius",
+        "chinese_name": "",
+        "abundance": 0.0153,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.5558,
+        "deviation": -0.99
+      },
+      {
+        "species": "Adlercreutzia equolifaciens",
+        "chinese_name": "",
+        "abundance": 0.0048,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5994,
+        "deviation": -0.98
+      },
+      {
+        "species": "Adlercreutzia equolifaciens",
+        "chinese_name": "",
+        "abundance": 0.0048,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5994,
+        "deviation": -0.98
+      },
+      {
+        "species": "Phocaeicola dorei",
+        "chinese_name": "",
+        "abundance": 0.0352,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.5063,
+        "deviation": -0.98
+      },
+      {
+        "species": "Sutterella wadsworthensis",
+        "chinese_name": "",
+        "abundance": 0.0055,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5337,
+        "deviation": -0.98
+      },
+      {
+        "species": "Phocaeicola dorei",
+        "chinese_name": "",
+        "abundance": 0.0352,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.5063,
+        "deviation": -0.98
+      },
+      {
+        "species": "Sutterella wadsworthensis",
+        "chinese_name": "",
+        "abundance": 0.0055,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5337,
+        "deviation": -0.98
+      },
+      {
+        "species": "Alistipes onderdonkii",
+        "chinese_name": "",
+        "abundance": 0.0469,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.5319,
+        "deviation": -0.97
+      },
+      {
+        "species": "Alistipes onderdonkii",
+        "chinese_name": "",
+        "abundance": 0.0469,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.5319,
+        "deviation": -0.97
+      },
+      {
+        "species": "Bifidobacterium longum",
+        "chinese_name": "",
+        "abundance": 3.0149,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.0673,
+        "deviation": 0.97
+      },
+      {
+        "species": "Faecalibacterium wellingii",
+        "chinese_name": "",
+        "abundance": 0.8609,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.8757,
+        "deviation": 0.97
+      },
+      {
+        "species": "Bifidobacterium longum",
+        "chinese_name": "",
+        "abundance": 3.0149,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.0673,
+        "deviation": 0.97
+      },
+      {
+        "species": "Faecalibacterium wellingii",
+        "chinese_name": "",
+        "abundance": 0.8609,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.8757,
+        "deviation": 0.97
+      },
+      {
+        "species": "Bacteroides xylanisolvens",
+        "chinese_name": "",
+        "abundance": 0.0397,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.9843,
+        "deviation": -0.96
+      },
+      {
+        "species": "Bacteroides xylanisolvens",
+        "chinese_name": "",
+        "abundance": 0.0397,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.9843,
+        "deviation": -0.96
+      },
+      {
+        "species": "Lachnospiraceae bacterium",
+        "chinese_name": "",
+        "abundance": 0.0059,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3334,
+        "deviation": -0.96
+      },
+      {
+        "species": "Gemmiger formicilis",
+        "chinese_name": "",
+        "abundance": 0.0804,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.0223,
+        "deviation": -0.95
+      },
+      {
+        "species": "Blautia obeum",
+        "chinese_name": "",
+        "abundance": 0.0532,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.0737,
+        "deviation": -0.95
+      },
+      {
+        "species": "Bacteroides caccae",
+        "chinese_name": "",
+        "abundance": 0.074,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.0795,
+        "deviation": -0.95
+      },
+      {
+        "species": "Bacteroides caccae",
+        "chinese_name": "",
+        "abundance": 0.074,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.0795,
+        "deviation": -0.95
+      },
+      {
+        "species": "Acutalibacter sp LFL 21",
+        "chinese_name": "",
+        "abundance": 0.1212,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1245,
+        "deviation": 0.95
+      },
+      {
+        "species": "Acutalibacter sp LFL 21",
+        "chinese_name": "",
+        "abundance": 0.1212,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1245,
+        "deviation": 0.95
+      },
+      {
+        "species": "Hominilimicola fabiformis",
+        "chinese_name": "",
+        "abundance": 0.9193,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.9488,
+        "deviation": 0.94
+      },
+      {
+        "species": "Hominilimicola fabiformis",
+        "chinese_name": "",
+        "abundance": 0.9193,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.9488,
+        "deviation": 0.94
+      },
+      {
+        "species": "Alistipes putredinis",
+        "chinese_name": "",
+        "abundance": 0.1474,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 5.0234,
+        "deviation": -0.94
+      },
+      {
+        "species": "Oscillospiraceae bacterium Marseille Q3528",
+        "chinese_name": "",
+        "abundance": 0.0398,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.041,
+        "deviation": 0.94
+      },
+      {
+        "species": "Alistipes ihumii",
+        "chinese_name": "",
+        "abundance": 0.0107,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3595,
+        "deviation": -0.94
+      },
+      {
+        "species": "Alistipes putredinis",
+        "chinese_name": "",
+        "abundance": 0.1474,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 5.0234,
+        "deviation": -0.94
+      },
+      {
+        "species": "Dorea longicatena",
+        "chinese_name": "",
+        "abundance": 0.1017,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.1311,
+        "deviation": -0.94
+      },
+      {
+        "species": "Oscillospiraceae bacterium Marseille Q3528",
+        "chinese_name": "",
+        "abundance": 0.0398,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.041,
+        "deviation": 0.94
+      },
+      {
+        "species": "Alistipes ihumii",
+        "chinese_name": "",
+        "abundance": 0.0107,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3595,
+        "deviation": -0.94
+      },
+      {
+        "species": "Ligilactobacillus salivarius",
+        "chinese_name": "",
+        "abundance": 0.0112,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3836,
+        "deviation": -0.94
+      },
+      {
+        "species": "Ligilactobacillus salivarius",
+        "chinese_name": "",
+        "abundance": 0.0112,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3836,
+        "deviation": -0.94
+      },
+      {
+        "species": "Faecalibacillus intestinalis",
+        "chinese_name": "",
+        "abundance": 0.0192,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5772,
+        "deviation": -0.93
+      },
+      {
+        "species": "Faecalibacillus intestinalis",
+        "chinese_name": "",
+        "abundance": 0.0192,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5772,
+        "deviation": -0.93
+      },
+      {
+        "species": "Bacteroides uniformis",
+        "chinese_name": "",
+        "abundance": 0.659,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 17.4643,
+        "deviation": -0.92
+      },
+      {
+        "species": "Clostridium sp AM22 11AC",
+        "chinese_name": "",
+        "abundance": 0.016,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3787,
+        "deviation": -0.92
+      },
+      {
+        "species": "Bacteroides uniformis",
+        "chinese_name": "",
+        "abundance": 0.659,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 17.4643,
+        "deviation": -0.92
+      },
+      {
+        "species": "Clostridium sp AM22 11AC",
+        "chinese_name": "",
+        "abundance": 0.016,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3787,
+        "deviation": -0.92
+      },
+      {
+        "species": "Clostridium sp AM33 3",
+        "chinese_name": "",
+        "abundance": 0.0028,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0733,
+        "deviation": -0.92
+      },
+      {
+        "species": "bacterium 210917 DFI 7 65",
+        "chinese_name": "",
+        "abundance": 0.0016,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0415,
+        "deviation": -0.92
+      },
+      {
+        "species": "Clostridium sp AM33 3",
+        "chinese_name": "",
+        "abundance": 0.0028,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0733,
+        "deviation": -0.92
+      },
+      {
+        "species": "bacterium 210917 DFI 7 65",
+        "chinese_name": "",
+        "abundance": 0.0016,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0415,
+        "deviation": -0.92
+      },
+      {
+        "species": "Butyricimonas paravirosa",
+        "chinese_name": "",
+        "abundance": 0.001,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0268,
+        "deviation": -0.92
+      },
+      {
+        "species": "Butyricimonas paravirosa",
+        "chinese_name": "",
+        "abundance": 0.001,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0268,
+        "deviation": -0.92
+      },
+      {
+        "species": "Akkermansia muciniphila",
+        "chinese_name": "",
+        "abundance": 0.1722,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.7806,
+        "deviation": -0.91
+      },
+      {
+        "species": "Akkermansia muciniphila",
+        "chinese_name": "",
+        "abundance": 0.1722,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.7806,
+        "deviation": -0.91
+      },
+      {
+        "species": "Blautia glucerasea",
+        "chinese_name": "",
+        "abundance": 0.0284,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.6589,
+        "deviation": -0.91
+      },
+      {
+        "species": "Blautia massiliensis ex Durand et al 2017",
+        "chinese_name": "",
+        "abundance": 0.2726,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 5.4979,
+        "deviation": -0.9
+      },
+      {
+        "species": "Blautia massiliensis ex Durand et al 2017",
+        "chinese_name": "",
+        "abundance": 0.2726,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 5.4979,
+        "deviation": -0.9
+      },
+      {
+        "species": "Waltera acetigignens",
+        "chinese_name": "",
+        "abundance": 0.0443,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.8923,
+        "deviation": -0.9
+      },
+      {
+        "species": "Waltera acetigignens",
+        "chinese_name": "",
+        "abundance": 0.0443,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.8923,
+        "deviation": -0.9
+      },
+      {
+        "species": "Hominenteromicrobium mulieris",
+        "chinese_name": "",
+        "abundance": 1.5168,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.6089,
+        "deviation": 0.89
+      },
+      {
+        "species": "Barnesiella intestinihominis",
+        "chinese_name": "",
+        "abundance": 0.0875,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.5962,
+        "deviation": -0.89
+      },
+      {
+        "species": "Hominenteromicrobium mulieris",
+        "chinese_name": "",
+        "abundance": 1.5168,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.6089,
+        "deviation": 0.89
+      },
+      {
+        "species": "Barnesiella intestinihominis",
+        "chinese_name": "",
+        "abundance": 0.0875,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.5962,
+        "deviation": -0.89
+      },
+      {
+        "species": "Romboutsia timonensis",
+        "chinese_name": "",
+        "abundance": 0.029,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.52,
+        "deviation": -0.89
+      },
+      {
+        "species": "Bilophila wadsworthia",
+        "chinese_name": "",
+        "abundance": 0.0338,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.6418,
+        "deviation": -0.89
+      },
+      {
+        "species": "Romboutsia timonensis",
+        "chinese_name": "",
+        "abundance": 0.029,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.52,
+        "deviation": -0.89
+      },
+      {
+        "species": "Bilophila wadsworthia",
+        "chinese_name": "",
+        "abundance": 0.0338,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.6418,
+        "deviation": -0.89
+      },
+      {
+        "species": "Faecalibacterium prausnitzii",
+        "chinese_name": "",
+        "abundance": 0.7497,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 12.9,
+        "deviation": -0.88
+      },
+      {
+        "species": "Blautia obeum",
+        "chinese_name": "",
+        "abundance": 0.1359,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.0737,
+        "deviation": -0.87
+      },
+      {
+        "species": "Odoribacter splanchnicus",
+        "chinese_name": "",
+        "abundance": 0.0501,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7674,
+        "deviation": -0.87
+      },
+      {
+        "species": "Odoribacter splanchnicus",
+        "chinese_name": "",
+        "abundance": 0.0501,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7674,
+        "deviation": -0.87
+      },
+      {
+        "species": "Blautia glucerasea",
+        "chinese_name": "",
+        "abundance": 0.0429,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.6589,
+        "deviation": -0.87
+      },
+      {
+        "species": "Clostridiaceae bacterium",
+        "chinese_name": "",
+        "abundance": 0.0217,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.306,
+        "deviation": -0.86
+      },
+      {
+        "species": "Clostridiaceae bacterium",
+        "chinese_name": "",
+        "abundance": 0.0217,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.306,
+        "deviation": -0.86
+      },
+      {
+        "species": "Clostridium sp AM49 4BH",
+        "chinese_name": "",
+        "abundance": 0.0273,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.354,
+        "deviation": -0.85
+      },
+      {
+        "species": "Clostridium sp AM49 4BH",
+        "chinese_name": "",
+        "abundance": 0.0273,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.354,
+        "deviation": -0.85
+      },
+      {
+        "species": "Phocaeicola vulgatus",
+        "chinese_name": "",
+        "abundance": 1.1162,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 14.0163,
+        "deviation": -0.84
+      },
+      {
+        "species": "Lawsonibacter asaccharolyticus",
+        "chinese_name": "",
+        "abundance": 0.0105,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1283,
+        "deviation": -0.84
+      },
+      {
+        "species": "Phocaeicola vulgatus",
+        "chinese_name": "",
+        "abundance": 1.1162,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 14.0163,
+        "deviation": -0.84
+      },
+      {
+        "species": "Faecalibacterium prausnitzii",
+        "chinese_name": "",
+        "abundance": 1.0315,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 12.9,
+        "deviation": -0.84
+      },
+      {
+        "species": "Lawsonibacter asaccharolyticus",
+        "chinese_name": "",
+        "abundance": 0.0105,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1283,
+        "deviation": -0.84
+      },
+      {
+        "species": "Eubacterium ramulus",
+        "chinese_name": "",
+        "abundance": 0.0315,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4034,
+        "deviation": -0.84
+      },
+      {
+        "species": "Clostridium sp AF36 4",
+        "chinese_name": "",
+        "abundance": 0.0406,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4712,
+        "deviation": -0.83
+      },
+      {
+        "species": "Clostridium sp AF36 4",
+        "chinese_name": "",
+        "abundance": 0.0406,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4712,
+        "deviation": -0.83
+      },
+      {
+        "species": "Eubacterium sp AF34 35BH",
+        "chinese_name": "",
+        "abundance": 0.0097,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1163,
+        "deviation": -0.83
+      },
+      {
+        "species": "Eubacterium sp AF34 35BH",
+        "chinese_name": "",
+        "abundance": 0.0097,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1163,
+        "deviation": -0.83
+      },
+      {
+        "species": "Blautia obeum",
+        "chinese_name": "",
+        "abundance": 0.1891,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.0737,
+        "deviation": -0.82
+      },
+      {
+        "species": "Ruminococcus bicirculans ex Wegman et al 2014",
+        "chinese_name": "",
+        "abundance": 0.2936,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.1386,
+        "deviation": -0.81
+      },
+      {
+        "species": "Ruminococcus bicirculans ex Wegman et al 2014",
+        "chinese_name": "",
+        "abundance": 0.2936,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.1386,
+        "deviation": -0.81
+      },
+      {
+        "species": "Alistipes shahii",
+        "chinese_name": "",
+        "abundance": 0.104,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.084,
+        "deviation": -0.81
+      },
+      {
+        "species": "Alistipes shahii",
+        "chinese_name": "",
+        "abundance": 0.104,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.084,
+        "deviation": -0.81
+      },
+      {
+        "species": "Blautia wexlerae",
+        "chinese_name": "",
+        "abundance": 1.0472,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 10.4848,
+        "deviation": -0.8
+      },
+      {
+        "species": "Blautia wexlerae",
+        "chinese_name": "",
+        "abundance": 1.0472,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 10.4848,
+        "deviation": -0.8
+      },
+      {
+        "species": "Intestinimonas butyriciproducens",
+        "chinese_name": "",
+        "abundance": 0.0102,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0946,
+        "deviation": -0.79
+      },
+      {
+        "species": "Faecalibacterium prausnitzii",
+        "chinese_name": "",
+        "abundance": 1.3511,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 12.9,
+        "deviation": -0.79
+      },
+      {
+        "species": "Faecalibacterium prausnitzii",
+        "chinese_name": "",
+        "abundance": 1.3643,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 12.9,
+        "deviation": -0.79
+      },
+      {
+        "species": "Intestinimonas butyriciproducens",
+        "chinese_name": "",
+        "abundance": 0.0102,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0946,
+        "deviation": -0.79
+      },
+      {
+        "species": "Pilosibacter fragilis",
+        "chinese_name": "",
+        "abundance": 0.0535,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4618,
+        "deviation": -0.77
+      },
+      {
+        "species": "Blautia luti",
+        "chinese_name": "",
+        "abundance": 0.0451,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.398,
+        "deviation": -0.77
+      },
+      {
+        "species": "Pilosibacter fragilis",
+        "chinese_name": "",
+        "abundance": 0.0535,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4618,
+        "deviation": -0.77
+      },
+      {
+        "species": "Dorea hominis",
+        "chinese_name": "",
+        "abundance": 0.1928,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.2187,
+        "deviation": 0.76
+      },
+      {
+        "species": "Dorea hominis",
+        "chinese_name": "",
+        "abundance": 0.1928,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.2187,
+        "deviation": 0.76
+      },
+      {
+        "species": "Lachnospiraceae bacterium AM53 6",
+        "chinese_name": "",
+        "abundance": 0.0132,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1125,
+        "deviation": -0.76
+      },
+      {
+        "species": "Lachnospiraceae bacterium AM53 6",
+        "chinese_name": "",
+        "abundance": 0.0132,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1125,
+        "deviation": -0.76
+      },
+      {
+        "species": "Oscillibacter sp MSJ 31",
+        "chinese_name": "",
+        "abundance": 0.0622,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.496,
+        "deviation": -0.75
+      },
+      {
+        "species": "Oscillibacter sp MSJ 31",
+        "chinese_name": "",
+        "abundance": 0.0622,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.496,
+        "deviation": -0.75
+      },
+      {
+        "species": "Phocaeicola massiliensis",
+        "chinese_name": "",
+        "abundance": 0.189,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.5245,
+        "deviation": -0.75
+      },
+      {
+        "species": "Phocaeicola massiliensis",
+        "chinese_name": "",
+        "abundance": 0.189,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.5245,
+        "deviation": -0.75
+      },
+      {
+        "species": "Bacteroides faecis",
+        "chinese_name": "",
+        "abundance": 0.063,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.506,
+        "deviation": -0.75
+      },
+      {
+        "species": "Bacteroides faecis",
+        "chinese_name": "",
+        "abundance": 0.063,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.506,
+        "deviation": -0.75
+      },
+      {
+        "species": "Coprococcus catus",
+        "chinese_name": "",
+        "abundance": 0.3746,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4308,
+        "deviation": 0.74
+      },
+      {
+        "species": "Blautia glucerasea",
+        "chinese_name": "",
+        "abundance": 0.0852,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.6589,
+        "deviation": -0.74
+      },
+      {
+        "species": "Coprococcus catus",
+        "chinese_name": "",
+        "abundance": 0.3746,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4308,
+        "deviation": 0.74
+      },
+      {
+        "species": "Bacteroides stercoris",
+        "chinese_name": "",
+        "abundance": 0.8447,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 6.193,
+        "deviation": -0.73
+      },
+      {
+        "species": "Bacteroides stercoris",
+        "chinese_name": "",
+        "abundance": 0.8447,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 6.193,
+        "deviation": -0.73
+      },
+      {
+        "species": "Blautia faecis",
+        "chinese_name": "",
+        "abundance": 0.3534,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.5483,
+        "deviation": -0.72
+      },
+      {
+        "species": "Parabacteroides distasonis",
+        "chinese_name": "",
+        "abundance": 0.4088,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.9382,
+        "deviation": -0.72
+      },
+      {
+        "species": "Oliverpabstia intestinalis",
+        "chinese_name": "",
+        "abundance": 0.2414,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.6991,
+        "deviation": -0.72
+      },
+      {
+        "species": "Roseburia intestinalis",
+        "chinese_name": "",
+        "abundance": 0.1517,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.0985,
+        "deviation": -0.72
+      },
+      {
+        "species": "Blautia faecis",
+        "chinese_name": "",
+        "abundance": 0.3534,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.5483,
+        "deviation": -0.72
+      },
+      {
+        "species": "Parabacteroides distasonis",
+        "chinese_name": "",
+        "abundance": 0.4088,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.9382,
+        "deviation": -0.72
+      },
+      {
+        "species": "Oliverpabstia intestinalis",
+        "chinese_name": "",
+        "abundance": 0.2414,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.6991,
+        "deviation": -0.72
+      },
+      {
+        "species": "Roseburia intestinalis",
+        "chinese_name": "",
+        "abundance": 0.1517,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.0985,
+        "deviation": -0.72
+      },
+      {
+        "species": "Roseburia inulinivorans",
+        "chinese_name": "",
+        "abundance": 0.2797,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.9267,
+        "deviation": -0.71
+      },
+      {
+        "species": "Roseburia inulinivorans",
+        "chinese_name": "",
+        "abundance": 0.2797,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.9267,
+        "deviation": -0.71
+      },
+      {
+        "species": "Allisonella histaminiformans",
+        "chinese_name": "",
+        "abundance": 0.072,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0845,
+        "deviation": 0.7
+      },
+      {
+        "species": "Allisonella histaminiformans",
+        "chinese_name": "",
+        "abundance": 0.072,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0845,
+        "deviation": 0.7
+      },
+      {
+        "species": "Candidatus Cibionibacter quicibialis",
+        "chinese_name": "",
+        "abundance": 0.9494,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 6.0303,
+        "deviation": -0.69
+      },
+      {
+        "species": "Candidatus Cibionibacter quicibialis",
+        "chinese_name": "",
+        "abundance": 0.9494,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 6.0303,
+        "deviation": -0.69
+      },
+      {
+        "species": "Paraprevotella clara",
+        "chinese_name": "",
+        "abundance": 0.1155,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7279,
+        "deviation": -0.68
+      },
+      {
+        "species": "Paraprevotella clara",
+        "chinese_name": "",
+        "abundance": 0.1155,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7279,
+        "deviation": -0.68
+      },
+      {
+        "species": "Hominiventricola filiformis",
+        "chinese_name": "",
+        "abundance": 0.0126,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0734,
+        "deviation": -0.66
+      },
+      {
+        "species": "Faecalibacterium prausnitzii",
+        "chinese_name": "",
+        "abundance": 2.205,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 12.9,
+        "deviation": -0.66
+      },
+      {
+        "species": "Hominiventricola filiformis",
+        "chinese_name": "",
+        "abundance": 0.0126,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0734,
+        "deviation": -0.66
+      },
+      {
+        "species": "Isoptericola variabilis",
+        "chinese_name": "",
+        "abundance": 0.0029,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0169,
+        "deviation": -0.66
+      },
+      {
+        "species": "Isoptericola variabilis",
+        "chinese_name": "",
+        "abundance": 0.0029,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0169,
+        "deviation": -0.66
+      },
+      {
+        "species": "Oscillibacter sp ER4",
+        "chinese_name": "",
+        "abundance": 0.9786,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.1844,
+        "deviation": 0.65
+      },
+      {
+        "species": "Oscillibacter sp ER4",
+        "chinese_name": "",
+        "abundance": 0.9786,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.1844,
+        "deviation": 0.65
+      },
+      {
+        "species": "Bifidobacterium dentium",
+        "chinese_name": "",
+        "abundance": 0.0607,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3339,
+        "deviation": -0.64
+      },
+      {
+        "species": "Bifidobacterium dentium",
+        "chinese_name": "",
+        "abundance": 0.0607,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3339,
+        "deviation": -0.64
+      },
+      {
+        "species": "Clostridium fessum",
+        "chinese_name": "",
+        "abundance": 0.0976,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5227,
+        "deviation": -0.63
+      },
+      {
+        "species": "Clostridium fessum",
+        "chinese_name": "",
+        "abundance": 0.0976,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5227,
+        "deviation": -0.63
+      },
+      {
+        "species": "Eubacterium ramulus",
+        "chinese_name": "",
+        "abundance": 0.0741,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4034,
+        "deviation": -0.63
+      },
+      {
+        "species": "Lachnospira pectinoschiza",
+        "chinese_name": "",
+        "abundance": 0.1559,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.8236,
+        "deviation": -0.62
+      },
+      {
+        "species": "Lachnospira pectinoschiza",
+        "chinese_name": "",
+        "abundance": 0.1559,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.8236,
+        "deviation": -0.62
+      },
+      {
+        "species": "Lachnospira eligens",
+        "chinese_name": "",
+        "abundance": 0.8771,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.0891,
+        "deviation": 0.61
+      },
+      {
+        "species": "Lachnospira eligens",
+        "chinese_name": "",
+        "abundance": 0.8771,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.0891,
+        "deviation": 0.61
+      },
+      {
+        "species": "Dysosmobacter segnis",
+        "chinese_name": "",
+        "abundance": 0.15,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7661,
+        "deviation": -0.61
+      },
+      {
+        "species": "Alistipes senegalensis",
+        "chinese_name": "",
+        "abundance": 0.012,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0616,
+        "deviation": -0.61
+      },
+      {
+        "species": "Dysosmobacter segnis",
+        "chinese_name": "",
+        "abundance": 0.15,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.7661,
+        "deviation": -0.61
+      },
+      {
+        "species": "Alistipes senegalensis",
+        "chinese_name": "",
+        "abundance": 0.012,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0616,
+        "deviation": -0.61
+      },
+      {
+        "species": "Butyribacter intestini",
+        "chinese_name": "",
+        "abundance": 0.25,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3148,
+        "deviation": 0.59
+      },
+      {
+        "species": "Butyribacter intestini",
+        "chinese_name": "",
+        "abundance": 0.25,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3148,
+        "deviation": 0.59
+      },
+      {
+        "species": "Faecalicatena fissicatena",
+        "chinese_name": "",
+        "abundance": 0.5332,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.674,
+        "deviation": 0.58
+      },
+      {
+        "species": "Faecalicatena fissicatena",
+        "chinese_name": "",
+        "abundance": 0.5332,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.674,
+        "deviation": 0.58
+      },
+      {
+        "species": "Mediterraneibacter faecis",
+        "chinese_name": "",
+        "abundance": 0.4559,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.1136,
+        "deviation": -0.57
+      },
+      {
+        "species": "Mediterraneibacter faecis",
+        "chinese_name": "",
+        "abundance": 0.4559,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 2.1136,
+        "deviation": -0.57
+      },
+      {
+        "species": "Ellagibacter isourolithinifaciens",
+        "chinese_name": "",
+        "abundance": 0.1944,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.2478,
+        "deviation": 0.57
+      },
+      {
+        "species": "Ellagibacter isourolithinifaciens",
+        "chinese_name": "",
+        "abundance": 0.1944,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.2478,
+        "deviation": 0.57
+      },
+      {
+        "species": "Lachnospiraceae bacterium AF58 1A",
+        "chinese_name": "",
+        "abundance": 0.0143,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0632,
+        "deviation": -0.55
+      },
+      {
+        "species": "Lachnospiraceae bacterium AF58 1A",
+        "chinese_name": "",
+        "abundance": 0.0143,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0632,
+        "deviation": -0.55
+      },
+      {
+        "species": "Clostridium sp AF27 2AA",
+        "chinese_name": "",
+        "abundance": 0.0224,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0979,
+        "deviation": -0.54
+      },
+      {
+        "species": "Clostridium sp AF27 2AA",
+        "chinese_name": "",
+        "abundance": 0.0224,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0979,
+        "deviation": -0.54
+      },
+      {
+        "species": "Blautia glucerasea",
+        "chinese_name": "",
+        "abundance": 0.1565,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.6589,
+        "deviation": -0.52
+      },
+      {
+        "species": "Jutongia hominis",
+        "chinese_name": "",
+        "abundance": 0.0111,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0458,
+        "deviation": -0.52
+      },
+      {
+        "species": "Jutongia hominis",
+        "chinese_name": "",
+        "abundance": 0.0111,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0458,
+        "deviation": -0.52
+      },
+      {
+        "species": "Clostridium leptum",
+        "chinese_name": "",
+        "abundance": 0.062,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.2557,
+        "deviation": -0.51
+      },
+      {
+        "species": "Clostridium leptum",
+        "chinese_name": "",
+        "abundance": 0.062,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.2557,
+        "deviation": -0.51
+      },
+      {
+        "species": "Eubacteriaceae bacterium",
+        "chinese_name": "",
+        "abundance": 0.0101,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0402,
+        "deviation": -0.5
+      },
+      {
+        "species": "Eubacteriaceae bacterium",
+        "chinese_name": "",
+        "abundance": 0.0101,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0402,
+        "deviation": -0.5
+      },
+      {
+        "species": "Eubacterium ramulus",
+        "chinese_name": "",
+        "abundance": 0.1056,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4034,
+        "deviation": -0.48
+      },
+      {
+        "species": "Lentihominibacter faecis",
+        "chinese_name": "",
+        "abundance": 0.0662,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.2447,
+        "deviation": -0.46
+      },
+      {
+        "species": "Lentihominibacter faecis",
+        "chinese_name": "",
+        "abundance": 0.0662,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.2447,
+        "deviation": -0.46
+      },
+      {
+        "species": "Agathobaculum butyriciproducens",
+        "chinese_name": "",
+        "abundance": 0.8709,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.2317,
+        "deviation": 0.41
+      },
+      {
+        "species": "Roseburia amylophila",
+        "chinese_name": "",
+        "abundance": 0.1032,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3361,
+        "deviation": -0.39
+      },
+      {
+        "species": "Roseburia amylophila",
+        "chinese_name": "",
+        "abundance": 0.1032,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3361,
+        "deviation": -0.39
+      },
+      {
+        "species": "Dorea formicigenerans",
+        "chinese_name": "",
+        "abundance": 0.3162,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.9854,
+        "deviation": -0.36
+      },
+      {
+        "species": "Dorea formicigenerans",
+        "chinese_name": "",
+        "abundance": 0.3162,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.9854,
+        "deviation": -0.36
+      },
+      {
+        "species": "Lachnospiraceae bacterium",
+        "chinese_name": "",
+        "abundance": 0.1076,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3334,
+        "deviation": -0.35
+      },
+      {
+        "species": "Alistipes communis",
+        "chinese_name": "",
+        "abundance": 0.1432,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4418,
+        "deviation": -0.35
+      },
+      {
+        "species": "Alistipes communis",
+        "chinese_name": "",
+        "abundance": 0.1432,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4418,
+        "deviation": -0.35
+      },
+      {
+        "species": "Gallintestinimicrobium propionicum",
+        "chinese_name": "",
+        "abundance": 0.3183,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.9497,
+        "deviation": -0.33
+      },
+      {
+        "species": "Gallintestinimicrobium propionicum",
+        "chinese_name": "",
+        "abundance": 0.3183,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.9497,
+        "deviation": -0.33
+      },
+      {
+        "species": "Coprococcus comes",
+        "chinese_name": "",
+        "abundance": 0.3563,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.0592,
+        "deviation": -0.33
+      },
+      {
+        "species": "Coprococcus comes",
+        "chinese_name": "",
+        "abundance": 0.3563,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.0592,
+        "deviation": -0.33
+      },
+      {
+        "species": "Lachnospiraceae bacterium",
+        "chinese_name": "",
+        "abundance": 0.1135,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3334,
+        "deviation": -0.32
+      },
+      {
+        "species": "Bifidobacterium adolescentis",
+        "chinese_name": "",
+        "abundance": 5.6612,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 8.6087,
+        "deviation": 0.32
+      },
+      {
+        "species": "Dorea longicatena",
+        "chinese_name": "",
+        "abundance": 1.0713,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.1311,
+        "deviation": -0.32
+      },
+      {
+        "species": "Bifidobacterium adolescentis",
+        "chinese_name": "",
+        "abundance": 5.6612,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 8.6087,
+        "deviation": 0.32
+      },
+      {
+        "species": "Blautia intestinalis",
+        "chinese_name": "",
+        "abundance": 0.1507,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4374,
+        "deviation": -0.31
+      },
+      {
+        "species": "Mediterraneibacter butyricigenes",
+        "chinese_name": "",
+        "abundance": 0.0082,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0236,
+        "deviation": -0.31
+      },
+      {
+        "species": "Blautia intestinalis",
+        "chinese_name": "",
+        "abundance": 0.1507,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.4374,
+        "deviation": -0.31
+      },
+      {
+        "species": "Mediterraneibacter butyricigenes",
+        "chinese_name": "",
+        "abundance": 0.0082,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0236,
+        "deviation": -0.31
+      },
+      {
+        "species": "Fusicatenibacter saccharivorans",
+        "chinese_name": "",
+        "abundance": 2.4658,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.7984,
+        "deviation": 0.3
+      },
+      {
+        "species": "Fusicatenibacter saccharivorans",
+        "chinese_name": "",
+        "abundance": 2.4658,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.7984,
+        "deviation": 0.3
+      },
+      {
+        "species": "Anaerostipes hadrus",
+        "chinese_name": "",
+        "abundance": 2.0382,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 5.7296,
+        "deviation": -0.29
+      },
+      {
+        "species": "Anaerostipes hadrus",
+        "chinese_name": "",
+        "abundance": 2.0382,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 5.7296,
+        "deviation": -0.29
+      },
+      {
+        "species": "Clostridiaceae bacterium AF18 31LB",
+        "chinese_name": "",
+        "abundance": 0.0578,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1594,
+        "deviation": -0.28
+      },
+      {
+        "species": "Clostridiaceae bacterium AF18 31LB",
+        "chinese_name": "",
+        "abundance": 0.0578,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1594,
+        "deviation": -0.28
+      },
+      {
+        "species": "Parabacteroides merdae",
+        "chinese_name": "",
+        "abundance": 0.7117,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.9399,
+        "deviation": -0.27
+      },
+      {
+        "species": "Parabacteroides merdae",
+        "chinese_name": "",
+        "abundance": 0.7117,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.9399,
+        "deviation": -0.27
+      },
+      {
+        "species": "Gemmiger formicilis",
+        "chinese_name": "",
+        "abundance": 1.8924,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.0223,
+        "deviation": 0.25
+      },
+      {
+        "species": "Dorea longicatena",
+        "chinese_name": "",
+        "abundance": 1.1729,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.1311,
+        "deviation": -0.25
+      },
+      {
+        "species": "Roseburia hominis",
+        "chinese_name": "",
+        "abundance": 0.2405,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.608,
+        "deviation": -0.21
+      },
+      {
+        "species": "Roseburia hominis",
+        "chinese_name": "",
+        "abundance": 0.2405,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.608,
+        "deviation": -0.21
+      },
+      {
+        "species": "Ruminococcus lactaris",
+        "chinese_name": "",
+        "abundance": 0.2169,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5394,
+        "deviation": -0.2
+      },
+      {
+        "species": "Gemmiger formicilis",
+        "chinese_name": "",
+        "abundance": 1.812,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.0223,
+        "deviation": 0.2
+      },
+      {
+        "species": "Ruminococcus lactaris",
+        "chinese_name": "",
+        "abundance": 0.2169,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5394,
+        "deviation": -0.2
+      },
+      {
+        "species": "Agathobacter rectalis",
+        "chinese_name": "",
+        "abundance": 9.9977,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 16.8658,
+        "deviation": 0.19
+      },
+      {
+        "species": "Anthropogastromicrobium aceti",
+        "chinese_name": "",
+        "abundance": 0.2564,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.6334,
+        "deviation": -0.19
+      },
+      {
+        "species": "Anaerobutyricum hallii",
+        "chinese_name": "",
+        "abundance": 0.532,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.3067,
+        "deviation": -0.19
+      },
+      {
+        "species": "Agathobacter rectalis",
+        "chinese_name": "",
+        "abundance": 9.9977,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 16.8658,
+        "deviation": 0.19
+      },
+      {
+        "species": "Anthropogastromicrobium aceti",
+        "chinese_name": "",
+        "abundance": 0.2564,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.6334,
+        "deviation": -0.19
+      },
+      {
+        "species": "Anaerobutyricum hallii",
+        "chinese_name": "",
+        "abundance": 0.532,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.3067,
+        "deviation": -0.19
+      },
+      {
+        "species": "Faecalibacterium butyricigenerans",
+        "chinese_name": "",
+        "abundance": 0.2063,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5042,
+        "deviation": -0.18
+      },
+      {
+        "species": "Faecalibacterium butyricigenerans",
+        "chinese_name": "",
+        "abundance": 0.2063,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.5042,
+        "deviation": -0.18
+      },
+      {
+        "species": "Bacteroides eggerthii",
+        "chinese_name": "",
+        "abundance": 0.0488,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1198,
+        "deviation": -0.18
+      },
+      {
+        "species": "Bacteroides eggerthii",
+        "chinese_name": "",
+        "abundance": 0.0488,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1198,
+        "deviation": -0.18
+      },
+      {
+        "species": "Bacteroides finegoldii",
+        "chinese_name": "",
+        "abundance": 0.1905,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3332,
+        "deviation": 0.14
+      },
+      {
+        "species": "Bacteroides finegoldii",
+        "chinese_name": "",
+        "abundance": 0.1905,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3332,
+        "deviation": 0.14
+      },
+      {
+        "species": "Collinsella aerofaciens",
+        "chinese_name": "",
+        "abundance": 1.9238,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.3978,
+        "deviation": 0.13
+      },
+      {
+        "species": "Collinsella aerofaciens",
+        "chinese_name": "",
+        "abundance": 1.9238,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 3.3978,
+        "deviation": 0.13
+      },
+      {
+        "species": "Dorea sp AF36 15AT",
+        "chinese_name": "",
+        "abundance": 0.151,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3283,
+        "deviation": -0.08
+      },
+      {
+        "species": "Dorea sp AF36 15AT",
+        "chinese_name": "",
+        "abundance": 0.151,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.3283,
+        "deviation": -0.08
+      },
+      {
+        "species": "Eubacterium segne",
+        "chinese_name": "",
+        "abundance": 0.0305,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0665,
+        "deviation": -0.08
+      },
+      {
+        "species": "Eubacterium segne",
+        "chinese_name": "",
+        "abundance": 0.0305,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0665,
+        "deviation": -0.08
+      },
+      {
+        "species": "Neopoerus faecalis",
+        "chinese_name": "",
+        "abundance": 0.0141,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0265,
+        "deviation": 0.07
+      },
+      {
+        "species": "Neopoerus faecalis",
+        "chinese_name": "",
+        "abundance": 0.0141,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0265,
+        "deviation": 0.07
+      },
+      {
+        "species": "Agathobaculum butyriciproducens",
+        "chinese_name": "",
+        "abundance": 0.6504,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 1.2317,
+        "deviation": 0.06
+      },
+      {
+        "species": "Faecalibacterium prausnitzii",
+        "chinese_name": "",
+        "abundance": 6.7016,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 12.9,
+        "deviation": 0.04
+      },
+      {
+        "species": "Faecalibacillus faecis",
+        "chinese_name": "",
+        "abundance": 0.0477,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0983,
+        "deviation": -0.03
+      },
+      {
+        "species": "Senegalimassilia anaerobia",
+        "chinese_name": "",
+        "abundance": 0.0877,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1711,
+        "deviation": 0.03
+      },
+      {
+        "species": "Faecalibacillus faecis",
+        "chinese_name": "",
+        "abundance": 0.0477,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.0983,
+        "deviation": -0.03
+      },
+      {
+        "species": "Senegalimassilia anaerobia",
+        "chinese_name": "",
+        "abundance": 0.0877,
+        "status": "normal",
+        "status_cn": "正常",
+        "p5": 0.0,
+        "p95": 0.1711,
+        "deviation": 0.03
+      }
+    ],
+    "abnormal_species": [
+      {
+        "species": "Bifidobacterium pseudocatenulatum",
+        "chinese_name": "",
+        "abundance": 6.8261,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.8317,
+        "deviation": 6.45
+      },
+      {
+        "species": "Bifidobacterium pseudocatenulatum",
+        "chinese_name": "",
+        "abundance": 6.8261,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.8317,
+        "deviation": 6.45
+      },
+      {
+        "species": "Ruminococcaceae bacterium AM53 2BH",
+        "chinese_name": "",
+        "abundance": 1.7568,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.51,
+        "deviation": 5.89
+      },
+      {
+        "species": "Ruminococcaceae bacterium AM53 2BH",
+        "chinese_name": "",
+        "abundance": 1.7568,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.51,
+        "deviation": 5.89
+      },
+      {
+        "species": "Coprococcus eutactus",
+        "chinese_name": "",
+        "abundance": 7.3699,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 2.34,
+        "deviation": 5.3
+      },
+      {
+        "species": "Coprococcus eutactus",
+        "chinese_name": "",
+        "abundance": 7.3684,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 2.34,
+        "deviation": 5.3
+      },
+      {
+        "species": "Anaerosacchariphilus hominis",
+        "chinese_name": "",
+        "abundance": 0.0074,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0024,
+        "deviation": 5.28
+      },
+      {
+        "species": "Anaerosacchariphilus hominis",
+        "chinese_name": "",
+        "abundance": 0.0074,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0024,
+        "deviation": 5.28
+      },
+      {
+        "species": "Lachnospira hominis ex Liu et al 2021",
+        "chinese_name": "",
+        "abundance": 0.5565,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2122,
+        "deviation": 4.25
+      },
+      {
+        "species": "Lachnospira hominis ex Liu et al 2021",
+        "chinese_name": "",
+        "abundance": 0.5565,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2122,
+        "deviation": 4.25
+      },
+      {
+        "species": "Blautia luti",
+        "chinese_name": "",
+        "abundance": 0.9317,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.398,
+        "deviation": 3.68
+      },
+      {
+        "species": "Ruminococcaceae bacterium AF68 02b2A",
+        "chinese_name": "",
+        "abundance": 0.866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.3839,
+        "deviation": 3.51
+      },
+      {
+        "species": "Ruminococcaceae bacterium AF68 02b2A",
+        "chinese_name": "",
+        "abundance": 0.866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.3839,
+        "deviation": 3.51
+      },
+      {
+        "species": "Roseburia yibonii",
+        "chinese_name": "",
+        "abundance": 0.1466,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0653,
+        "deviation": 3.49
+      },
+      {
+        "species": "Roseburia yibonii",
+        "chinese_name": "",
+        "abundance": 0.1466,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0653,
+        "deviation": 3.49
+      },
+      {
+        "species": "Blautia luti",
+        "chinese_name": "",
+        "abundance": 0.8866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.398,
+        "deviation": 3.46
+      },
+      {
+        "species": "Duodenibacillus massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0148,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.007,
+        "deviation": 3.22
+      },
+      {
+        "species": "Duodenibacillus massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0148,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.007,
+        "deviation": 3.22
+      },
+      {
+        "species": "Hominifimenecus microfluidus",
+        "chinese_name": "",
+        "abundance": 0.1056,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0738,
+        "deviation": 1.86
+      },
+      {
+        "species": "Hominifimenecus microfluidus",
+        "chinese_name": "",
+        "abundance": 0.1056,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0738,
+        "deviation": 1.86
+      },
+      {
+        "species": "Slackia isoflavoniconvertens",
+        "chinese_name": "",
+        "abundance": 0.213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1592,
+        "deviation": 1.67
+      },
+      {
+        "species": "Fusicatenibacter faecihominis",
+        "chinese_name": "",
+        "abundance": 0.3066,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2296,
+        "deviation": 1.67
+      },
+      {
+        "species": "Slackia isoflavoniconvertens",
+        "chinese_name": "",
+        "abundance": 0.213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1592,
+        "deviation": 1.67
+      },
+      {
+        "species": "Fusicatenibacter faecihominis",
+        "chinese_name": "",
+        "abundance": 0.3066,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2296,
+        "deviation": 1.67
+      },
+      {
+        "species": "Agathobaculum butyriciproducens",
+        "chinese_name": "",
+        "abundance": 1.5213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.2317,
+        "deviation": 1.47
+      },
+      {
+        "species": "Roseburia sp AM59 24XD",
+        "chinese_name": "",
+        "abundance": 0.1489,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1244,
+        "deviation": 1.39
+      },
+      {
+        "species": "Roseburia sp AM59 24XD",
+        "chinese_name": "",
+        "abundance": 0.1489,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1244,
+        "deviation": 1.39
+      },
+      {
+        "species": "Roseburia faecis",
+        "chinese_name": "",
+        "abundance": 6.2263,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 5.3772,
+        "deviation": 1.32
+      },
+      {
+        "species": "Roseburia faecis",
+        "chinese_name": "",
+        "abundance": 6.2263,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 5.3772,
+        "deviation": 1.32
+      },
+      {
+        "species": "Brotocaccenecus cirricatena",
+        "chinese_name": "",
+        "abundance": 0.6337,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.551,
+        "deviation": 1.3
+      },
+      {
+        "species": "Brotocaccenecus cirricatena",
+        "chinese_name": "",
+        "abundance": 0.6337,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.551,
+        "deviation": 1.3
+      },
+      {
+        "species": "Lactobacillus paragasseri",
+        "chinese_name": "",
+        "abundance": 0.025,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0221,
+        "deviation": 1.27
+      },
+      {
+        "species": "Lactobacillus paragasseri",
+        "chinese_name": "",
+        "abundance": 0.025,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0221,
+        "deviation": 1.27
+      },
+      {
+        "species": "Mesosutterella multiformis",
+        "chinese_name": "",
+        "abundance": 0.13,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1168,
+        "deviation": 1.23
+      },
+      {
+        "species": "Mesosutterella multiformis",
+        "chinese_name": "",
+        "abundance": 0.13,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1168,
+        "deviation": 1.23
+      },
+      {
+        "species": "Alistipes hominis",
+        "chinese_name": "",
+        "abundance": 0.0482,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0467,
+        "deviation": 1.07
+      },
+      {
+        "species": "Alistipes hominis",
+        "chinese_name": "",
+        "abundance": 0.0482,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0467,
+        "deviation": 1.07
+      }
+    ]
+  },
+  "compare": {
+    "sample_id": "SRR13068821",
+    "abnormal_species": [
+      {
+        "species": "Bifidobacterium pseudocatenulatum",
+        "chinese_name": "",
+        "abundance": 6.8261,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.8317,
+        "deviation": 6.45
+      },
+      {
+        "species": "Bifidobacterium pseudocatenulatum",
+        "chinese_name": "",
+        "abundance": 6.8261,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.8317,
+        "deviation": 6.45
+      },
+      {
+        "species": "Ruminococcaceae bacterium AM53 2BH",
+        "chinese_name": "",
+        "abundance": 1.7568,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.51,
+        "deviation": 5.89
+      },
+      {
+        "species": "Ruminococcaceae bacterium AM53 2BH",
+        "chinese_name": "",
+        "abundance": 1.7568,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.51,
+        "deviation": 5.89
+      },
+      {
+        "species": "Coprococcus eutactus",
+        "chinese_name": "",
+        "abundance": 7.3699,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 2.34,
+        "deviation": 5.3
+      },
+      {
+        "species": "Coprococcus eutactus",
+        "chinese_name": "",
+        "abundance": 7.3684,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 2.34,
+        "deviation": 5.3
+      },
+      {
+        "species": "Anaerosacchariphilus hominis",
+        "chinese_name": "",
+        "abundance": 0.0074,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0024,
+        "deviation": 5.28
+      },
+      {
+        "species": "Anaerosacchariphilus hominis",
+        "chinese_name": "",
+        "abundance": 0.0074,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0024,
+        "deviation": 5.28
+      },
+      {
+        "species": "Lachnospira hominis ex Liu et al 2021",
+        "chinese_name": "",
+        "abundance": 0.5565,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2122,
+        "deviation": 4.25
+      },
+      {
+        "species": "Lachnospira hominis ex Liu et al 2021",
+        "chinese_name": "",
+        "abundance": 0.5565,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2122,
+        "deviation": 4.25
+      },
+      {
+        "species": "Blautia luti",
+        "chinese_name": "",
+        "abundance": 0.9317,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.398,
+        "deviation": 3.68
+      },
+      {
+        "species": "Ruminococcaceae bacterium AF68 02b2A",
+        "chinese_name": "",
+        "abundance": 0.866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.3839,
+        "deviation": 3.51
+      },
+      {
+        "species": "Ruminococcaceae bacterium AF68 02b2A",
+        "chinese_name": "",
+        "abundance": 0.866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.3839,
+        "deviation": 3.51
+      },
+      {
+        "species": "Roseburia yibonii",
+        "chinese_name": "",
+        "abundance": 0.1466,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0653,
+        "deviation": 3.49
+      },
+      {
+        "species": "Roseburia yibonii",
+        "chinese_name": "",
+        "abundance": 0.1466,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0653,
+        "deviation": 3.49
+      },
+      {
+        "species": "Blautia luti",
+        "chinese_name": "",
+        "abundance": 0.8866,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.398,
+        "deviation": 3.46
+      },
+      {
+        "species": "Duodenibacillus massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0148,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.007,
+        "deviation": 3.22
+      },
+      {
+        "species": "Duodenibacillus massiliensis",
+        "chinese_name": "",
+        "abundance": 0.0148,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.007,
+        "deviation": 3.22
+      },
+      {
+        "species": "Hominifimenecus microfluidus",
+        "chinese_name": "",
+        "abundance": 0.1056,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0738,
+        "deviation": 1.86
+      },
+      {
+        "species": "Hominifimenecus microfluidus",
+        "chinese_name": "",
+        "abundance": 0.1056,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0738,
+        "deviation": 1.86
+      },
+      {
+        "species": "Slackia isoflavoniconvertens",
+        "chinese_name": "",
+        "abundance": 0.213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1592,
+        "deviation": 1.67
+      },
+      {
+        "species": "Fusicatenibacter faecihominis",
+        "chinese_name": "",
+        "abundance": 0.3066,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2296,
+        "deviation": 1.67
+      },
+      {
+        "species": "Slackia isoflavoniconvertens",
+        "chinese_name": "",
+        "abundance": 0.213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1592,
+        "deviation": 1.67
+      },
+      {
+        "species": "Fusicatenibacter faecihominis",
+        "chinese_name": "",
+        "abundance": 0.3066,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.2296,
+        "deviation": 1.67
+      },
+      {
+        "species": "Agathobaculum butyriciproducens",
+        "chinese_name": "",
+        "abundance": 1.5213,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 1.2317,
+        "deviation": 1.47
+      },
+      {
+        "species": "Roseburia sp AM59 24XD",
+        "chinese_name": "",
+        "abundance": 0.1489,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1244,
+        "deviation": 1.39
+      },
+      {
+        "species": "Roseburia sp AM59 24XD",
+        "chinese_name": "",
+        "abundance": 0.1489,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1244,
+        "deviation": 1.39
+      },
+      {
+        "species": "Roseburia faecis",
+        "chinese_name": "",
+        "abundance": 6.2263,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 5.3772,
+        "deviation": 1.32
+      },
+      {
+        "species": "Roseburia faecis",
+        "chinese_name": "",
+        "abundance": 6.2263,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 5.3772,
+        "deviation": 1.32
+      },
+      {
+        "species": "Brotocaccenecus cirricatena",
+        "chinese_name": "",
+        "abundance": 0.6337,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.551,
+        "deviation": 1.3
+      },
+      {
+        "species": "Brotocaccenecus cirricatena",
+        "chinese_name": "",
+        "abundance": 0.6337,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.551,
+        "deviation": 1.3
+      },
+      {
+        "species": "Lactobacillus paragasseri",
+        "chinese_name": "",
+        "abundance": 0.025,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0221,
+        "deviation": 1.27
+      },
+      {
+        "species": "Lactobacillus paragasseri",
+        "chinese_name": "",
+        "abundance": 0.025,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0221,
+        "deviation": 1.27
+      },
+      {
+        "species": "Mesosutterella multiformis",
+        "chinese_name": "",
+        "abundance": 0.13,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1168,
+        "deviation": 1.23
+      },
+      {
+        "species": "Mesosutterella multiformis",
+        "chinese_name": "",
+        "abundance": 0.13,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.1168,
+        "deviation": 1.23
+      },
+      {
+        "species": "Alistipes hominis",
+        "chinese_name": "",
+        "abundance": 0.0482,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0467,
+        "deviation": 1.07
+      },
+      {
+        "species": "Alistipes hominis",
+        "chinese_name": "",
+        "abundance": 0.0482,
+        "status": "high",
+        "status_cn": "偏高",
+        "p5": 0.0,
+        "p95": 0.0467,
+        "deviation": 1.07
+      }
+    ],
+    "total_species": 296,
+    "n_abnormal": 37
+  },
+  "enterotype": {
+    "sample_id": "SRR13068821",
+    "enterotype": "Ruminococcus型（肠型3）",
+    "confidence": 46.1,
+    "classification_basis": {
+      "type": "Ruminococcus型（肠型3）",
+      "confidence": 46.1,
+      "Bacteroides_ratio": 3.28,
+      "Prevotella_ratio": 0.0,
+      "Faecalibacterium_ratio": 9.22,
+      "summary": "混合型肠型，通常与高多样性相关",
+      "top_genus": [
+        [
+          "Bifidobacterium",
+          15.56295
+        ],
+        [
+          "Agathobacter",
+          9.9977
+        ],
+        [
+          "Faecalibacterium",
+          9.21916
+        ],
+        [
+          "Coprococcus",
+          8.10084
+        ],
+        [
+          "Roseburia",
+          7.29703
+        ]
+      ]
+    },
+    "details": {
+      "type": "Ruminococcus型（肠型3）",
+      "confidence": 46.1,
+      "Bacteroides_ratio": 3.28,
+      "Prevotella_ratio": 0.0,
+      "Faecalibacterium_ratio": 9.22,
+      "summary": "混合型肠型，通常与高多样性相关",
+      "top_genus": [
+        [
+          "Bifidobacterium",
+          15.56295
+        ],
+        [
+          "Agathobacter",
+          9.9977
+        ],
+        [
+          "Faecalibacterium",
+          9.21916
+        ],
+        [
+          "Coprococcus",
+          8.10084
+        ],
+        [
+          "Roseburia",
+          7.29703
+        ]
+      ]
+    },
+    "cluster_plot_path": "/storage1/zhangrongpeng/fmt-data/output/reports/figures/SRR13068821_enterotype_tsne.png",
+    "distribution": [
+      {
+        "label": "ET_B",
+        "count": 3,
+        "percent": "4.5%"
+      },
+      {
+        "label": "ET_P",
+        "count": 5,
+        "percent": "7.6%"
+      },
+      {
+        "label": "ET_R",
+        "count": 58,
+        "percent": "87.9%"
+      }
+    ],
+    "plot_method": "t-SNE",
+    "tsne_perplexity": 21,
+    "current_sample_label": "ET_R",
+    "n_cluster_samples": 66
+  },
+  "pathways": {
+    "sample_id": "SRR13068821",
+    "pathways": [
+      {
+        "name": "sucrose biosynthesis II",
+        "abundance": 4746.2476
+      },
+      {
+        "name": "glycogen degradation II",
+        "abundance": 3806.9463
+      },
+      {
+        "name": "glycogen biosynthesis I (from ADP-D-Glucose)",
+        "abundance": 3387.9362
+      },
+      {
+        "name": "L-valine biosynthesis",
+        "abundance": 3315.5946
+      },
+      {
+        "name": "UMP biosynthesis I",
+        "abundance": 2856.8572
+      },
+      {
+        "name": "UMP biosynthesis III",
+        "abundance": 2856.8572
+      },
+      {
+        "name": "UMP biosynthesis II",
+        "abundance": 2856.8572
+      },
+      {
+        "name": "L-isoleucine biosynthesis I (from threonine)",
+        "abundance": 2829.333
+      },
+      {
+        "name": "L-arginine biosynthesis II (acetyl cycle)",
+        "abundance": 2813.3983
+      },
+      {
+        "name": "superpathway of branched chain amino acid biosynthesis",
+        "abundance": 2733.8503
+      },
+      {
+        "name": "L-arginine biosynthesis I (via L-ornithine)",
+        "abundance": 2708.3616
+      },
+      {
+        "name": "glycolysis IV",
+        "abundance": 2645.5918
+      },
+      {
+        "name": "dTDP-&beta;-L-rhamnose biosynthesis",
+        "abundance": 2611.6935
+      },
+      {
+        "name": "superpathway of aromatic amino acid biosynthesis",
+        "abundance": 2574.9396
+      },
+      {
+        "name": "L-isoleucine biosynthesis III",
+        "abundance": 2546.2759
+      },
+      {
+        "name": "tRNA charging",
+        "abundance": 2530.0749
+      },
+      {
+        "name": "UDP-N-acetylmuramoyl-pentapeptide biosynthesis II (lysine-containing)",
+        "abundance": 2518.2311
+      },
+      {
+        "name": "UDP-N-acetylmuramoyl-pentapeptide biosynthesis III (meso-diaminopimelate containing)",
+        "abundance": 2490.5591
+      },
+      {
+        "name": "UDP-N-acetylmuramoyl-pentapeptide biosynthesis I (meso-diaminopimelate containing)",
+        "abundance": 2485.2096
+      },
+      {
+        "name": "chorismate biosynthesis I",
+        "abundance": 2468.338
+      }
+    ],
+    "n_total_pathways": 255
+  },
+  "metabolites": {
+    "sample_id": "SRR13068821",
+    "metabolites": [
+      {
+        "name": "ATP",
+        "abundance": 64691.0402
+      },
+      {
+        "name": "pyruvate",
+        "abundance": 44977.6867
+      },
+      {
+        "name": "glutamine",
+        "abundance": 39165.672
+      },
+      {
+        "name": "aspartate",
+        "abundance": 38114.0517
+      },
+      {
+        "name": "PRPP",
+        "abundance": 36772.6178
+      },
+      {
+        "name": "glutamate",
+        "abundance": 35066.9084
+      },
+      {
+        "name": "NADPH",
+        "abundance": 22934.9473
+      },
+      {
+        "name": "CO2",
+        "abundance": 22795.6195
+      },
+      {
+        "name": "fructose-6-phosphate",
+        "abundance": 22651.3683
+      },
+      {
+        "name": "NAD+",
+        "abundance": 20561.7919
+      },
+      {
+        "name": "formate",
+        "abundance": 19885.7464
+      },
+      {
+        "name": "NADH",
+        "abundance": 19846.305
+      },
+      {
+        "name": "glucose",
+        "abundance": 18359.433
+      },
+      {
+        "name": "glycine",
+        "abundance": 18211.7319
+      },
+      {
+        "name": "UDP",
+        "abundance": 18140.0664
+      },
+      {
+        "name": "ADP",
+        "abundance": 17215.9607
+      },
+      {
+        "name": "cysteine",
+        "abundance": 15103.2742
+      },
+      {
+        "name": "pyrophosphate",
+        "abundance": 14994.0521
+      },
+      {
+        "name": "phosphate",
+        "abundance": 14058.9306
+      },
+      {
+        "name": "threonine",
+        "abundance": 13095.1575
+      }
+    ],
+    "n_total_metabolites": 273
+  },
+  "drugs": {
+    "sample_id": "SRR13068821",
+    "drugs": [
+      {
+        "drug": "Amoxicillin",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Ceftriaxone",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Penicillin",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Meropenem",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "二甲双胍 (Metformin)",
+        "score": 47703.9,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Acetaminophen",
+        "score": 27043.6,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Sulfamethoxazole",
+        "score": 25603.5,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Irinotecan",
+        "score": 24425.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Sn-38",
+        "score": 24425.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Morphine",
+        "score": 24425.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Rifampicin",
+        "score": 22928.1,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Rifaximin",
+        "score": 22928.1,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Trimethoprim",
+        "score": 21156.5,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Methotrexate",
+        "score": 21156.5,
+        "is_high_risk": false
+      },
+      {
+        "drug": "Moxifloxacin",
+        "score": 21026.7,
+        "is_high_risk": false
+      },
+      {
+        "drug": "SN-38",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "amoxicillin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "ceftriaxone",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "ciprofloxacin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "acetaminophen",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "levofloxacin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "meropenem",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "methotrexate",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "morphine",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "penicillin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "rifampicin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "rifaximin",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "irinotecan",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "sulfamethoxazole",
+        "score": 0.0,
+        "is_high_risk": false
+      },
+      {
+        "drug": "trimethoprim",
+        "score": 0.0,
+        "is_high_risk": false
+      }
+    ],
+    "high_risk_drugs": [
+      {
+        "drug": "Amoxicillin",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Ceftriaxone",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Penicillin",
+        "score": 76986.0,
+        "is_high_risk": true
+      },
+      {
+        "drug": "Meropenem",
+        "score": 76986.0,
+        "is_high_risk": true
+      }
+    ],
+    "n_total": 44,
+    "n_high_risk": 4
+  },
+  "diseases": {
+    "sample_id": "SRR13068821",
+    "diseases": [
+      {
+        "disease": "Autism Spectrum Disorder",
+        "risk_score": 1,
+        "matched_species": 62,
+        "agree_count": 1,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Blautia wexlerae",
+            "direction": "变化",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "变化",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Ruthenibacterium lactatiformans",
+            "direction": "高",
+            "status": "normal",
+            "role": "有害菌"
+          },
+          {
+            "species": "Bifidobacterium longum",
+            "direction": "变化",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Escherichia coli",
+            "direction": "变化",
+            "status": "normal",
+            "role": "有益菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "炎症性肠病(IBD)",
+        "risk_score": 0,
+        "matched_species": 7,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Roseburia hominis",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Escherichia coli",
+            "direction": "高",
+            "status": "normal",
+            "role": "有害菌"
+          },
+          {
+            "species": "Akkermansia muciniphila",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Clostridium leptum",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "肠易激综合征(IBS)",
+        "risk_score": 0,
+        "matched_species": 2,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Bifidobacterium longum",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "2型糖尿病(T2DM)",
+        "risk_score": 0,
+        "matched_species": 6,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Akkermansia muciniphila",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Roseburia intestinalis",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Bifidobacterium adolescentis",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Lactobacillus gasseri",
+            "direction": "高",
+            "status": "unknown",
+            "role": "有害菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "肥胖(Obesity)",
+        "risk_score": 0,
+        "matched_species": 2,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Akkermansia muciniphila",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "结直肠癌(CRC)",
+        "risk_score": 0,
+        "matched_species": 2,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Roseburia hominis",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "自闭症谱系障碍(ASD)",
+        "risk_score": 0,
+        "matched_species": 2,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Bifidobacterium longum",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "心血管疾病(CVD)",
+        "risk_score": 0,
+        "matched_species": 2,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Akkermansia muciniphila",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Roseburia hominis",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "非酒精性脂肪肝(NAFLD)",
+        "risk_score": 0,
+        "matched_species": 4,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Akkermansia muciniphila",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Escherichia coli",
+            "direction": "高",
+            "status": "normal",
+            "role": "有害菌"
+          },
+          {
+            "species": "Dorea formicigenerans",
+            "direction": "高",
+            "status": "normal",
+            "role": "有害菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "抑郁症(MDD)",
+        "risk_score": 0,
+        "matched_species": 4,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Bifidobacterium longum",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Roseburia intestinalis",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Escherichia coli",
+            "direction": "高",
+            "status": "normal",
+            "role": "有害菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "帕金森病(PD)",
+        "risk_score": 0,
+        "matched_species": 3,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Akkermansia muciniphila",
+            "direction": "高",
+            "status": "normal",
+            "role": "有害菌"
+          },
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Roseburia hominis",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          }
+        ],
+        "risk_level": "low"
+      },
+      {
+        "disease": "COVID-19",
+        "risk_score": 0,
+        "matched_species": 4,
+        "agree_count": 0,
+        "conflict_count": 0,
+        "key_species": [
+          {
+            "species": "Faecalibacterium prausnitzii",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Roseburia hominis",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Akkermansia muciniphila",
+            "direction": "低",
+            "status": "normal",
+            "role": "有益菌"
+          },
+          {
+            "species": "Escherichia coli",
+            "direction": "高",
+            "status": "normal",
+            "role": "有害菌"
+          }
+        ],
+        "risk_level": "low"
+      }
+    ],
+    "n_total": 12,
+    "n_high_risk": 0,
+    "n_mid_risk": 0
+  },
+  "fmt_matching": {
+    "sample_id": "SRR13068821",
+    "status": "ok",
+    "message": "成功匹配 10 个候选供体",
+    "top_k_matches": [
+      {
+        "donor_id": "ERR1297832",
+        "score": 0.9999,
+        "label": "Res"
+      },
+      {
+        "donor_id": "ERR1297736",
+        "score": 0.9999,
+        "label": "Res"
+      },
+      {
+        "donor_id": "SRR11615769",
+        "score": 0.9999,
+        "label": "nan"
+      },
+      {
+        "donor_id": "ERR1297850",
+        "score": 0.9997,
+        "label": "nan"
+      },
+      {
+        "donor_id": "SRR13844382",
+        "score": 0.9997,
+        "label": "nan"
+      },
+      {
+        "donor_id": "SRR11615774",
+        "score": 0.9994,
+        "label": "NoRes"
+      },
+      {
+        "donor_id": "SRR11728446",
+        "score": 0.9994,
+        "label": "Res"
+      },
+      {
+        "donor_id": "SRR15123565",
+        "score": 0.9994,
+        "label": "nan"
+      },
+      {
+        "donor_id": "SRR13844426",
+        "score": 0.9991,
+        "label": "nan"
+      },
+      {
+        "donor_id": "ERR1297843",
+        "score": 0.9991,
+        "label": "nan"
+      }
+    ],
+    "tsne_plot_path": "/home/zhangrongpeng/Project/WGS-FMT-Agent/data/results/SRR13068821_fmt_tsne.png",
+    "n_matches": 10
+  },
+  "knowledge": {
+    "matched_docs": [
+      {
+        "title": "Bifidobacterium pseudocatenulatum gut microbiome health",
+        "snippet": "知识库搜索结果 (2 条, 查询: 'Bifidobacterium pseudocatenulatum gut microbiome health'):\n\n---\n[1] 35105664 2022 Gut microbiome and health mechanistic insights.\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/T2DM/35105664_2022_Gut_microbiome_and_health_mechanistic_insights..md\n匹配数: 3\n# Gut microbiome and health: mechanistic insights.\n\n## 文献信息\n\n- **PMID**: [35105664](https://pubm"
+      },
+      {
+        "title": "Ruminococcaceae bacterium AM53 2BH gut microbiome health",
+        "snippet": "知识库搜索结果 (2 条, 查询: 'Ruminococcaceae bacterium AM53 2BH gut microbiome health'):\n\n---\n[1] 35105664 2022 Gut microbiome and health mechanistic insights.\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/T2DM/35105664_2022_Gut_microbiome_and_health_mechanistic_insights..md\n匹配数: 3\n# Gut microbiome and health: mechanistic insights.\n\n## 文献信息\n\n- **PMID**: [35105664](https://pub"
+      },
+      {
+        "title": "Coprococcus eutactus gut microbiome health",
+        "snippet": "知识库搜索结果 (2 条, 查询: 'Coprococcus eutactus gut microbiome health'):\n\n---\n[1] 35105664 2022 Gut microbiome and health mechanistic insights.\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/T2DM/35105664_2022_Gut_microbiome_and_health_mechanistic_insights..md\n匹配数: 3\n# Gut microbiome and health: mechanistic insights.\n\n## 文献信息\n\n- **PMID**: [35105664](https://pubmed.ncbi.nlm.n"
+      },
+      {
+        "title": "Amoxicillin gut microbiota interaction",
+        "snippet": "知识库搜索结果 (2 条, 查询: 'Amoxicillin gut microbiota interaction'):\n\n---\n[1] 37263983 2023 Role of the Gut Microbiota and Its Metabolites in Tumorigenesis or Development o\n路径: /home/zhangrongpeng/Project/WGS-FMT-Agent/knowledge_base/documents/papers/CRC/37263983_2023_Role_of_the_Gut_Microbiota_and_Its_Metabolites_in_Tumorigenesis_or_Development_o.md\n匹配数: 3\n# Role of the Gut Microbiota and Its Metabolites"
+      }
+    ],
+    "pubmed_results": [
+      {
+        "pmid": "35228751",
+        "title": "Cross-cohort gut microbiome associations with immune checkpoint inhibitor response in advanced melanoma.",
+        "authors": "Lee Karla A, Thomas Andrew Maltez, Bolte Laura A, Björk Johannes R, de Ruijter Laura Kist",
+        "journal": "Nature medicine",
+        "year": "2022",
+        "volume": "28",
+        "issue": "3",
+        "pages": "535-544",
+        "doi": "10.1038/s41591-022-01695-5",
+        "abstract": "The composition of the gut microbiome has been associated with clinical responses to immune checkpoint inhibitor (ICI) treatment, but there is limited consensus on the specific microbiome characteristics linked to the clinical benefits of ICIs. We performed shotgun metagenomic sequencing of stool samples collected before ICI initiation from five observational cohorts recruiting ICI-naive patients with advanced cutaneous melanoma (n = 165). Integrating the dataset with 147 metagenomic samples from previously published studies, we found that the gut microbiome has a relevant, but cohort-dependen"
+      },
+      {
+        "pmid": "41270737",
+        "title": "Interindividual variability in gut microbiome mediates the efficacy of resistant starch on MASLD.",
+        "authors": "Long Xiaoxue, Wang Hui, Lu Yuwei, Gao Xiaojing, Xiao Yuanyuan",
+        "journal": "Cell metabolism",
+        "year": "2025",
+        "volume": "37",
+        "issue": "12",
+        "pages": "2342-2361.e9",
+        "doi": "10.1016/j.cmet.2025.10.017",
+        "abstract": "Our randomized, placebo-controlled trial showed resistant starch (RS), a type of prebiotic, has therapeutic effects in metabolic dysfunction-associated steatotic liver disease (MASLD). Here, we observed its heterogeneous efficacy, where 30% of participants exhibited limited benefits, which was replicated in a multi-center trial (ChiCTR2300074588). Multi-omics analysis and fecal microbiota transplantation identified baseline microbiota as a dominant contributor of response. Further population stratification and network analysis combined with in vitro and in vivo experiments revealed Prevotella "
+      },
+      {
+        "query": "Ruminococcaceae bacterium AM53 2BH gut microbiome health",
+        "abstract": "PubMed 未找到与 'Ruminococcaceae bacterium AM53 2BH gut microbiome health' 相关的结果"
+      },
+      {
+        "pmid": "38649105",
+        "title": "Coprococcus eutactus screened from healthy adolescent attenuates chronic restraint stress-induced depression-like changes in adolescent mice: Potential roles in the microbiome and neurotransmitter modulation.",
+        "authors": "Xu Liuting, Wang Sizhe, Wu Linlin, Cao Hui, Fan Yichun",
+        "journal": "Journal of affective disorders",
+        "year": "2024",
+        "volume": "356",
+        "issue": "",
+        "pages": "737-752",
+        "doi": "10.1016/j.jad.2024.04.050",
+        "abstract": "The onset of depression commonly occurs in adolescence; therefore, depressive prevention and intervention are pivotal during this period. It is becoming evident that neurotransmitter imbalance and gut microbiota dysbiosis are prominent causes of depression. However, the underlying links and mechanisms remain poorly understood. In this study, with 16S ribosomal RNA gene sequencing, genus Coprococcus markedly differentiated between the healthy and unmedicated depressive adolescents. Based on this, transplantation of Coprococcus eutactus (C.e.) was found to dramatically ameliorate the chronic res"
+      },
+      {
+        "pmid": "39295905",
+        "title": "The butyrate-producing and spore-forming bacterial genus ",
+        "authors": "Notting Fleur, Pirovano Walter, Sybesma Wilbert, Kort Remco",
+        "journal": "Gut microbiome (Cambridge, England)",
+        "year": "2023",
+        "volume": "4",
+        "issue": "",
+        "pages": "e16",
+        "doi": "10.1017/gmb.2023.14",
+        "abstract": "The host-intestinal microbiome interaction has gained much scientific attention in the past two decades, boosted by advances in DNA sequencing and cultivation techniques. An accumulating amount of evidence shows that gut microbes play crucial roles in gut homeostasis, immune system education, and are associated with quality-of-life indicators. Beneficial health factors are associated with the digestion of dietary fibres in the colon and the subsequent production of short-chain fatty acids, including acetate, propionate, and butyrate. "
+      },
+      {
+        "pmid": "31700098",
+        "title": "Gut Microbiota-Mediated Drug-Drug Interaction between Amoxicillin and Aspirin.",
+        "authors": "Zhang Juanhong, Sun Yuemei, Wang Rong, Zhang Junmin",
+        "journal": "Scientific reports",
+        "year": "2019",
+        "volume": "9",
+        "issue": "1",
+        "pages": "16194",
+        "doi": "10.1038/s41598-019-52632-5",
+        "abstract": "The effects of antibiotics on the intestinal flora can create potential drug-drug interactions. The combination of amoxicillin and aspirin is high and there is a high probability of interaction. We used 16S rRNA, incubation experiments and liquid chromatography-tandem mass spectrometry to analyze rat biological samples to characterize the effect of amoxicillin on the pharmacokinetics of aspirin metabolites. We first discovered that amoxicillin reduced the species and number of intestinal flora in rats, such as reducing the abundance of Helicobacter pylori and Prevotella_copri. After 12, 24, an"
+      },
+      {
+        "pmid": "41473771",
+        "title": "Gut microbiota-metabolite interactions in drug-induced liver injury: mechanisms, biomarkers, and therapeutic perspectives.",
+        "authors": "Mao Xiaoya, Hu Xujiao, Fang Jingjing",
+        "journal": "Frontiers in cellular and infection microbiology",
+        "year": "2025",
+        "volume": "15",
+        "issue": "",
+        "pages": "1737234",
+        "doi": "10.3389/fcimb.2025.1737234",
+        "abstract": "Drug-induced liver injury (DILI) remains a major obstacle in clinical pharmacotherapy and a leading cause of acute liver failure and drug withdrawal worldwide. Conventional mechanistic models centered on hepatic xenobiotic metabolism, oxidative stress, and immune injury cannot fully account for the substantial interindividual variability and the unpredictable nature of idiosyncratic DILI. Increasing evidence shows that the gut microbiota and its metabolites critically shape hepatic susceptibility through modulation of drug metabolism, inflammatory signaling, and intestinal barrier integrity. T"
+      }
+    ]
+  },
+  "markdown": "虽然自动报告生成工具因路径格式问题遇到困难，但我已经收集了所有必要的分析数据。现在让我基于所有这些发现，手动生成完整的 Markdown 健康评估报告。\n\n---\n\n# 📋 WGS.FMT 完整宏基因组健康评估报告\n\n## 样本信息\n\n| 项目 | 内容 |\n|------|------|\n| **样本 ID** | SRR13068821 |\n| **分析日期** | 当前 |\n| **分析方法** | MetaPhlAn4 + HUMAnN3 |\n| **Pipeline 状态** | ✅ 全部 7/7 步骤完成 |\n| **检测物种数** | 296 种 |\n| **总丰度** | 正常 ✅ |\n\n---\n\n## 一、🦠 物种组成与健康参考对比\n\n### 1.1 总体概况\n\n| 分类 | 数量 | 占比 |\n|------|:----:|:----:|\n| 正常物种 | 251 | 84.8% |\n| **偏高物种** | **37** | **12.5%** |\n| 偏低物种 | 0 | 0% |\n| 无参考物种 | 8 | 2.7% |\n\n> ⚠️ **发现**: 37 种物种显著偏高，无偏低物种。偏差幅度从 +1.07 到 +6.45 不等，提示肠道菌群存在明显的**物种组成失衡**。\n\n### 1.2 Top 5 优势菌种\n\n| 排名 | 物种 | 丰度(%) | 状态 | 健康参考范围(P5-P95) | 偏差 |\n|:----:|:-----|:-------:|:----:|:-------------------:|:----:|\n| 1 | **Agathobacter rectalis**（直肠杆菌） | 9.998 | 正常 | 0-16.87 | +0.19 |\n| 2 | **Coprococcus eutactus**（有序粪球菌） | 7.370 | ⬆️偏高 | 0-2.34 | **+5.30** |\n| 3 | **Bifidobacterium pseudocatenulatum**（假链状双歧杆菌） | 6.826 | ⬆️偏高 | 0-1.83 | **+6.45** |\n| 4 | **Roseburia faecis**（粪便罗氏菌） | 6.226 | ⬆️偏高 | 0-5.38 | +1.32 |\n| 5 | **Bifidobacterium adolescentis**（青春双歧杆菌） | 5.661 | 正常 | 0-8.61 | +0.32 |\n\n### 1.3 显著异常物种（偏差 > ±3.0）\n\n| 物种 | 丰度(%) | 参考上限(P95) | 偏差 | 临床意义 |\n|:-----|:-------:|:------------:|:----:|:---------|\n| **Bifidobacterium pseudocatenulatum**（假链状双歧杆菌） | 6.83% | 1.83% | **+6.45** 🔴 | 双歧杆菌属过度增殖，可能与益生菌摄入或特定饮食相关 |\n| **Ruminococcaceae bacterium AM53 2BH**（瘤胃球菌科菌） | 1.76% | 0.51% | **+5.89** 🔴 | 纤维降解菌显著偏高 |\n| **Coprococcus eutactus**（有序粪球菌） | 7.37% | 2.34% | **+5.30** 🔴 | 丁酸产生菌异常偏高；文献报道在帕金森病患者中通常降低[PMID:28429209]，但动物实验显示有抗抑郁潜力[PMID:38649105] |\n| **Anaerosacchariphilus hominis**（人厌氧糖嗜菌） | 0.0074% | 0.0024% | **+5.28** 🔴 | 罕见菌种异常增殖 |\n| **Lachnospira hominis**（人毛螺菌） | 0.56% | 0.21% | **+4.25** 🔴 | 毛螺菌属菌种偏高，与丁酸代谢相关 |\n| **Blautia luti**（布劳特氏菌） | 0.93% | 0.40% | **+3.68** 🔴 | 与腹泻保护相关[PMID:41087741] |\n| **Ruminococcaceae bacterium AF68 02b2A** | 0.87% | 0.38% | **+3.51** 🔴 | 瘤胃球菌科未培养菌偏高 |\n| **Roseburia yibonii**（宜宾罗氏菌） | 0.15% | 0.065% | **+3.49** 🔴 | 丁酸产生菌偏高 |\n| **Duodenibacillus massiliensis** | 0.015% | 0.007% | **+3.22** 🔴 | 十二指肠来源菌偏高 |\n\n---\n\n## 二、🔬 肠型分类分析\n\n| 项目 | 结果 |\n|:----|:-----|\n| **肠型** | **Ruminococcus型（肠型3）** 🏷️ |\n| **置信度** | 46.1% |\n| **Bacteroides/Phocaeicola 比例** | 3.28%（低） |\n| **Prevotella/Segatella 比例** | 0.00%（无） |\n| **Faecalibacterium 比例** | 9.22% |\n| **t-SNE 聚类** | 属于 ET_R 类群（87.9%样本属此类） |\n\n**优势菌属排名**：\n1. **Bifidobacterium（双歧杆菌属）** — 15.56%\n2. **Agathobacter（善杆菌属）** — 10.00%\n3. **Faecalibacterium（粪杆菌属）** — 9.22%\n4. **Coprococcus（粪球菌属）** — 8.10%\n5. **Roseburia（罗氏菌属）** — 7.30%\n\n> **解读**：Ruminococcus 肠型（混合型）通常与**高菌群多样性**相关，以产生丁酸等短链脂肪酸的菌群为主。该样本中 Bifidobacterium 占比极高（15.56%），提示可能有较多益生菌摄入或存在特定代谢特征。\n\n---\n\n## 三、🧬 代谢通路分析\n\n共检测到 **255 条**代谢通路，Top 10 如下：\n\n| 排名 | 代谢通路 | 丰度 | 功能描述 |\n|:----:|:---------|:----:|:---------|\n| 1 | **蔗糖合成 II** | 4746.25 | 碳水化合物代谢 |\n| 2 | **糖原降解 II** | 3806.95 | 能量代谢 |\n| 3 | **糖原生物合成 I** | 3387.94 | 糖原储存 |\n| 4 | **L-缬氨酸生物合成** | 3315.59 | 支链氨基酸合成 |\n| 5 | **UMP 生物合成 I/II/III** | 2856.86 | 核苷酸代谢 |\n| 6 | **L-异亮氨酸生物合成 I** | 2829.33 | 支链氨基酸合成 |\n| 7 | **L-精氨酸生物合成 II** | 2813.40 | 氨基酸代谢 |\n| 8 | **支链氨基酸超通路** | 2733.85 | BCAA 合成 |\n| 9 | **糖酵解 IV** | 2645.59 | 能量获取 |\n| 10 | **dTDP-β-L-鼠李糖生物合成** | 2611.69 | 细胞壁合成 |\n\n> **关键发现**：该样本的代谢通路以**糖代谢**（蔗糖合成、糖原代谢）和**氨基酸合成**（支链氨基酸、精氨酸）为主导，与高丰度的 Bifidobacterium 和产丁酸菌（Coprococcus, Roseburia）的代谢特征一致。\n\n---\n\n## 四、💊 药物-微生物组交互分析\n\n共检测 **44 种**药物交互关系，其中 **4 种高风险药物**（评分 > 50,000）：\n\n### 🚨 高风险药物\n\n| 药物名称 | 风险评分 | 风险等级 | 建议 |\n|:---------|:-------:|:--------:|:----|\n| **阿莫西林 (Amoxicillin)** | **76,986** | 🔴 极高 | 该菌群对 β-内酰胺类抗生素高度敏感，使用可能导致菌群严重损伤 |\n| **头孢曲松 (Ceftriaxone)** | **76,986** | 🔴 极高 | 三代头孢菌素，抗菌谱广，对当前菌群杀伤力大 |\n| **青霉素 (Penicillin)** | **76,986** | 🔴 极高 | β-内酰胺类，对革兰阳性菌有效 |\n| **美罗培南 (Meropenem)** | **76,986** | 🔴 极高 | 碳青霉烯类，广谱强效抗生素 |\n\n### 中等风险药物\n\n| 药物名称 | 风险评分 | 说明 |\n|:---------|:-------:|:-----|\n| 二甲双胍 (Metformin) | 47,704 | 糖尿病用药，对肠道菌群有调节作用 |\n| 对乙酰氨基酚 (Acetaminophen) | 27,044 | 解热镇痛药 |\n| 磺胺甲噁唑 (Sulfamethoxazole) | 25,604 | 磺胺类抗生素 |\n| 伊立替康 (Irinotecan) | 24,425 | 化疗药物 |\n| 吗啡 (Morphine) | 24,425 | 阿片类镇痛药 |\n\n> ⚠️ **强烈建议**：如需抗生素治疗，应优先选择对肠道菌群影响较小的药物（如窄谱抗生素），并在使用后补充益生菌/益生元以恢复菌群平衡。\n\n---\n\n## 五、🩺 疾病关联风险分析\n\n共匹配 **12 种**疾病，均为低风险：\n\n| 疾病 | 风险评分 | 风险等级 | 匹配关键菌种 |\n|:----|:-------:|:--------:|:-------------|\n| 自闭症谱系障碍 (ASD) | 1/100 | 🟢 低 | Blautia wexlerae, F. prausnitzii, B. longum |\n| 炎症性肠病 (IBD) | 0/100 | 🟢 低 | F. prausnitzii, Roseburia hominis |\n| 肠易激综合征 (IBS) | 0/100 | 🟢 低 | Bifidobacterium longum, F. prausnitzii |\n| 2型糖尿病 (T2DM) | 0/100 | 🟢 低 | Akkermansia muciniphila, F. prausnitzii |\n| 肥胖 (Obesity) | 0/100 | 🟢 低 | A. muciniphila, F. prausnitzii |\n| 结直肠癌 (CRC) | 0/100 | 🟢 低 | F. prausnitzii, Roseburia hominis |\n| 心血管疾病 (CVD) | 0/100 | 🟢 低 | A. muciniphila, Roseburia hominis |\n| 非酒精性脂肪肝 (NAFLD) | 0/100 | 🟢 低 | A. muciniphila, F. prausnitzii |\n| 抑郁症 (MDD) | 0/100 | 🟢 低 | F. prausnitzii, B. longum, Roseburia |\n| 帕金森病 (PD) | 0/100 | 🟢 低 | A. muciniphila, F. prausnitzii |\n| COVID-19 | 0/100 | 🟢 低 | F. prausnitzii, Roseburia, A. muciniphila |\n\n> ✅ **结论**：所有疾病风险评分均为低风险，表明该菌群构成与常见慢性疾病的关联风险较低。值得注意的是，帕金森病匹配的 Coprococcus eutactus 在该样本中偏高（文献中 PD 患者通常降低[PMID:28429209]），但整体未达到风险阈值。\n\n---\n\n## 六、🧪 代谢物含量分析\n\n共检测 **273 种**代谢物，Top 10：\n\n| 排名 | 代谢物 | 丰度 (CPM) | 功能 |\n|:----:|:-------|:----------:|:-----|\n| 1 | **ATP**（三磷酸腺苷） | 64,691 | 能量货币 |\n| 2 | **Pyruvate**（丙酮酸） | 44,978 | 糖酵解关键代谢物 |\n| 3 | **Glutamine**（谷氨酰胺） | 39,166 | 氨基酸代谢 |\n| 4 | **Aspartate**（天冬氨酸） | 38,114 | 氨基酸代谢 |\n| 5 | **PRPP**（磷酸核糖焦磷酸） | 36,773 | 核苷酸合成 |\n| 6 | **Glutamate**（谷氨酸） | 35,067 | 神经递质前体 |\n| 7 | **NADPH**（还原型辅酶Ⅱ） | 22,935 | 抗氧化/合成代谢 |\n| 8 | **CO₂**（二氧化碳） | 22,796 | 代谢终产物 |\n| 9 | **Fructose-6-phosphate**（果糖-6-磷酸） | 22,651 | 糖酵解中间体 |\n| 10 | **NAD⁺**（氧化型辅酶Ⅰ） | 20,562 | 氧化还原反应 |\n\n> **代谢特征**：能量代谢旺盛（高 ATP），氨基酸合成活跃，与高丰度的 Bifidobacterium 和产丁酸菌群一致。\n\n---\n\n## 七、🎯 FMT 配型分析\n\n该样本成功匹配 **5 个候选供体**：\n\n| 排名 | 供体 ID | 匹配评分 | 标签 |\n|:----:|:--------|:-------:|:----:|\n| 🥇 | **ERR1297832** | **0.9999** | Res（响应者） |\n| 🥈 | **ERR1297736** | **0.9999** | Res（响应者） |\n| 🥉 | **SRR11615769** | **0.9999** | — |\n| 4 | **ERR1297850** | **0.9997** | — |\n| 5 | **SRR13844382** | **0.9997** | — |\n\n> 所有匹配供体评分均 > 0.999，其中 ERR1297832 和 ERR1297736 标注为 \"Res\"（响应者类型），提示该样本如果接受 FMT 治疗，很可能获得良好响应。t-SNE 聚类图已保存。\n\n---\n\n## 八、📚 文献证据汇总\n\n### 关键物种文献\n\n| 物种 | 文献发现 | 来源 |\n|:----|:---------|:----:|\n| **Coprococcus eutactus** | 在健康青少年中筛选出并证明可缓解慢性束缚应激诱导的抑郁样行为，具有抗抑郁潜力 | [PMID:38649105] |\n| **Coprococcus eutactus** | 在帕金森病患者中显著减少，提示其可能为保护性菌种 | [PMID:28429209] |\n| **Blautia luti** | 可减轻 neratinib 诱导的腹泻，具有益生菌潜力 | [PMID:41087741] |\n| **Bifidobacterium pseudocatenulatum** | 参与人乳低聚糖（HMO）代谢，在婴儿肠道中富集 | [PMID:39315793] |\n| **Bifidobacterium 属** | 益生菌制剂（含 Bifidobacterium 和 Lactobacillus）可改善 IBS 症状 | [知识库:38999862] |\n| **Roseburia faecis** | 丁酸产生菌，作为下一代益生菌候选 | [PMID:40711452] |\n| **Faecalibacterium prausnitzii** | 与多种疾病呈负相关，是关键的抗炎有益菌 | [知识库:37451743] |\n| **短链脂肪酸(SCFA)** | 丁酸、丙酸、乙酸在维持肠道和代谢健康中发挥重要作用 | [知识库:39284033, 32865024] |\n\n---\n\n## 九、📊 综合评估与建议\n\n### 优势 ✅\n1. **高菌群多样性** — 296 种物种，Ruminococcus 肠型，提示菌群丰富度良好\n2. **有益的丁酸产生菌丰度高** — Faecalibacterium (9.22%)、Roseburia (7.30%)、Coprococcus (8.10%) 均丰富\n3. **所有疾病风险评分低** — 与12种常见慢病的关联风险均处于低水平\n4. **有益菌 Bifidobacterium 丰度高** — 15.56%，远超健康参考中位值\n5. **FMT 配型良好** — 5个供体匹配评分 > 0.999\n\n### 关注点 ⚠️\n1. **37 种物种显著偏高** — 显示菌群生态存在一定失衡\n2. **Bifidobacterium pseudocatenulatum 异常偏高（+6.45）** — 可能是外源性益生菌过度补充或特定饮食的结果\n3. **Coprococcus eutactus 偏高（+5.30）** — 虽有一定抗抑郁潜力，但偏离健康参考范围\n4. **β-内酰胺类抗生素高度敏感** — 4种抗生素风险评分 76,986，使用前需谨慎评估\n\n### 建议 💡\n\n| 类别 | 建议 |\n|:----|:------|\n| **饮食调整** | 增加膳食纤维摄入（如全谷物、蔬菜），维持有益菌群平衡 |\n| **益生菌** | 减少外源性 Bifidobacterium 补充剂的使用，避免过度增殖 |\n| **抗生素使用** | 如需使用抗生素，应避免 β-内酰胺类，优先选择窄谱抗生素 |\n| **FMT 考虑** | 如有临床需要，前 2 位候选供体（ERR1297832、ERR1297736）是最佳匹配 |\n| **定期监测** | 建议定期复查肠道菌群组成，动态监测菌群变化趋势 |\n\n---\n\n## 附注\n\n- 本报告中所有疾病风险评分仅供参考，**不代表临床诊断**\n- 物种偏差值基于健康人群参考范围（P5-P95）计算\n- 药物交互评分为微生物组介导的药物代谢风险预测，非药物疗效评估\n- 分析基于 MetaPhlAn4 + HUMAnN3 标准流程\n\n---\n\n*报告生成完毕 ✅ | 样本 SRR13068821 | WGS.FMT-Agent 完整分析*"
+}

@@ -1,0 +1,135 @@
+{
+  "seed": 20260830,
+  "audit": {
+    "post_samples_total": 81,
+    "pairing_eligible": 68,
+    "complete_species_triplets": 67,
+    "labeled_triplets": 66,
+    "unique_recipients": 66,
+    "unique_donors": 43,
+    "responders": 45,
+    "nonresponders": 21,
+    "projects": {
+      "PRJNA705895": 22,
+      "PRJNA672867": 13,
+      "PRJNA628604": 12,
+      "PRJNA678737": 9,
+      "PRJEB12357": 5,
+      "PRJNA628029": 5
+    },
+    "common_species": 1448,
+    "leakage_control": "All samples from one recipient occur in exactly one fold; preprocessing is fit on training fold only."
+  },
+  "provenance": {
+    "pairs": {
+      "path": "/storage/main/users/zhangrongpeng/data/fmt/postfmt_processed/analysis/sample_pairing_v2/fmt_sample_triplets.tsv",
+      "sha256": "d472b8783d327d075bf020f7f6172b0bef8ddc9b668eb6c0d822059aafc2fadb"
+    },
+    "baseline_species": {
+      "path": "/storage/main/users/zhangrongpeng/data/fmt/species_abundance_train.csv",
+      "sha256": "4c96730d061cb3fc44d93827f9cdf266b21f86e9d5de3203c070f7a66d8eb775"
+    },
+    "post_species": {
+      "path": "/storage/main/users/zhangrongpeng/data/fmt/postfmt_processed/matrices/species_relative_abundance_percent.tsv",
+      "sha256": "a6d72aa9d79f0c402553fb2d493956f398cb757d9ae09bed9cdbb71d2db9eaa6"
+    }
+  },
+  "cross_validation": {
+    "response_roc_auc": {
+      "mean": 0.8377777777777778,
+      "std": 0.09512824352446217,
+      "ci95_low": 0.754394195890244,
+      "ci95_high": 0.9211613596653117
+    },
+    "response_pr_auc": {
+      "mean": 0.9156892490225825,
+      "std": 0.0724022626016268,
+      "ci95_low": 0.8522258677089875,
+      "ci95_high": 0.9791526303361776
+    },
+    "response_f1": {
+      "mean": 0.72859477124183,
+      "std": 0.1491280529329004,
+      "ci95_low": 0.5978782694674504,
+      "ci95_high": 0.8593112730162097
+    },
+    "response_balanced_accuracy": {
+      "mean": 0.7322222222222222,
+      "std": 0.09751147447516617,
+      "ci95_low": 0.646749646301241,
+      "ci95_high": 0.8176947981432034
+    },
+    "mrr": {
+      "mean": 0.33934701648774124,
+      "std": 0.08313443016419766,
+      "ci95_low": 0.2664764755375421,
+      "ci95_high": 0.41221755743794036
+    },
+    "mean_rank": {
+      "mean": 10.189010989010988,
+      "std": 3.111184835134708,
+      "ci95_low": 7.4619372424953365,
+      "ci95_high": 12.91608473552664
+    },
+    "recall_at_1": {
+      "mean": 0.21208791208791208,
+      "std": 0.06379307812615381,
+      "ci95_low": 0.15617081368777042,
+      "ci95_high": 0.26800501048805375
+    },
+    "recall_at_3": {
+      "mean": 0.3791208791208791,
+      "std": 0.09500888168016802,
+      "ci95_low": 0.2958419225028678,
+      "ci95_high": 0.46239983573889043
+    },
+    "recall_at_5": {
+      "mean": 0.4252747252747254,
+      "std": 0.11997665111170269,
+      "ci95_low": 0.32011055381609654,
+      "ci95_high": 0.5304388967333542
+    },
+    "recall_at_10": {
+      "mean": 0.5791208791208791,
+      "std": 0.18509226738564913,
+      "ci95_low": 0.4168803534631986,
+      "ci95_high": 0.7413614047785595
+    },
+    "baseline_mrr": {
+      "mean": 0.21883658004770692,
+      "std": 0.07704987102220891,
+      "ci95_low": 0.1512993903365128,
+      "ci95_high": 0.28637376975890105
+    },
+    "baseline_mean_rank": {
+      "mean": 15.67032967032967,
+      "std": 4.039205283984504,
+      "ci95_low": 12.129810135023918,
+      "ci95_high": 19.210849205635423
+    },
+    "baseline_recall_at_1": {
+      "mean": 0.1208791208791209,
+      "std": 0.0868757598947357,
+      "ci95_low": 0.04472915982826192,
+      "ci95_high": 0.19702908192997987
+    },
+    "baseline_recall_at_3": {
+      "mean": 0.19670329670329673,
+      "std": 0.06733852175759794,
+      "ci95_low": 0.1376784799387964,
+      "ci95_high": 0.25572811346779706
+    },
+    "baseline_recall_at_5": {
+      "mean": 0.30439560439560437,
+      "std": 0.12442355916235748,
+      "ci95_low": 0.1953335461701211,
+      "ci95_high": 0.41345766262108763
+    },
+    "baseline_recall_at_10": {
+      "mean": 0.45604395604395603,
+      "std": 0.21350944206291703,
+      "ci95_low": 0.26889467853798776,
+      "ci95_high": 0.6431932335499243
+    }
+  }
+}

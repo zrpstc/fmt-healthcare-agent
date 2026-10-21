@@ -1,0 +1,190 @@
+{
+  "validation_design": "5-fold patient-level out-of-fold",
+  "n_patients": 66,
+  "classification_pooled": {
+    "n": 66,
+    "prevalence": 0.6818181818181818,
+    "accuracy": 0.696969696969697,
+    "balanced_accuracy": 0.7269841269841271,
+    "sensitivity": 0.6444444444444445,
+    "specificity": 0.8095238095238095,
+    "precision_ppv": 0.8787878787878788,
+    "negative_predictive_value": 0.5151515151515151,
+    "f1": 0.7435897435897436,
+    "mcc": 0.42289003161103106,
+    "roc_auc": 0.7999999999999999,
+    "pr_auc": 0.8879718808478285,
+    "brier_score": 0.2072482234617223,
+    "tp": 29,
+    "tn": 17,
+    "fp": 4,
+    "fn": 16
+  },
+  "classification_patient_bootstrap_95ci": {
+    "prevalence": {
+      "mean": 0.6827424242424243,
+      "ci95_low": 0.5757575757575758,
+      "ci95_high": 0.7878787878787878
+    },
+    "accuracy": {
+      "mean": 0.6989318181818183,
+      "ci95_low": 0.5909090909090909,
+      "ci95_high": 0.803030303030303
+    },
+    "balanced_accuracy": {
+      "mean": 0.7289876411898818,
+      "ci95_low": 0.6111111111111112,
+      "ci95_high": 0.8363256987577639
+    },
+    "sensitivity": {
+      "mean": 0.6468983829289516,
+      "ci95_low": 0.5101940776310524,
+      "ci95_high": 0.783797032326444
+    },
+    "specificity": {
+      "mean": 0.8110768994508119,
+      "ci95_low": 0.625,
+      "ci95_high": 0.9583333333333334
+    },
+    "precision_ppv": {
+      "mean": 0.8809260500662013,
+      "ci95_low": 0.7647058823529411,
+      "ci95_high": 0.972972972972973
+    },
+    "negative_predictive_value": {
+      "mean": 0.5164061926953589,
+      "ci95_low": 0.34285714285714286,
+      "ci95_high": 0.6875
+    },
+    "f1": {
+      "mean": 0.7435149903980028,
+      "ci95_low": 0.6301369863013698,
+      "ci95_high": 0.8421052631578947
+    },
+    "mcc": {
+      "mean": 0.4260550692925592,
+      "ci95_low": 0.2071042173948785,
+      "ci95_high": 0.6326221933201508
+    },
+    "roc_auc": {
+      "mean": 0.8023969018933501,
+      "ci95_low": 0.6835629225284398,
+      "ci95_high": 0.9106058405129233
+    },
+    "pr_auc": {
+      "mean": 0.8928862594381536,
+      "ci95_low": 0.7890638199696435,
+      "ci95_high": 0.9674535232928273
+    },
+    "brier_score": {
+      "mean": 0.20620300907012648,
+      "ci95_low": 0.13516936003267097,
+      "ci95_high": 0.28377253981583667
+    }
+  },
+  "donor_ranking_model": {
+    "mrr": 0.3390670267443984,
+    "mean_rank": 10.242424242424242,
+    "median_rank": 7.5,
+    "recall_at_1": 0.21212121212121213,
+    "recall_at_3": 0.3787878787878788,
+    "recall_at_5": 0.42424242424242425,
+    "recall_at_10": 0.5757575757575758
+  },
+  "donor_ranking_fixed_clr_baseline": {
+    "mrr": 0.21875129312644995,
+    "mean_rank": 15.696969696969697,
+    "median_rank": 13.0,
+    "recall_at_1": 0.12121212121212122,
+    "recall_at_3": 0.19696969696969696,
+    "recall_at_5": 0.30303030303030304,
+    "recall_at_10": 0.45454545454545453
+  },
+  "ranking_patient_bootstrap_95ci": {
+    "model_mrr": {
+      "mean": 0.3378240759715726,
+      "ci95_low": 0.2504776071642724,
+      "ci95_high": 0.42866559953534883
+    },
+    "model_mean_rank": {
+      "mean": 10.280257575757576,
+      "ci95_low": 8.106060606060606,
+      "ci95_high": 12.56060606060606
+    },
+    "model_median_rank": {
+      "mean": 7.8495,
+      "ci95_low": 3.5,
+      "ci95_high": 12.0
+    },
+    "model_recall_at_1": {
+      "mean": 0.21117424242424238,
+      "ci95_low": 0.12121212121212122,
+      "ci95_high": 0.30340909090908885
+    },
+    "model_recall_at_3": {
+      "mean": 0.37737878787878787,
+      "ci95_low": 0.25757575757575757,
+      "ci95_high": 0.5
+    },
+    "model_recall_at_5": {
+      "mean": 0.4223712121212121,
+      "ci95_low": 0.30303030303030304,
+      "ci95_high": 0.5454545454545454
+    },
+    "model_recall_at_10": {
+      "mean": 0.574090909090909,
+      "ci95_low": 0.45454545454545453,
+      "ci95_high": 0.696969696969697
+    },
+    "baseline_mrr": {
+      "mean": 0.21770891979890689,
+      "ci95_low": 0.15212790604704662,
+      "ci95_high": 0.29690213793451614
+    },
+    "baseline_mean_rank": {
+      "mean": 15.720992424242423,
+      "ci95_low": 12.7875,
+      "ci95_high": 18.698106060606055
+    },
+    "baseline_median_rank": {
+      "mean": 13.025,
+      "ci95_low": 9.5,
+      "ci95_high": 18.0
+    },
+    "baseline_recall_at_1": {
+      "mean": 0.12016666666666664,
+      "ci95_low": 0.045454545454545456,
+      "ci95_high": 0.21212121212121213
+    },
+    "baseline_recall_at_3": {
+      "mean": 0.19617424242424242,
+      "ci95_low": 0.10606060606060606,
+      "ci95_high": 0.2878787878787879
+    },
+    "baseline_recall_at_5": {
+      "mean": 0.30261363636363636,
+      "ci95_low": 0.19696969696969696,
+      "ci95_high": 0.4090909090909091
+    },
+    "baseline_recall_at_10": {
+      "mean": 0.4530984848484848,
+      "ci95_low": 0.3333333333333333,
+      "ci95_high": 0.5757575757575758
+    },
+    "mrr_difference": {
+      "mean": 0.12011515617266567,
+      "ci95_low": 0.04152728039872959,
+      "ci95_high": 0.19652641650737093
+    }
+  },
+  "engraftment_group_test": {
+    "mann_whitney_u": 612.0,
+    "p_value": 0.05567074678188039,
+    "rank_biserial": 0.2952380952380953
+  },
+  "notes": [
+    "All plotted response scores are out-of-fold predictions.",
+    "The comparator is a fixed CLR-distance baseline, not the previously trained contrastive_model.pt.",
+    "Bootstrap confidence intervals use 2,000 patient-level resamples."
+  ]
+}

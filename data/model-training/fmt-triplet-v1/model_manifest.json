@@ -1,0 +1,28 @@
+{
+  "name": "fmt-triplet-contrastive",
+  "task": "donor-ranking-response-prediction-engraftment",
+  "version": "1.0.0",
+  "artifact_uri": "data/model-training/fmt-triplet-v1/fmt_triplet_contrastive_model.npz",
+  "feature_version": "fmt-triplet-v1",
+  "training_dataset_version": "d472b8783d32",
+  "metrics": {
+    "response_roc_auc": 0.8377777777777778,
+    "response_pr_auc": 0.9156892490225825,
+    "response_f1": 0.72859477124183,
+    "response_balanced_accuracy": 0.7322222222222222,
+    "mrr": 0.33934701648774124,
+    "mean_rank": 10.189010989010988,
+    "recall_at_1": 0.21208791208791208,
+    "recall_at_3": 0.3791208791208791,
+    "recall_at_5": 0.4252747252747254,
+    "recall_at_10": 0.5791208791208791,
+    "baseline_mrr": 0.21883658004770692,
+    "baseline_mean_rank": 15.67032967032967,
+    "baseline_recall_at_1": 0.1208791208791209,
+    "baseline_recall_at_3": 0.19670329670329673,
+    "baseline_recall_at_5": 0.30439560439560437,
+    "baseline_recall_at_10": 0.45604395604395603
+  },
+  "validation": "5-fold patient-level out-of-fold",
+  "seed": 20260830
+}

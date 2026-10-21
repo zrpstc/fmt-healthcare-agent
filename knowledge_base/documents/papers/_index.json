@@ -1,0 +1,152 @@
+{
+  "pmids": {
+    "36157114": {
+      "topic": "IBD",
+      "title": "Gut microbiota, inflammatory bowel disease and colorectal cancer.",
+      "year": "2022",
+      "date": "2026-06-09T12:53:35.314689"
+    },
+    "37451743": {
+      "topic": "IBD",
+      "title": "Faecalibacterium: a bacterial genus with promising human health applications.",
+      "year": "2023",
+      "date": "2026-06-09T12:53:35.314818"
+    },
+    "37170220": {
+      "topic": "IBD",
+      "title": "Oxidative stress gene expression, DNA methylation, and gut microbiota interaction trigger Crohn's disease: a multi-omics Mendelian randomization study.",
+      "year": "2023",
+      "date": "2026-06-09T12:53:35.314906"
+    },
+    "39326132": {
+      "topic": "IBD",
+      "title": "Puerarin ameliorates colitis by direct suppression of macrophage M1 polarization in DSS mice.",
+      "year": "2024",
+      "date": "2026-06-09T12:53:35.314976"
+    },
+    "37734419": {
+      "topic": "IBD",
+      "title": "Pathobionts in Inflammatory Bowel Disease: Origins, Underlying Mechanisms, and Implications for Clinical Care.",
+      "year": "2024",
+      "date": "2026-06-09T12:53:35.315043"
+    },
+    "37169888": {
+      "topic": "CRC",
+      "title": "Gut microbiota in colorectal cancer development and therapy.",
+      "year": "2023",
+      "date": "2026-06-09T12:54:04.072959"
+    },
+    "37263983": {
+      "topic": "CRC",
+      "title": "Role of the Gut Microbiota and Its Metabolites in Tumorigenesis or Development of Colorectal Cancer.",
+      "year": "2023",
+      "date": "2026-06-09T12:54:04.073080"
+    },
+    "36058786": {
+      "topic": "CRC",
+      "title": "Fusobacterium nucleatum, a key pathogenic factor and microbial biomarker for colorectal cancer.",
+      "year": "2023",
+      "date": "2026-06-09T12:54:04.073156"
+    },
+    "35105664": {
+      "topic": "T2DM",
+      "title": "Gut microbiome and health: mechanistic insights.",
+      "year": "2022",
+      "date": "2026-06-09T12:54:05.544577"
+    },
+    "31263284": {
+      "topic": "T2DM",
+      "title": "Supplementation with Akkermansia muciniphila in overweight and obese human volunteers: a proof-of-concept exploratory study.",
+      "year": "2019",
+      "date": "2026-06-09T12:54:05.544700"
+    },
+    "39879980": {
+      "topic": "T2DM",
+      "title": "Akkermansia muciniphila supplementation in patients with overweight/obese type 2 diabetes: Efficacy depends on its baseline levels in the gut.",
+      "year": "2025",
+      "date": "2026-06-09T12:54:05.544781"
+    },
+    "39454570": {
+      "topic": "Obesity",
+      "title": "Effects of healthy low-carbohydrate diet and time-restricted eating on weight and gut microbiome in adults with overweight or obesity: Feeding RCT.",
+      "year": "2024",
+      "date": "2026-06-09T12:54:07.636247"
+    },
+    "35421277": {
+      "topic": "Obesity",
+      "title": "Obesity and gut-microbiota-brain axis: A narrative review.",
+      "year": "2022",
+      "date": "2026-06-09T12:54:07.636372"
+    },
+    "29902436": {
+      "topic": "Obesity",
+      "title": "The Impact of Dietary Fiber on Gut Microbiota in Host Health and Disease.",
+      "year": "2018",
+      "date": "2026-06-09T12:54:07.636448"
+    },
+    "38999862": {
+      "topic": "FMT",
+      "title": "The Efficacy of Probiotics, Prebiotics, Synbiotics, and Fecal Microbiota Transplantation in Irritable Bowel Syndrome: A Systematic Review and Network Meta-Analysis.",
+      "year": "2024",
+      "date": "2026-06-09T12:54:09.376020"
+    },
+    "33542131": {
+      "topic": "FMT",
+      "title": "Fecal microbiota transplant overcomes resistance to anti-PD-1 therapy in melanoma patients.",
+      "year": "2021",
+      "date": "2026-06-09T12:54:09.376130"
+    },
+    "40659786": {
+      "topic": "FMT",
+      "title": "Microbiota-driven antitumour immunity mediated by dendritic cell migration.",
+      "year": "2025",
+      "date": "2026-06-09T12:54:09.376203"
+    },
+    "39284033": {
+      "topic": "SCFA",
+      "title": "The interplay between gut microbiota, short-chain fatty acids, and implications for host health and disease.",
+      "year": "2024",
+      "date": "2026-06-09T12:54:11.703272"
+    },
+    "32865024": {
+      "topic": "SCFA",
+      "title": "Short chain fatty acids in human gut and metabolic health.",
+      "year": "2020",
+      "date": "2026-06-09T12:54:11.703391"
+    }
+  },
+  "topics": {
+    "IBD": [
+      "37170220",
+      "36157114",
+      "37451743",
+      "37734419",
+      "39326132"
+    ],
+    "CRC": [
+      "37263983",
+      "37169888",
+      "36058786"
+    ],
+    "T2DM": [
+      "39879980",
+      "35105664",
+      "31263284"
+    ],
+    "Obesity": [
+      "39454570",
+      "29902436",
+      "35421277"
+    ],
+    "FMT": [
+      "33542131",
+      "38999862",
+      "40659786"
+    ],
+    "SCFA": [
+      "32865024",
+      "39284033"
+    ]
+  },
+  "last_update": "2026-06-09T12:54:11.703405"
+}
