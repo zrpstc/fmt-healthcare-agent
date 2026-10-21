@@ -50,14 +50,20 @@ export interface Paper {
   sample_source?:string; target_disease_code?:string; target_disease_name?:string; pmc_id?:string;
   full_text_available?:number; [key:string]:any;
 }
-export interface LitkgSource { kind:string; label:string; knowledge_base_id:number; endpoint:string }
+export interface LitkgKnowledgeBase {
+  id:number;slug?:string;name:string;description?:string|null;document_count?:number;claim_count?:number;
+  relation_count?:number;created_at?:string;updated_at?:string;selected?:boolean;
+}
+export interface LitkgSource { kind:string;label:string;knowledge_base_id?:number|null;knowledge_base_ids:number[];knowledge_base_names:string[];endpoint:string }
 export interface LitkgStatus {
   available:boolean; source:LitkgSource; document_count:number; claim_count:number; ready_count:number;
-  batch_count:number; latest_batch?:Record<string,any>|null; message?:string;
+  relation_count?:number;batch_count:number;latest_batch?:Record<string,any>|null;message?:string;
+  knowledge_bases:LitkgKnowledgeBase[];selected_knowledge_base_ids:number[];errors?:Array<{knowledge_base_id:number;message:string}>;
 }
 export interface LitkgDocument {
   id:number; filename:string; title?:string; status:string; error?:string|null; created_at?:string; updated_at?:string;
   chunk_count?:number; chunk_done_count?:number; chunk_failed_count?:number; claim_count?:number;
+  knowledge_base_id?:number;knowledge_base_name?:string;
 }
 export interface GraphNode { id:number|string; label:string; type:string; normalized_id?:string|null }
 export interface GraphEvidence { claim_id?:number|string; document_id?:number; filename?:string; section?:string; sentence?:string; confidence?:number }
@@ -68,7 +74,7 @@ export interface GraphEdge {
 }
 export interface KnowledgeGraph {
   nodes:GraphNode[]; edges:GraphEdge[]; summary:{node_count:number;relation_count:number;represented_document_count:number};
-  knowledge_base_id:number; document_id?:number|null; source:LitkgSource;
+  knowledge_base_id?:number|null;knowledge_base_ids:number[];document_id?:number|null;source:LitkgSource;
 }
 
 const BASE = "/backend/api";
@@ -128,10 +134,11 @@ export const api = {
   },
   paper: (pmid:string) => request<Paper>(`/knowledge/papers/${encodeURIComponent(pmid)}`),
   bindPaper: (pmid:string,sampleId:string) => request(`/knowledge/papers/${encodeURIComponent(pmid)}/bind`, {method:"POST",body:JSON.stringify({sample_id:sampleId})}),
-  litkgStatus: () => request<LitkgStatus>("/knowledge/remote/status"),
-  litkgDocuments: () => request<{knowledge_base_id:number;documents:LitkgDocument[];source:LitkgSource}>("/knowledge/remote/documents"),
-  litkgClaims: (q:string,limit=30) => request<{count:number;claims:Array<Record<string,any>>;source:LitkgSource}>(`/knowledge/remote/claims?q=${encodeURIComponent(q)}&limit=${limit}`),
-  bindLitkgClaim: (claimId:number|string,sampleId:string) => request(`/knowledge/remote/claims/${encodeURIComponent(String(claimId))}/bind`, {method:"POST",body:JSON.stringify({sample_id:sampleId})}),
+  litkgStatus: (ids:number[]=[] ) => request<LitkgStatus>(`/knowledge/remote/status${ids.length?`?knowledge_base_ids=${ids.join(",")}`:""}`),
+  litkgKnowledgeBases: (ids:number[]=[] ) => request<{knowledge_bases:LitkgKnowledgeBase[];selected_knowledge_base_ids:number[];source:LitkgSource}>(`/knowledge/remote/knowledge-bases${ids.length?`?knowledge_base_ids=${ids.join(",")}`:""}`),
+  litkgDocuments: (ids:number[]=[] ) => request<{knowledge_base_ids:number[];documents:LitkgDocument[];source:LitkgSource}>(`/knowledge/remote/documents${ids.length?`?knowledge_base_ids=${ids.join(",")}`:""}`),
+  litkgClaims: (q:string,limit=30,ids:number[]=[] ) => request<{count:number;claims:Array<Record<string,any>>;source:LitkgSource}>(`/knowledge/remote/claims?q=${encodeURIComponent(q)}&limit=${limit}${ids.length?`&knowledge_base_ids=${ids.join(",")}`:""}`),
+  bindLitkgClaim: (claimId:number|string,sampleId:string,knowledgeBaseId?:number) => request(`/knowledge/remote/claims/${encodeURIComponent(String(claimId))}/bind${knowledgeBaseId?`?knowledge_base_id=${knowledgeBaseId}`:""}`, {method:"POST",body:JSON.stringify({sample_id:sampleId})}),
   knowledgeGraph: (params:Record<string,string|number|boolean|undefined>) => {
     const query=new URLSearchParams(); Object.entries(params).forEach(([key,value])=>{if(value!==undefined&&value!=="")query.set(key,String(value))});
     return request<KnowledgeGraph>(`/knowledge/remote/graph?${query.toString()}`);

@@ -18,9 +18,15 @@ WGS_ELASTICSEARCH_URL
 WGS_ELASTICSEARCH_INDEX
 WGS_EMBEDDING_DIMENSIONS
 WGS_CLAIM_API_URL
-WGS_CLAIM_API_KNOWLEDGE_BASE_ID
+WGS_CLAIM_API_KNOWLEDGE_BASE_IDS
 WGS_GRAPH_TEXT_SEARCH_PATH
 ```
+
+`WGS_CLAIM_API_KNOWLEDGE_BASE_IDS=auto` discovers the current catalog with
+`GET /knowledge-bases` and searches every available knowledge base. Set a
+comma-separated list such as `25,26` to restrict server-side retrieval. The
+legacy singular `WGS_CLAIM_API_KNOWLEDGE_BASE_ID` remains available only for
+older adapters and emergency fallback.
 
 The embedding dimension is part of the Elasticsearch index mapping. Changing it requires creating a new index or reindexing existing documents.
 

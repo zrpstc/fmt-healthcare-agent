@@ -27,6 +27,11 @@ from wgs_agent.pipeline.upload_workflow import get_workflow_status, submit_uploa
 from app.local_chat import LocalChatError, list_models
 from wgs_agent.tools.knowledge_tools import claim_record_to_reference
 from wgs_fmt_platform.config import get_settings
+from wgs_fmt_platform.knowledge.litkg_catalog import (
+    normalize_knowledge_bases,
+    parse_knowledge_base_ids,
+    select_knowledge_bases,
+)
 from wgs_fmt_platform.infrastructure.api import router as infrastructure_router
 from wgs_fmt_platform.infrastructure.api import ensure_local_user
 from wgs_fmt_platform.infrastructure.database import Conversation, Message, SessionLocal, create_schema
@@ -1014,38 +1019,96 @@ async def _litkg_get(path: str, params: dict[str, Any] | None = None) -> dict[st
     return payload
 
 
-def _litkg_source() -> dict[str, Any]:
+async def _litkg_selection(requested_ids: str = "") -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     settings = get_settings()
+    payload = await _litkg_get("/knowledge-bases")
+    try:
+        available = normalize_knowledge_bases(payload)
+    except ValueError as exc:
+        raise HTTPException(502, f"LitKG 知识库目录格式错误：{exc}") from exc
+    selected = select_knowledge_bases(
+        available,
+        requested_ids=requested_ids,
+        configured_ids=settings.claim_api_knowledge_base_ids,
+    )
+    requested = parse_knowledge_base_ids(requested_ids)
+    if requested and not selected:
+        raise HTTPException(404, "所选 LitKG 知识库不存在或已经被删除。")
+    return available, selected
+
+
+def _litkg_source(selected: list[dict[str, Any]]) -> dict[str, Any]:
+    settings = get_settings()
+    ids = [int(item["id"]) for item in selected]
+    names = [str(item.get("name") or f"Knowledge Base {item['id']}") for item in selected]
     return {
         "kind": "litkg-rest-api",
-        "label": f"LitKG · Knowledge Base {settings.claim_api_knowledge_base_id}",
-        "knowledge_base_id": settings.claim_api_knowledge_base_id,
+        "label": f"LitKG · {names[0]}" if len(names) == 1 else f"LitKG · {len(names)} 个知识库",
+        "knowledge_base_id": ids[0] if len(ids) == 1 else None,
+        "knowledge_base_ids": ids,
+        "knowledge_base_names": names,
         "endpoint": settings.claim_api_url.rstrip("/"),
     }
 
 
+@app.get("/api/knowledge/remote/knowledge-bases")
+async def litkg_knowledge_bases(
+    knowledge_base_ids: str = Query(default="", max_length=1000),
+) -> dict[str, Any]:
+    available, selected = await _litkg_selection(knowledge_base_ids)
+    selected_ids = {int(item["id"]) for item in selected}
+    return {
+        "knowledge_bases": [{**item, "selected": int(item["id"]) in selected_ids} for item in available],
+        "selected_knowledge_base_ids": sorted(selected_ids),
+        "source": _litkg_source(selected),
+    }
+
+
 @app.get("/api/knowledge/remote/status")
-async def litkg_status() -> dict[str, Any]:
-    settings = get_settings()
-    kb = settings.claim_api_knowledge_base_id
+async def litkg_status(
+    knowledge_base_ids: str = Query(default="", max_length=1000),
+) -> dict[str, Any]:
     try:
-        documents = await _litkg_get(f"/knowledge-bases/{kb}/documents", {"limit": 100, "offset": 0})
-        batches = await _litkg_get(f"/knowledge-bases/{kb}/batches", {"limit": 50})
-        items = documents.get("documents", []) if isinstance(documents.get("documents"), list) else []
-        batch_items = batches.get("batches", []) if isinstance(batches.get("batches"), list) else []
+        available, selected = await _litkg_selection(knowledge_base_ids)
+        all_documents: list[dict[str, Any]] = []
+        all_batches: list[dict[str, Any]] = []
+        errors: list[dict[str, Any]] = []
+        for knowledge_base in selected:
+            kb = int(knowledge_base["id"])
+            try:
+                documents = await _litkg_get(f"/knowledge-bases/{kb}/documents", {"limit": 500, "offset": 0})
+                batches = await _litkg_get(f"/knowledge-bases/{kb}/batches", {"limit": 50})
+                all_documents.extend(
+                    {**item, "knowledge_base_id": kb, "knowledge_base_name": knowledge_base["name"]}
+                    for item in documents.get("documents", []) if isinstance(item, dict)
+                )
+                all_batches.extend(
+                    {**item, "knowledge_base_id": kb, "knowledge_base_name": knowledge_base["name"]}
+                    for item in batches.get("batches", []) if isinstance(item, dict)
+                )
+            except HTTPException as exc:
+                errors.append({"knowledge_base_id": kb, "message": str(exc.detail)})
+        all_batches.sort(key=lambda item: str(item.get("created_at") or ""), reverse=True)
+        selected_ids = {int(item["id"]) for item in selected}
         return {
-            "available": True,
-            "source": _litkg_source(),
-            "document_count": len(items),
-            "claim_count": sum(int(item.get("claim_count") or 0) for item in items if isinstance(item, dict)),
-            "ready_count": sum(1 for item in items if isinstance(item, dict) and item.get("status") == "done"),
-            "batch_count": len(batch_items),
-            "latest_batch": batch_items[0] if batch_items else None,
+            "available": bool(selected) and len(errors) < len(selected),
+            "source": _litkg_source(selected),
+            "knowledge_bases": [{**item, "selected": int(item["id"]) in selected_ids} for item in available],
+            "selected_knowledge_base_ids": sorted(selected_ids),
+            "document_count": len(all_documents),
+            "claim_count": sum(int(item.get("claim_count") or 0) for item in selected),
+            "relation_count": sum(int(item.get("relation_count") or 0) for item in selected),
+            "ready_count": sum(1 for item in all_documents if item.get("status") == "done"),
+            "batch_count": len(all_batches),
+            "latest_batch": all_batches[0] if all_batches else None,
+            "errors": errors,
+            "message": "未发现可用知识库。" if not selected else None,
         }
     except HTTPException as exc:
         return {
             "available": False,
-            "source": _litkg_source(),
+            "source": _litkg_source([]),
+            "knowledge_bases": [], "selected_knowledge_base_ids": [],
             "document_count": 0, "claim_count": 0, "ready_count": 0, "batch_count": 0,
             "message": str(exc.detail),
         }
@@ -1055,62 +1118,90 @@ async def litkg_status() -> dict[str, Any]:
 async def litkg_documents(
     limit: int = Query(default=100, ge=1, le=500),
     offset: int = Query(default=0, ge=0),
+    knowledge_base_ids: str = Query(default="", max_length=1000),
 ) -> dict[str, Any]:
-    settings = get_settings(); kb = settings.claim_api_knowledge_base_id
-    payload = await _litkg_get(f"/knowledge-bases/{kb}/documents", {"limit": limit, "offset": offset})
-    payload["source"] = _litkg_source()
-    return payload
+    _, selected = await _litkg_selection(knowledge_base_ids)
+    documents: list[dict[str, Any]] = []
+    for knowledge_base in selected:
+        kb = int(knowledge_base["id"])
+        payload = await _litkg_get(f"/knowledge-bases/{kb}/documents", {"limit": limit, "offset": offset})
+        documents.extend(
+            {**item, "knowledge_base_id": kb, "knowledge_base_name": knowledge_base["name"]}
+            for item in payload.get("documents", []) if isinstance(item, dict)
+        )
+    return {
+        "knowledge_base_ids": [int(item["id"]) for item in selected],
+        "documents": documents,
+        "source": _litkg_source(selected),
+    }
 
 
 @app.get("/api/knowledge/remote/claims")
 async def litkg_claims(
     q: str = Query(default="", max_length=300),
     limit: int = Query(default=30, ge=1, le=100),
+    knowledge_base_ids: str = Query(default="", max_length=1000),
 ) -> dict[str, Any]:
-    settings = get_settings(); kb = settings.claim_api_knowledge_base_id
+    settings = get_settings()
+    _, selected = await _litkg_selection(knowledge_base_ids)
     scan_limit = min(1000, max(limit * 10, 200))
-    payload = await _litkg_get(f"/knowledge-bases/{kb}/claims", {"limit": scan_limit, "offset": 0})
-    raw = payload.get("claims", []) if isinstance(payload.get("claims"), list) else []
     terms = [term.casefold() for term in q.split() if term]
     ranked: list[tuple[int, float, dict[str, Any]]] = []
-    for item in raw:
-        if not isinstance(item, dict):
-            continue
-        haystack = " ".join(str(item.get(key, "")) for key in (
-            "subject_text", "subject_type", "predicate", "object_text", "object_type",
-            "evidence_text", "section_title", "filename",
-        )).casefold()
-        score = sum(term in haystack for term in terms) if terms else 1
-        if score:
-            ranked.append((score, float(item.get("confidence") or 0), item))
+    for knowledge_base in selected:
+        kb = int(knowledge_base["id"])
+        payload = await _litkg_get(f"/knowledge-bases/{kb}/claims", {"limit": scan_limit, "offset": 0})
+        raw = payload.get("claims", []) if isinstance(payload.get("claims"), list) else []
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            haystack = " ".join(str(item.get(key, "")) for key in (
+                "subject_text", "subject_type", "predicate", "object_text", "object_type",
+                "evidence_text", "section_title", "filename",
+            )).casefold()
+            score = sum(term in haystack for term in terms) if terms else 1
+            if score:
+                reference = claim_record_to_reference(
+                    item,
+                    base_url=settings.claim_api_url,
+                    knowledge_base_id=kb,
+                    query=q,
+                    retrieval_score=score,
+                )
+                reference["knowledge_base_name"] = knowledge_base["name"]
+                ranked.append((score, float(item.get("confidence") or 0), reference))
     ranked.sort(key=lambda row: (row[0], row[1]), reverse=True)
-    results = [
-        claim_record_to_reference(
-            item,
-            base_url=settings.claim_api_url,
-            knowledge_base_id=kb,
-            query=q,
-            retrieval_score=score,
-        )
-        for score, _, item in ranked[:limit]
-    ]
-    return {"count": len(results), "claims": results, "source": _litkg_source()}
+    results = [item for _, _, item in ranked[:limit]]
+    return {"count": len(results), "claims": results, "source": _litkg_source(selected)}
 
 
 @app.post("/api/knowledge/remote/claims/{claim_id}/bind")
-async def bind_litkg_claim(claim_id: int, payload: EvidenceBindPayload) -> dict[str, Any]:
+async def bind_litkg_claim(
+    claim_id: int,
+    payload: EvidenceBindPayload,
+    knowledge_base_id: int | None = Query(default=None, ge=1),
+) -> dict[str, Any]:
     sample_id = _safe_sample_id(payload.sample_id)
-    settings = get_settings(); kb = settings.claim_api_knowledge_base_id
-    result = await _litkg_get(f"/knowledge-bases/{kb}/claims", {"limit": 1000, "offset": 0})
-    claims = result.get("claims", []) if isinstance(result.get("claims"), list) else []
-    raw = next((item for item in claims if isinstance(item, dict) and int(item.get("id") or -1) == claim_id), None)
+    settings = get_settings()
+    _, selected = await _litkg_selection(str(knowledge_base_id or ""))
+    raw: dict[str, Any] | None = None
+    matched_base: dict[str, Any] | None = None
+    for knowledge_base in selected:
+        kb = int(knowledge_base["id"])
+        result = await _litkg_get(f"/knowledge-bases/{kb}/claims", {"limit": 1000, "offset": 0})
+        claims = result.get("claims", []) if isinstance(result.get("claims"), list) else []
+        raw = next((item for item in claims if isinstance(item, dict) and int(item.get("id") or -1) == claim_id), None)
+        if raw is not None:
+            matched_base = knowledge_base
+            break
     if raw is None:
         raise HTTPException(404, "接口知识库中未找到该 Claim。")
+    kb = int(matched_base["id"])
     claim = claim_record_to_reference(
         raw,
         base_url=settings.claim_api_url,
         knowledge_base_id=kb,
     )
+    claim["knowledge_base_name"] = matched_base["name"]
     knowledge_path = RESULTS_DIR / f"{sample_id}_knowledge.json"
     knowledge = _json_object(knowledge_path) or {"matched_docs": [], "pubmed_results": []}
     matched = [item for item in knowledge.get("matched_docs", []) if isinstance(item, dict)]
@@ -1133,9 +1224,13 @@ async def litkg_graph(
     min_document_count: int = Query(default=1, ge=1, le=100),
     include_negated: bool = False,
     include_speculative: bool = True,
+    knowledge_base_ids: str = Query(default="", max_length=1000),
 ) -> dict[str, Any]:
-    settings = get_settings(); kb = settings.claim_api_knowledge_base_id
+    _, selected = await _litkg_selection(knowledge_base_ids)
     params: dict[str, Any] = {"limit": limit, "evidence_limit": 2}
+    nodes_by_id: dict[str, dict[str, Any]] = {}
+    edges_by_id: dict[str, dict[str, Any]] = {}
+    represented_document_count = 0
     if document_id is None:
         params.update({
             "min_document_count": min_document_count,
@@ -1144,19 +1239,31 @@ async def litkg_graph(
         })
         if entity_type.strip(): params["entity_type"] = entity_type.strip()
         if predicate.strip(): params["predicate"] = predicate.strip()
-        path = f"/knowledge-bases/{kb}/graph"
+        targets = [(int(item["id"]), f"/knowledge-bases/{int(item['id'])}/graph") for item in selected]
     else:
-        path = f"/documents/{document_id}/graph"
-    payload = await _litkg_get(path, params)
-    nodes = payload.get("nodes", []) if isinstance(payload.get("nodes"), list) else []
-    edges = payload.get("edges", []) if isinstance(payload.get("edges"), list) else []
+        targets = [(int(selected[0]["id"]) if selected else 0, f"/documents/{document_id}/graph")]
+    for kb, path in targets:
+        payload = await _litkg_get(path, params)
+        for node in payload.get("nodes", []) if isinstance(payload.get("nodes"), list) else []:
+            if isinstance(node, dict): nodes_by_id[str(node.get("id"))] = node
+        for edge in payload.get("edges", []) if isinstance(payload.get("edges"), list) else []:
+            if not isinstance(edge, dict): continue
+            edge_key = str(edge.get("id"))
+            current = edges_by_id.get(edge_key)
+            if current is None:
+                edges_by_id[edge_key] = {**edge, "knowledge_base_ids": [kb]}
+            elif kb not in current["knowledge_base_ids"]:
+                current["knowledge_base_ids"].append(kb)
+        summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+        represented_document_count += int(summary.get("represented_document_count") or 0)
+    nodes = list(nodes_by_id.values())
+    edges = list(edges_by_id.values())
     return {
         "nodes": nodes,
         "edges": edges,
-        "summary": payload.get("summary") or {
-            "node_count": len(nodes), "relation_count": len(edges), "represented_document_count": 1 if document_id else 0,
-        },
-        "knowledge_base_id": payload.get("knowledge_base_id", kb),
+        "summary": {"node_count": len(nodes), "relation_count": len(edges), "represented_document_count": represented_document_count or (1 if document_id else 0)},
+        "knowledge_base_id": int(selected[0]["id"]) if len(selected) == 1 else None,
+        "knowledge_base_ids": [int(item["id"]) for item in selected],
         "document_id": document_id,
-        "source": _litkg_source(),
+        "source": _litkg_source(selected),
     }

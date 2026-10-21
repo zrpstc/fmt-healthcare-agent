@@ -6,6 +6,7 @@ import httpx
 from elasticsearch import Elasticsearch
 
 from wgs_fmt_platform.config import get_settings
+from wgs_fmt_platform.knowledge.litkg_catalog import normalize_knowledge_bases, select_knowledge_bases
 
 
 class HybridKnowledgeSearch:
@@ -55,14 +56,36 @@ class HybridKnowledgeSearch:
         return self._merge(rankings, limit)
 
     async def graph_search(self, query: str, limit: int) -> list[dict[str, Any]]:
-        path = self.settings.graph_text_search_path.format(knowledge_base_id=self.settings.claim_api_knowledge_base_id)
         headers = {"Authorization": f"Bearer {self.settings.claim_api_token}"} if self.settings.claim_api_token else {}
         async with httpx.AsyncClient(base_url=self.settings.claim_api_url, headers=headers, timeout=self.settings.claim_api_timeout) as client:
-            response = await client.get(path, params={"q": query, "limit": limit})
-            response.raise_for_status()
-            payload = response.json()
-        rows = payload.get("claims", payload.get("items", payload if isinstance(payload, list) else []))
-        return [{"id": f"graph:{row.get('id', index)}", "title": row.get("subject_text", "") + " → " + row.get("object_text", ""), "content": row.get("evidence_text", row.get("sentence", "")), "source": "knowledge-graph", "channel": "graph", "metadata": row} for index, row in enumerate(rows[:limit])]
+            catalog_response = await client.get("/knowledge-bases")
+            catalog_response.raise_for_status()
+            selected = select_knowledge_bases(
+                normalize_knowledge_bases(catalog_response.json()),
+                configured_ids=self.settings.claim_api_knowledge_base_ids,
+            )
+            results: list[dict[str, Any]] = []
+            for knowledge_base in selected:
+                knowledge_base_id = int(knowledge_base["id"])
+                path = self.settings.graph_text_search_path.format(knowledge_base_id=knowledge_base_id)
+                response = await client.get(path, params={"query": query, "limit": limit})
+                response.raise_for_status()
+                payload = response.json()
+                rows = payload.get("relations", payload.get("claims", payload.get("items", payload if isinstance(payload, list) else [])))
+                for index, row in enumerate(rows[:limit]):
+                    subject = row.get("subject") if isinstance(row.get("subject"), dict) else {}
+                    object_ = row.get("object") if isinstance(row.get("object"), dict) else {}
+                    subject_text = subject.get("text") or row.get("subject_text", "")
+                    object_text = object_.get("text") or row.get("object_text", "")
+                    results.append({
+                        "id": f"graph:{knowledge_base_id}:{row.get('id', index)}",
+                        "title": f"{subject_text} → {object_text}",
+                        "content": row.get("evidence", row.get("evidence_text", row.get("sentence", ""))),
+                        "source": "knowledge-graph",
+                        "channel": "graph",
+                        "metadata": {**row, "knowledge_base_id": knowledge_base_id, "knowledge_base_name": knowledge_base["name"]},
+                    })
+        return results[:limit]
 
     async def fused_search(self, query: str, *, vector: list[float] | None = None, limit: int = 10) -> dict[str, Any]:
         errors: list[str] = []

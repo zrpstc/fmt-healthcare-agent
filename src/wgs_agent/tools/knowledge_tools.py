@@ -7,6 +7,10 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from wgs_agent.core.tools.base import BaseTool, ToolResult
+from wgs_fmt_platform.knowledge.litkg_catalog import (
+    normalize_knowledge_bases,
+    select_knowledge_bases,
+)
 
 
 class KnowledgeSearchParams(BaseModel):
@@ -318,7 +322,6 @@ async def search_claim_references(query: str, max_results: int = 10) -> list[dic
     base_url = os.environ.get("WGS_CLAIM_API_URL", "").rstrip("/")
     if not base_url:
         return []
-    knowledge_base_id = int(os.environ.get("WGS_CLAIM_API_KNOWLEDGE_BASE_ID", "7"))
     scan_limit = min(1000, max(1, int(os.environ.get("WGS_CLAIM_API_SCAN_LIMIT", "1000"))))
     timeout = float(os.environ.get("WGS_CLAIM_API_TIMEOUT", "20"))
     token = os.environ.get("WGS_CLAIM_API_TOKEN", "")
@@ -326,41 +329,62 @@ async def search_claim_references(query: str, max_results: int = 10) -> list[dic
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
-    path = f"/knowledge-bases/{knowledge_base_id}/claims"
     async with httpx.AsyncClient(base_url=base_url, timeout=timeout, headers=headers) as client:
-        response = await client.get(path, params={"limit": scan_limit, "offset": 0})
-        response.raise_for_status()
-    payload = response.json()
-    claims = payload.get("claims", []) if isinstance(payload, dict) else []
-    terms = [term.casefold() for term in query.split() if term]
-    matches: list[dict[str, Any]] = []
-    for claim in claims:
-        if not isinstance(claim, dict):
-            continue
-        haystack = " ".join(
-            str(claim.get(key, ""))
-            for key in (
-                "subject_text",
-                "subject_type",
-                "predicate",
-                "object_text",
-                "object_type",
-                "evidence_text",
-                "section_title",
-                "filename",
+        try:
+            catalog_response = await client.get("/knowledge-bases")
+            catalog_response.raise_for_status()
+            available = normalize_knowledge_bases(catalog_response.json())
+            selected = select_knowledge_bases(
+                available,
+                configured_ids=os.environ.get("WGS_CLAIM_API_KNOWLEDGE_BASE_IDS", "auto"),
             )
-        ).casefold()
-        score = sum(term in haystack for term in terms)
-        if score:
-            matches.append(
-                claim_record_to_reference(
+        except (httpx.HTTPError, ValueError):
+            selected = [{
+                "id": int(os.environ.get("WGS_CLAIM_API_KNOWLEDGE_BASE_ID", "7")),
+                "name": "Legacy configured knowledge base",
+            }]
+
+        terms = [term.casefold() for term in query.split() if term]
+        matches: list[dict[str, Any]] = []
+        for knowledge_base in selected:
+            knowledge_base_id = int(knowledge_base["id"])
+            response = await client.get(
+                f"/knowledge-bases/{knowledge_base_id}/claims",
+                params={"limit": scan_limit, "offset": 0},
+            )
+            if response.status_code == 404:
+                continue
+            response.raise_for_status()
+            payload = response.json()
+            claims = payload.get("claims", []) if isinstance(payload, dict) else []
+            for claim in claims:
+                if not isinstance(claim, dict):
+                    continue
+                haystack = " ".join(
+                    str(claim.get(key, ""))
+                    for key in (
+                        "subject_text",
+                        "subject_type",
+                        "predicate",
+                        "object_text",
+                        "object_type",
+                        "evidence_text",
+                        "section_title",
+                        "filename",
+                    )
+                ).casefold()
+                score = sum(term in haystack for term in terms)
+                if not score:
+                    continue
+                reference = claim_record_to_reference(
                     claim,
                     base_url=base_url,
                     knowledge_base_id=knowledge_base_id,
                     query=query,
                     retrieval_score=score,
                 )
-            )
+                reference["knowledge_base_name"] = knowledge_base["name"]
+                matches.append(reference)
     matches.sort(
         key=lambda item: (item["retrieval_score"], item.get("confidence") or 0),
         reverse=True,
@@ -411,10 +435,10 @@ def claim_record_to_reference(
 
 def _format_claim_results(query: str, matches: list[dict[str, Any]]) -> str:
     """Render Claim results for humans and append a machine-readable payload."""
-    knowledge_base_id = matches[0].get("knowledge_base_id", "") if matches else ""
+    knowledge_base_ids = sorted({item.get("knowledge_base_id") for item in matches if item.get("knowledge_base_id")})
 
     lines = [
-        f"LitKG Claim 搜索结果 ({len(matches)} 条, KB={knowledge_base_id}, 查询: '{query}'):\n"
+        f"LitKG Claim 搜索结果 ({len(matches)} 条, KB={knowledge_base_ids}, 查询: '{query}'):\n"
     ]
     for index, claim in enumerate(matches, 1):
         lines.extend(
@@ -429,6 +453,7 @@ def _format_claim_results(query: str, matches: list[dict[str, Any]]) -> str:
                 f"证据: {claim.get('evidence_text', '')}",
                 (
                     f"来源: document:{claim.get('document_id', 'N/A')} "
+                    f"| KB:{claim.get('knowledge_base_id', 'N/A')} {claim.get('knowledge_base_name', '')} "
                     f"| {claim.get('filename', '')} | 置信度: {claim.get('confidence', 'N/A')}"
                 ),
             ]

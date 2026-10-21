@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     claim_api_version_path: str = ""
     claim_api_timeout: float = 20.0
     claim_api_knowledge_base_id: int = 7
+    claim_api_knowledge_base_ids: str = "auto"
     claim_api_scan_limit: int = 1000
     claim_api_startup_probe: bool = True
     claim_api_probe_required: bool = False
@@ -36,7 +37,7 @@ class Settings(BaseSettings):
     elasticsearch_index: str = "wgs-knowledge"
     elasticsearch_api_key: str = ""
     embedding_dimensions: int = 384
-    graph_text_search_path: str = "/api/knowledge-bases/{knowledge_base_id}/claims"
+    graph_text_search_path: str = "/knowledge-bases/{knowledge_base_id}/relations"
     artifact_root: Path = Path("./var/artifacts")
     workflow_engine: str = "local"
     nextflow_bin: str = "nextflow"

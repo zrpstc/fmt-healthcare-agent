@@ -31,7 +31,11 @@ cp .env.container.example .env.container
 ```text
 WGS_CLAIM_API_URL=http://10.181.8.92:8080
 WGS_CLAIM_API_OPENAPI_PATH=/openapi.json
+WGS_CLAIM_API_KNOWLEDGE_BASE_IDS=auto
 ```
+
+`auto` 会先读取 `/knowledge-bases`，因此知识库重建并产生新 ID 后无需修改配置。
+如需限制检索范围，可填写逗号分隔的 ID，例如 `25,26`；知识库页面也可以临时多选。
 
 先从计算节点验证：
 
@@ -99,4 +103,3 @@ docker save wgs-fmt-agent:v0.3.0 | gzip > wgs-fmt-agent-v0.3.0-image.tar.gz
 ```bash
 gunzip -c wgs-fmt-agent-v0.3.0-image.tar.gz | docker load
 ```
-
