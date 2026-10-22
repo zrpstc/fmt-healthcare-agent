@@ -16,7 +16,7 @@ from threading import Lock
 from typing import Any
 
 import httpx
-from fastapi import FastAPI, File, Form, HTTPException, Query, Response, UploadFile
+from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
@@ -24,12 +24,17 @@ from sqlalchemy import select
 
 from app.agent_chat import TOOLS, _atomic_text_write, _audit, _sandbox_canvas_item, _sandbox_dir, execute_confirmed_action, run_agent_turn
 from wgs_agent.pipeline.upload_workflow import get_workflow_status, list_uploaded_workflows, submit_uploaded_sample
+from wgs_agent.pipeline.sample_management import delete_sample_files
+from wgs_agent.pipeline.sample_registry import (
+    SampleBusyError, SampleDeletedError, is_deleted, read_record, records as sample_records,
+    update_metadata,
+)
 from app.local_chat import LocalChatError, list_models
 from wgs_agent.tools.knowledge_tools import claim_record_to_reference
 from wgs_fmt_platform.config import get_settings
 from wgs_fmt_platform.paths import knowledge_db_path, project_path, runner_status_path, runtime_path, workspace_root
 from wgs_fmt_platform.infrastructure.api import router as infrastructure_router
-from wgs_fmt_platform.infrastructure.api import ensure_local_user
+from wgs_fmt_platform.infrastructure.api import _authenticated_user, ensure_local_user
 from wgs_fmt_platform.infrastructure.database import Conversation, Message, SessionLocal, create_schema
 
 
@@ -139,6 +144,17 @@ class CanvasWritePayload(BaseModel):
 
 class ReportGeneratePayload(BaseModel):
     confirmed: bool = False
+
+
+class SampleEditPayload(BaseModel):
+    model_config = {"extra": "forbid"}
+    name: str | None = Field(default=None, max_length=100)
+    notes: str | None = Field(default=None, max_length=2000)
+
+
+class SampleDeletePayload(BaseModel):
+    confirmed: bool = False
+    confirm_sample_id: str = Field(default="", max_length=128)
 
 
 class EvidenceBindPayload(BaseModel):
@@ -641,6 +657,8 @@ def confirm_action(payload: ConfirmActionPayload) -> dict[str, Any]:
         raise HTTPException(404, "待确认操作不存在或已经处理。")
     try:
         result = execute_confirmed_action(action)
+    except (SampleBusyError, SampleDeletedError) as exc:
+        raise HTTPException(409, str(exc)) from exc
     except Exception as exc:
         raise HTTPException(500, f"操作执行失败：{exc}") from exc
     with LOCK:
@@ -650,9 +668,11 @@ def confirm_action(payload: ConfirmActionPayload) -> dict[str, Any]:
     return {"status": "completed", **result}
 
 
-def _safe_sample_id(value: str) -> str:
+def _safe_sample_id(value: str, *, allow_deleted: bool = False) -> str:
     if not SAMPLE_ID.fullmatch(value):
         raise HTTPException(422, "样本 ID 格式不合法。")
+    if not allow_deleted and is_deleted(value):
+        raise HTTPException(410, "该样本已永久删除。")
     return value
 
 
@@ -725,9 +745,15 @@ def _sample_summary(
     enterotype = analysis.get("enterotype") if isinstance(analysis.get("enterotype"), dict) else {}
     pathways = analysis.get("pathways") if isinstance(analysis.get("pathways"), dict) else {}
     reports = _sample_artifacts(sample_id)
+    metadata = read_record(sample_id)
     state = (workflow or {}).get("state") or runner_state or ("analyzed" if reports["analysis"]["exists"] else "known")
+    if metadata.get("deletion_status") in {"deleting", "failed"}:
+        state = "delete_failed" if metadata["deletion_status"] == "failed" else "deleting"
     return {
         "sample_id": sample_id,
+        "name": metadata.get("name") or sample_id,
+        "notes": metadata.get("notes", ""),
+        "metadata_updated_at": metadata.get("updated_at"),
         "status": state,
         "updated_at": reports["analysis"]["updated_at"] or reports["pdf"]["updated_at"] or (workflow or {}).get("submitted_at"),
         "workflow": {
@@ -745,11 +771,8 @@ def _sample_summary(
     }
 
 
-@app.get("/api/samples")
-def samples(q: str = "", limit: int = Query(default=200, ge=1, le=500)) -> dict[str, Any]:
-    states = _runner_states()
-    workflows = list_uploaded_workflows()
-    sample_ids = set(states) | set(workflows)
+def _sample_ids(states: dict, workflows: dict) -> set[str]:
+    sample_ids = set(states) | set(workflows) | set(sample_records())
     if RESULTS_DIR.is_dir():
         suffixes = ("_analysis.json", "_knowledge.json", "_health_report.md", "_health_report.pdf", "_fmt_tsne.png")
         for path in RESULTS_DIR.iterdir():
@@ -757,8 +780,17 @@ def samples(q: str = "", limit: int = Query(default=200, ge=1, le=500)) -> dict[
                 if path.name.endswith(suffix):
                     sample_ids.add(path.name[:-len(suffix)])
                     break
+    return {sid for sid in sample_ids if SAMPLE_ID.fullmatch(sid) and not is_deleted(sid)}
+
+
+@app.get("/api/samples")
+def samples(q: str = "", limit: int = Query(default=200, ge=1, le=500)) -> dict[str, Any]:
+    states = _runner_states()
+    workflows = list_uploaded_workflows()
+    sample_ids = _sample_ids(states, workflows)
     needle = q.strip().lower()
-    ordered = sorted(sid for sid in sample_ids if not needle or needle in sid.lower())[:limit]
+    ordered = sorted(sid for sid in sample_ids if not needle or needle in sid.lower()
+                     or needle in str(read_record(sid).get("name", "")).lower())[:limit]
     items = [_sample_summary(sid, states.get(sid, ""), workflows.get(sid)) for sid in ordered]
     counts: dict[str, int] = {}
     for item in items:
@@ -766,6 +798,53 @@ def samples(q: str = "", limit: int = Query(default=200, ge=1, le=500)) -> dict[
         key = "complete" if state in {"complete", "completed", "done", "success", "analyzed", "has_results"} else state
         counts[key] = counts.get(key, 0) + 1
     return {"count": len(sample_ids), "filtered_count": len(items), "status_counts": counts, "samples": items}
+
+
+def _sample_editor(authorization: str | None):
+    actor = _authenticated_user(authorization)
+    if actor.role not in {"admin", "researcher"}:
+        raise HTTPException(403, "当前账号为只读权限，不能编辑或删除样本。")
+    return actor
+
+
+@app.patch("/api/samples/{sample_id}")
+def edit_sample(sample_id: str, payload: SampleEditPayload, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+    actor = _sample_editor(authorization)
+    sample_id = _safe_sample_id(sample_id)
+    if sample_id not in _sample_ids(_runner_states(), list_uploaded_workflows()):
+        raise HTTPException(404, "样本不存在。")
+    try:
+        metadata = update_metadata(sample_id, payload.name, payload.notes)
+    except (SampleBusyError, SampleDeletedError) as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except OSError as exc:
+        raise HTTPException(500, "样本信息保存失败，请检查存储权限后重试。") from exc
+    _audit("sample.updated", {"sample_id": sample_id, "actor_id": actor.id})
+    return {"status": "saved", "sample_id": sample_id, "name": metadata["name"], "notes": metadata["notes"], "updated_at": metadata["updated_at"]}
+
+
+@app.delete("/api/samples/{sample_id}")
+def delete_sample(sample_id: str, payload: SampleDeletePayload, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+    actor = _sample_editor(authorization)
+    sample_id = _safe_sample_id(sample_id, allow_deleted=True)
+    if not payload.confirmed or payload.confirm_sample_id != sample_id:
+        raise HTTPException(409, "永久删除需要明确确认并输入一致的样本 ID。")
+    if not is_deleted(sample_id) and sample_id not in _sample_ids(_runner_states(), list_uploaded_workflows()):
+        raise HTTPException(404, "样本不存在。")
+    if _runner_states().get(sample_id, "").lower() in {"running", "queued", "processing"}:
+        raise HTTPException(409, "样本分析仍在运行，不能删除。")
+    try:
+        result = delete_sample_files(sample_id, RESULTS_DIR)
+    except SampleBusyError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except OSError as exc:
+        raise HTTPException(500, "样本删除未完成，请检查存储权限后重试；已删除的文件无法恢复。") from exc
+    _audit("sample.deleted", {"sample_id": sample_id, "actor_id": actor.id, "removed_paths": result["removed_paths"]})
+    return result
 
 
 @app.post("/api/samples/upload", status_code=202)
@@ -797,6 +876,7 @@ def upload_sample(
 
 @app.get("/api/samples/{sample_id}/workflow")
 def sample_workflow(sample_id: str) -> dict[str, Any]:
+    sample_id = _safe_sample_id(sample_id)
     try:
         return get_workflow_status(sample_id)
     except ValueError as exc:
@@ -823,7 +903,10 @@ def sample_plot(sample_id: str) -> FileResponse:
 
 
 def _report_rows() -> list[dict[str, Any]]:
-    sample_ids: set[str] = set()
+    # A completed upload can generate its first report before any result JSON
+    # exists. Listing it is read-only; generation remains a confirmed action.
+    workflows = list_uploaded_workflows()
+    sample_ids = {sid for sid, workflow in workflows.items() if workflow["state"] == "complete"}
     if RESULTS_DIR.is_dir():
         for path in RESULTS_DIR.iterdir():
             for suffix in ("_analysis.json", "_knowledge.json", "_health_report.md", "_health_report.pdf"):
@@ -832,9 +915,26 @@ def _report_rows() -> list[dict[str, Any]]:
                     break
     rows = []
     for sample_id in sample_ids:
+        if not SAMPLE_ID.fullmatch(sample_id) or is_deleted(sample_id):
+            continue
         artifacts = _sample_artifacts(sample_id)
-        latest = max((item["updated_at"] or "" for item in artifacts.values()), default="") or None
-        rows.append({"sample_id": sample_id, "updated_at": latest, "artifacts": artifacts})
+        metadata = read_record(sample_id)
+        workflow = workflows.get(sample_id, {})
+        latest = max(
+            (item["updated_at"] or "" for item in artifacts.values()), default=""
+        ) or workflow.get("submitted_at")
+        if artifacts["pdf"]["exists"] and artifacts["markdown"]["exists"]:
+            status = "report_ready"
+        elif artifacts["pdf"]["exists"] or artifacts["markdown"]["exists"]:
+            status = "report_partial"
+        elif artifacts["analysis"]["exists"]:
+            status = "analysis_ready"
+        else:
+            status = "bioinformatics_complete" if workflow.get("state") == "complete" else "missing_analysis"
+        rows.append({
+            "sample_id": sample_id, "updated_at": latest,
+            "artifacts": artifacts, "status": status, "name": metadata.get("name") or sample_id,
+        })
     return sorted(rows, key=lambda item: item["updated_at"] or "", reverse=True)
 
 
@@ -842,7 +942,7 @@ def _report_rows() -> list[dict[str, Any]]:
 def reports(response: Response, q: str = "") -> dict[str, Any]:
     response.headers["Cache-Control"] = "no-store, max-age=0"
     needle = q.strip().lower()
-    rows = [item for item in _report_rows() if not needle or needle in item["sample_id"].lower()]
+    rows = [item for item in _report_rows() if not needle or needle in item["sample_id"].lower() or needle in item["name"].lower()]
     return {
         "count": len(rows),
         "pdf_count": sum(1 for item in rows if item["artifacts"]["pdf"]["exists"]),
@@ -894,6 +994,8 @@ def generate_report(sample_id: str, payload: ReportGeneratePayload) -> dict[str,
             "kind": "generate_report",
             "params": {"sample_id": sample_id},
         })
+    except (SampleBusyError, SampleDeletedError) as exc:
+        raise HTTPException(409, str(exc)) from exc
     except (OSError, ValueError) as exc:
         raise HTTPException(422, str(exc)) from exc
     if result.get("is_error"):

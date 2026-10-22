@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 from wgs_fmt_platform.paths import PROJECT_ROOT, bioinformatics_root, project_path, runtime_path, workspace_root
+from .sample_registry import is_deleted, require_active, sample_lock
 
 
 _SAMPLE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
@@ -117,12 +118,37 @@ def _pid_alive(pid: int | None) -> bool:
         return False
     try:
         os.kill(int(pid), 0)
+        # Finished detached workers may remain as zombies until their parent
+        # reaps them; they cannot write more outputs and must not block deletion.
+        try:
+            state = Path(f"/proc/{int(pid)}/stat").read_text().rsplit(")", 1)[1].split()[0]
+            if state == "Z":
+                return False
+        except (OSError, IndexError):
+            pass
         return True
     except (OSError, ValueError, TypeError):
         return False
 
 
 def submit_uploaded_sample(
+    sample_id: str,
+    layout: str,
+    read1: BinaryIO,
+    read1_name: str,
+    read2: BinaryIO | None = None,
+    read2_name: str | None = None,
+    *,
+    settings: UploadWorkflowSettings | None = None,
+) -> dict[str, Any]:
+    settings = settings or UploadWorkflowSettings.from_env()
+    sample_id = validate_sample_id(sample_id)
+    with sample_lock(sample_id, workspace=settings.workspace):
+        require_active(sample_id, workspace=settings.workspace)
+        return _submit_uploaded_sample(sample_id, layout, read1, read1_name, read2, read2_name, settings=settings)
+
+
+def _submit_uploaded_sample(
     sample_id: str,
     layout: str,
     read1: BinaryIO,
@@ -242,6 +268,8 @@ def list_uploaded_workflows(
     for path in paths:
         try:
             sample_id = validate_sample_id(path.stem)
+            if is_deleted(sample_id, workspace=settings.workspace):
+                continue
             status = get_workflow_status(sample_id, settings=settings, include_log=False)
         except (OSError, ValueError):
             continue

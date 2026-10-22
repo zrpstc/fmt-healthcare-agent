@@ -213,13 +213,19 @@ def _read_sandbox(base: Path, value: str) -> dict[str, Any]:
 
 
 def _sample_id(params: dict[str, Any]) -> str:
+    from wgs_agent.pipeline.sample_registry import require_active
+
     value = validate_sample_id(str(params.get("sample_id", "")))
     if not _SAMPLE_RE.fullmatch(value):
         raise ValueError("样本 ID 不合法。")
+    require_active(value)
     return value
 
 
 def _list_samples(limit: int = 30) -> dict[str, Any]:
+    from wgs_agent.pipeline.sample_registry import is_deleted
+    from wgs_agent.pipeline.upload_workflow import list_uploaded_workflows
+
     samples: dict[str, str] = {}
     results = _results_dir()
     if results.is_dir():
@@ -243,6 +249,8 @@ def _list_samples(limit: int = 30) -> dict[str, Any]:
                     samples[fields[sid_col]] = state
         except OSError:
             pass
+    samples.update({sid: workflow["state"] for sid, workflow in list_uploaded_workflows().items()})
+    samples = {sid: state for sid, state in samples.items() if not is_deleted(sid)}
     ordered = [{"sample_id": sid, "status": state} for sid, state in sorted(samples.items())[: max(1, min(int(limit), 200))]]
     return {"count": len(samples), "samples": ordered}
 
@@ -541,12 +549,21 @@ def execute_confirmed_action(action: dict[str, Any]) -> dict[str, Any]:
     if kind == "pipeline_run":
         result = _run_async(PipelineRunStepTool().invoke(params))
     elif kind == "generate_report":
-        results = _results_dir()
-        analysis = results / f"{sid}_analysis.json"
-        knowledge = results / f"{sid}_knowledge.json"
-        if not analysis.is_file():
-            raise FileNotFoundError(f"缺少分析结果：{analysis.name}")
-        result = _run_async(ReportGeneratorTool().invoke({"sample_id": sid, "analysis_json_path": str(analysis), "knowledge_json_path": str(knowledge) if knowledge.is_file() else ""}))
+        from wgs_agent.pipeline.sample_registry import require_active, sample_lock
+
+        with sample_lock(sid):
+            require_active(sid)
+            results = _results_dir()
+            analysis = results / f"{sid}_analysis.json"
+            knowledge = results / f"{sid}_knowledge.json"
+            if not analysis.is_file():
+                from wgs_agent.reporting.analysis import ensure_analysis_input
+
+                workflow = get_workflow_status(sid, include_log=False)
+                if workflow["state"] != "complete":
+                    raise ValueError("尚无分析 JSON，且生信任务尚未完成，暂不能生成报告。")
+                analysis = ensure_analysis_input(sid, results)
+            result = _run_async(ReportGeneratorTool().invoke({"sample_id": sid, "analysis_json_path": str(analysis), "knowledge_json_path": str(knowledge) if knowledge.is_file() else ""}))
     else:
         raise ValueError("待确认动作类型无效或已过期。")
     payload = {"action_id": action.get("id"), "kind": kind, "sample_id": sid, "is_error": result.is_error, "content": result.content}

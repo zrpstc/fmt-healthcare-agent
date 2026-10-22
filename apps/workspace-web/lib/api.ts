@@ -36,13 +36,14 @@ export interface WorkflowSummary {
 }
 export interface SampleSummary {
   sample_id: string; status: string; updated_at?: string | null; species_total: number;
+  name?: string; notes?: string; metadata_updated_at?: string | null;
   species_high: number; species_low: number; enterotype: string; pathway_total: number;
   artifacts: Record<string, ArtifactInfo>;
   workflow?: WorkflowSummary | null;
 }
 export interface SampleList { count: number; filtered_count: number; status_counts: Record<string, number>; samples: SampleSummary[] }
 export interface SampleDetail { summary: SampleSummary; analysis: Record<string, any> }
-export interface ReportRow { sample_id: string; updated_at?: string | null; artifacts: Record<string, ArtifactInfo> }
+export interface ReportRow { sample_id: string; name?: string; updated_at?: string | null; artifacts: Record<string, ArtifactInfo>; status?: "report_ready"|"report_partial"|"analysis_ready"|"bioinformatics_complete"|"missing_analysis" }
 export interface ReportList { count: number; pdf_count: number; markdown_count: number; reports: ReportRow[] }
 export interface KnowledgeStats {
   papers: number; full_text: number; pathways: number; metabolites: number; microbes: number;
@@ -123,6 +124,8 @@ export const api = {
   },
   sampleWorkflow: (id:string) => request<Record<string,any>>(`/samples/${encodeURIComponent(id)}/workflow`),
   sample: (id:string) => request<SampleDetail>(`/samples/${encodeURIComponent(id)}`),
+  editSample: (id:string,value:{name:string;notes:string}) => request<{status:string;sample_id:string;name:string;notes:string}>(`/samples/${encodeURIComponent(id)}`,{method:"PATCH",body:JSON.stringify(value)}),
+  deleteSample: (id:string) => request<{status:string;sample_id:string;removed_paths:number}>(`/samples/${encodeURIComponent(id)}`,{method:"DELETE",body:JSON.stringify({confirmed:true,confirm_sample_id:id})}),
   reports: (q="") => request<ReportList>(`/reports?q=${encodeURIComponent(q)}`),
   generateReport: (id:string) => request<{status:string;sample_id:string;artifacts:Record<string,ArtifactInfo>;llm_status?:string;llm_accepted_topics?:number}>(`/reports/${encodeURIComponent(id)}/generate`, {method:"POST",body:JSON.stringify({confirmed:true})}),
   knowledgeStats: () => request<KnowledgeStats>("/knowledge/stats"),
