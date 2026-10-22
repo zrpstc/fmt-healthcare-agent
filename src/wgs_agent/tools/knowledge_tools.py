@@ -372,6 +372,7 @@ def claim_record_to_reference(
         "knowledge_base_id": knowledge_base_id,
         "document_id": document_id,
         "filename": claim.get("filename") or "",
+        **{key: claim[key] for key in ("title", "authors", "author", "journal", "journal_name", "year", "publication_year", "volume", "issue", "pages", "doi", "pmid") if claim.get(key)},
         "section_title": claim.get("section_title") or "",
         "subject": claim.get("subject_text") or "",
         "subject_type": claim.get("subject_type") or "",

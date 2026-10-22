@@ -305,7 +305,9 @@ def relation_label(edge: dict) -> str:
     )
     if status:
         flags.append(status)
-    return str(edge["predicate"]) + ("（" + "、".join(flags) + "）" if flags else "")
+    return str(edge.get("display_label") or edge["predicate"]) + (
+        "（" + "、".join(flags) + "）" if flags else ""
+    )
 
 
 def attach_subgraphs(document: dict) -> None:
@@ -313,115 +315,30 @@ def attach_subgraphs(document: dict) -> None:
         for topic in section["topics"]:
             previous = topic.get("knowledge_subgraph", {})
             graph = build_topic_graph(document, topic)
-            if (
-                previous.get("figure")
-                and {k: v for k, v in previous.items() if k != "figure"} == graph
-            ):
-                graph["figure"] = previous["figure"]
+            signature = hashlib.sha256(
+                json.dumps(graph, sort_keys=True, ensure_ascii=False).encode()
+            ).hexdigest()
+            if previous.get("source_signature") == signature:
+                continue
+            graph["source_signature"] = signature
             topic["knowledge_subgraph"] = graph
 
 
 def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
-    """Draw attributable directed triples with readable repeated endpoint labels."""
-    from PIL import Image, ImageDraw, ImageFont
-    from .fonts import resolve_cjk_fonts
+    from .graph_visual import render_graph_figures as render
 
-    font_path, bold_path = resolve_cjk_fonts()
-    regular = ImageFont.truetype(font_path, 31)
-    small = ImageFont.truetype(font_path, 25)
-    bold = ImageFont.truetype(bold_path, 32)
-    figures = {}
-    for topic in _topics(document):
-        graph = topic.get("knowledge_subgraph", {})
-        edges = graph.get("edges", [])
-        if not edges:
-            continue
-        digest = hashlib.sha256(
-            json.dumps(graph, sort_keys=True, ensure_ascii=False).encode()
-        ).hexdigest()[:12]
-        name = f"{document['sample_id']}_{topic['id'].replace('.', '_')}_kg_{digest}.png"
-        canvas = Image.new("RGB", (1800, 100 + len(edges) * 180), "#f5f9fa")
-        draw = ImageDraw.Draw(canvas)
-        draw.text((35, 24), f"{topic['title']} · 相关知识子图", font=bold, fill="#193c64")
-
-        def wrap(value, width, font, max_lines=3):
-            lines, current = [], ""
-            for char in str(value).replace("\n", " "):
-                if draw.textlength(current + char, font=font) > width:
-                    lines.append(current)
-                    current = char
-                else:
-                    current += char
-            if current:
-                lines.append(current)
-            if len(lines) > max_lines:
-                lines = lines[:max_lines]
-                lines[-1] = lines[-1][:-2] + "…"
-            return "\n".join(lines)
-
-        for i, edge in enumerate(edges):
-            y = 100 + i * 180
-            for left, value, fill in (
-                (35, edge["subject"], "#e0f1ee"),
-                (1175, edge["object"], "#e6edf7"),
-            ):
-                draw.rounded_rectangle(
-                    (left, y, left + 590, y + 130), radius=15, fill=fill, outline="#b4c9cc", width=2
-                )
-                draw.multiline_text(
-                    (left + 18, y + 14),
-                    wrap(value, 550, regular),
-                    font=regular,
-                    fill="#193c64",
-                    spacing=4,
-                )
-            draw.line((640, y + 90, 1155, y + 90), fill="#147e85", width=4)
-            draw.polygon([(1155, y + 90), (1136, y + 80), (1136, y + 100)], fill="#147e85")
-            label = wrap(relation_label(edge), 490, small, 2)
-            draw.multiline_text((665, y + 8), label, font=small, fill="#147e85", spacing=3)
-            draw.text(
-                (665, y + 103),
-                f"[{edge['evidence_id']}] document:{edge.get('document_id') or '—'}",
-                font=small,
-                fill="#526974",
-            )
-        directory.mkdir(parents=True, exist_ok=True)
-        target = directory / name
-        canvas.save(target, "PNG")
-        target.chmod(0o600)
-        graph["figure"] = name
-        figures[topic["id"]] = name
-    return figures
+    return render(document, directory)
 
 
 def graph_markdown(topic: dict) -> list[str]:
-    from .document import table, text
+    from .document import text
 
     graph = topic.get("knowledge_subgraph", {})
-    edges = graph.get("edges", [])
-    if not edges:
+    if not graph.get("edges"):
         return ["**相关知识子图**：未匹配到可展示的知识图谱关系。"]
-    description = (
-        "以下为本项解读引用的知识关系。"
-        if graph.get("selection") == "cited_claims"
-        else "以下为与本项检测结果相关的文献关系。"
-    )
-    output = ["**相关知识子图**", description + "关系方向和表述沿用知识库抽取结果。"]
+    if graph.get("display_status") != "ready":
+        return ["**相关知识子图**：中文图谱暂不可用。"]
+    output = ["**相关知识子图**"]
     if graph.get("figure"):
         output.append(f"![{text(topic['title'])}相关知识子图]({graph['figure']})")
-    rows = []
-    for edge in edges:
-        relation = (
-            f"{edge['subject']} → {relation_label(edge)} → {edge['object']} [{edge['evidence_id']}]"
-        )
-        quote = str(edge["evidence_text"])
-        if len(quote) > 500:
-            quote = quote[:500] + "…（完整原句见结构化报告）"
-        source = f"{edge['claim_id']}；document:{edge.get('document_id') or '未提供'}；{edge.get('filename') or '文件名未提供'}"
-        if edge.get("page") is not None:
-            source += f"；第{edge['page']}页"
-        rows.append([relation, quote + " 来源：" + source])
-    output.append(table(["图谱关系", "证据原句与出处"], rows))
-    if graph.get("truncated"):
-        output.append(f"本项仅展示最相关的 {len(edges)} 条关系。")
     return output

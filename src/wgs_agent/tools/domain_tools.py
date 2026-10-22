@@ -817,6 +817,7 @@ class ReportGeneratorTool(BaseTool):
         from wgs_agent.reporting.document import build_document
         from wgs_agent.reporting.inputs import load_existing_report_inputs
         from wgs_agent.reporting.narrative import generate_narrative
+        from wgs_agent.reporting.graph_labels import resolve_graph_model, translate_graph_labels
         from wgs_agent.reporting.knowledge_graph import enrich_document, attach_subgraphs, render_graph_figures
         from wgs_agent.tools.detailed_report import load_gene_family_evidence, resolve_report_model
         from wgs_agent.tools.report_maker import _generate_fpdf_report, build_full_report
@@ -890,6 +891,7 @@ class ReportGeneratorTool(BaseTool):
             await enrich_document(document)
             document = generate_narrative(document, resolve_report_model())
             attach_subgraphs(document)
+            translate_graph_labels(document, resolve_graph_model())
             document["audit"]["generation_id"] = uuid.uuid4().hex
             context["report_document"] = document
             evidence_manifest = {
@@ -908,6 +910,8 @@ class ReportGeneratorTool(BaseTool):
                     module("metabolites"), module("drugs"), module("diseases"), knowledge,
                     protein_data=proteins, report_context=context,
                 )
+                evidence_manifest["module_bibliographies"] = document.get("module_bibliographies", [])
+                evidence_manifest["graph_label_translations"] = document.get("graph_label_translations", {})
                 (staging / filenames["markdown"]).write_text(markdown, encoding="utf-8")
                 (staging / filenames["structured"]).write_text(json.dumps(document, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
                 (staging / filenames["evidence"]).write_text(json.dumps(evidence_manifest, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")

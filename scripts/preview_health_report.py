@@ -160,7 +160,14 @@ async def main() -> None:
         action="store_true",
         help="Retrieve related claims from the configured LitKG service",
     )
+    parser.add_argument(
+        "--use-graph-llm",
+        action="store_true",
+        help="Translate graph labels with the environment-configured model, independently of report narration",
+    )
     args = parser.parse_args()
+    if not (args.use_graph_llm or args.use_llm):
+        os.environ["WGS_REPORT_GRAPH_LLM_DISABLED"] = "1"
     if not args.use_knowledge_graph:
         os.environ["WGS_REPORT_GRAPH_RETRIEVAL_DISABLED"] = "1"
     if not args.use_llm:
@@ -169,7 +176,9 @@ async def main() -> None:
         from wgs_agent.tools.detailed_report import resolve_report_model
 
         if resolve_report_model() is None:
-            raise SystemExit("尚未配置报告模型，请设置工作区模型或 WGS_REPORT_LLM_BASE_URL/WGS_REPORT_LLM_MODEL。")
+            raise SystemExit(
+                "尚未配置报告模型，请设置工作区模型或 WGS_REPORT_LLM_BASE_URL/WGS_REPORT_LLM_MODEL。"
+            )
     data = (
         json.loads(args.analysis.read_text(encoding="utf-8")) if args.analysis else demonstration()
     )

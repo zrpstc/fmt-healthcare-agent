@@ -645,13 +645,6 @@ def render_markdown(document: dict) -> str:
                 output.append("**结果说明**：" + topic["note"])
             if topic["advice"]:
                 output.append("**日常关注**：" + topic["advice"])
-            citations = [
-                key
-                for key in topic.get("narrative_evidence_ids", [])
-                if evidence[key].get("kind") == "literature"
-            ]
-            if citations:
-                output.append("参考依据：" + "、".join(f"[{key}]" for key in citations))
             output.extend(graph_markdown(topic))
             if len(topic["evidence_ids"]) > 8:
                 output.append("本表展示部分条目，完整明细见结构化报告。")
@@ -664,22 +657,8 @@ def render_markdown(document: dict) -> str:
             "物种相对丰度以对应输入单位呈现；参考人群 P5–P95 为分布区间。HUMAnN 基因家族不等于蛋白质表达，功能通路不等于代谢物浓度。完整来源、方法、数值与引用记录保存在结构化报告及证据文件中。",
         ]
     )
-    for index, row in enumerate(records(document["references"], "matched_docs"), 1):
-        output.append(
-            f"[K{index}] {text(row.get('claim_id', row.get('title')))}；来源：{text(row.get('filename', row.get('source_id')))} (document:{text(row.get('document_id'))})。"
-        )
-        if row.get("evidence_text"):
-            output.append("证据原句: " + text(row["evidence_text"]))
-        if row.get("source_url"):
-            output.append(f"[REST 来源]({row['source_url']})")
-    for index, row in enumerate(records(document["references"], "pubmed_results"), 1):
-        output.append(
-            f"[B{index}] {text(row.get('title'))}. {text(row.get('journal'))}, {text(row.get('year'))}. PMID: {text(row.get('pmid'))}；DOI: {text(row.get('doi'))}。"
-        )
-    # Only methods relevant to a routine health report; FMT references stay with FMT.
-    for key in ("R1", "R4"):
-        row = evidence[key]
-        output.append(f"[{key}] [{row['title']}]({row['url']})")
+    from .bibliography import render_bibliographies
+    output.extend(render_bibliographies(document))
     matching = document.get("fmt_matching") or {}
     if matching.get("top_k_matches"):
         output.extend(_fmt_appendix(matching))

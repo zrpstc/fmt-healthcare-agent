@@ -629,7 +629,11 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
             marker = "• " if bullet else "– "
             pdf.multi_cell(0, 7, marker + text, align="L", wrapmode="CHAR", new_x="LMARGIN", new_y="NEXT")
         else:
-            pdf.multi_cell(0, 7, text, align="L", wrapmode="CHAR", new_x="LMARGIN", new_y="NEXT")
+            if re.match(r"^\[\d+\]\s", text):
+                pdf.set_font("WgsCN", "", 9.5)
+                pdf.multi_cell(0, 6, text, align="L", wrapmode="WORD", new_x="LMARGIN", new_y="NEXT")
+            else:
+                pdf.multi_cell(0, 7, text, align="L", wrapmode="CHAR", new_x="LMARGIN", new_y="NEXT")
 
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     pdf.output(output_path)

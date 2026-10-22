@@ -74,8 +74,9 @@ def test_graph_contains_only_relevant_actual_claims_and_valid_endpoints():
     assert all(e["source"] in node_ids and e["target"] in node_ids for e in graph["edges"])
     markdown = render_markdown(doc)
     assert "相关知识子图" in markdown
-    assert "CORRELATED_WITH" in markdown
-    assert "证据原句与出处" in markdown
+    assert "CORRELATED_WITH" not in markdown
+    assert "证据原句与出处" not in markdown
+    assert "分模块参考文献" in markdown
 
 
 def test_graph_caps_and_deduplicates_claims_deterministically():
@@ -155,7 +156,7 @@ def test_negation_speculation_and_no_effect_are_visible():
     edge = build_topic_graph(doc, topic(doc))["edges"][0]
     assert edge["negated"] and edge["speculative"]
     assert all(word in relation_label(edge) for word in ("否定", "推测", "不显著"))
-    assert "不显著" in render_markdown(doc)
+    assert "证据原句与出处" not in render_markdown(doc)
 
 
 @pytest.fixture
@@ -259,6 +260,7 @@ def generator(monkeypatch):
     from wgs_agent.tools.domain_tools import ReportGeneratorTool
 
     monkeypatch.setenv("WGS_REPORT_GRAPH_RETRIEVAL_DISABLED", "1")
+    monkeypatch.setenv("WGS_REPORT_GRAPH_LLM_DISABLED", "1")
     monkeypatch.setattr(detailed_report, "resolve_report_model", lambda: None)
     monkeypatch.setattr(detailed_report, "load_gene_family_evidence", lambda _: {})
     monkeypatch.setattr(inputs, "load_existing_report_inputs", lambda _: {})
