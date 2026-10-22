@@ -1,3 +1,6 @@
+import { uploadSampleFiles } from "./sample-upload";
+export type { UploadProgress } from "./sample-upload";
+
 export type RiskLevel = "read" | "sensitive" | "confirm";
 
 export interface Skill {
@@ -117,11 +120,7 @@ export const api = {
   createConversation: (agentId:string) => request<Conversation>("/backend/conversations",{method:"POST",body:JSON.stringify({agent_id:agentId,title:"新对话"})}),
   deleteConversation: (id:string) => request(`/backend/conversations/${encodeURIComponent(id)}`,{method:"DELETE"}),
   samples: (q="") => request<SampleList>(`/samples?q=${encodeURIComponent(q)}`,{cache:"no-store"}),
-  uploadSample: (value:{sampleId:string;layout:"single"|"paired";read1:File;read2?:File|null}) => {
-    const form=new FormData(); form.set("sample_id",value.sampleId); form.set("layout",value.layout); form.set("read1",value.read1);
-    if(value.read2)form.set("read2",value.read2);
-    return request<Record<string,any>>("/samples/upload",{method:"POST",body:form});
-  },
+  uploadSample: uploadSampleFiles,
   sampleWorkflow: (id:string) => request<Record<string,any>>(`/samples/${encodeURIComponent(id)}/workflow`),
   sample: (id:string) => request<SampleDetail>(`/samples/${encodeURIComponent(id)}`),
   editSample: (id:string,value:{name:string;notes:string}) => request<{status:string;sample_id:string;name:string;notes:string}>(`/samples/${encodeURIComponent(id)}`,{method:"PATCH",body:JSON.stringify(value)}),

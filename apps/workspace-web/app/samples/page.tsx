@@ -5,7 +5,7 @@ import { SampleManagement } from "@/components/sample-management";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Activity, ArrowUpRight, BarChart3, Beaker, CheckCircle2, Dna, FileText, Search, Sparkles, TestTube2, UploadCloud } from "lucide-react";
-import { api, backendUrl, SampleDetail, SampleSummary } from "@/lib/api";
+import { api, backendUrl, SampleDetail, SampleSummary, UploadProgress } from "@/lib/api";
 
 type View="overview"|"species"|"function"|"fmt";
 type SpeciesRow={species:string;chinese_name?:string;abundance:number;status:string;status_cn?:string;deviation?:number;p5?:number;p95?:number};
@@ -24,17 +24,18 @@ export default function SamplesPage(){
   const [view,setView]=useState<View>("overview"); const [loading,setLoading]=useState(true); const [error,setError]=useState("");
   const [indexError,setIndexError]=useState(""); const [detailError,setDetailError]=useState(""); const [refreshToken,setRefreshToken]=useState(0);
   const [uploadOpen,setUploadOpen]=useState(false); const [uploading,setUploading]=useState(false); const [uploadMessage,setUploadMessage]=useState("");
+  const [uploadProgress,setUploadProgress]=useState<UploadProgress|null>(null);
   const [uploadSampleId,setUploadSampleId]=useState(""); const [layout,setLayout]=useState<"single"|"paired">("paired"); const [read1,setRead1]=useState<File|null>(null); const [read2,setRead2]=useState<File|null>(null);
   const submitUpload=async(event:FormEvent)=>{
     event.preventDefault();
     if(!uploadSampleId.trim()||!read1||(layout==="paired"&&!read2)||uploading)return;
-    setUploading(true);setError("");setUploadMessage("");
+    setUploading(true);setUploadProgress(null);setError("");setUploadMessage("");
     try{
-      const result=await api.uploadSample({sampleId:uploadSampleId.trim(),layout,read1,read2});
+      const result=await api.uploadSample({sampleId:uploadSampleId.trim(),layout,read1,read2,onProgress:setUploadProgress});
       setUploadMessage(`样本 ${result.sample_id} 已提交，后台分析状态：${statusLabel(result.state||"running")}`);
       setSelected(result.sample_id);setQuery("");setPage(1);
     }catch(e){setError((e as Error).message)}
-    finally{setUploading(false);setRefreshToken(value=>value+1)}
+    finally{setUploading(false);setUploadProgress(null);setRefreshToken(value=>value+1)}
   };
   useEffect(()=>{
     let active=true;let inFlight=false;
@@ -75,7 +76,7 @@ export default function SamplesPage(){
   useEffect(()=>{setPage(current=>Math.min(current,pageCount))},[pageCount]);
   return <>
     <div className="page-intro"><div><p className="eyebrow">Sample observatory</p><h1>样本与分析</h1></div><div className="sample-actions"><button className="button button-coral" onClick={()=>setUploadOpen(value=>!value)}><UploadCloud size={15}/>上传测序文件</button><Link className="button button-primary" href={`/chat?sample=${encodeURIComponent(selected)}`}><Sparkles size={15}/>交给 Agent 分析</Link></div></div>
-    {uploadOpen&&<form className="panel sample-upload" onSubmit={submitUpload}><div className="sample-upload-copy"><p className="eyebrow">Manual FASTQ intake</p><h2>上传患者 Shotgun 宏基因组样本</h2><p>文件会进入独立工作区，并沿用现有可恢复流程执行质控、去宿主、物种谱、功能分析及 FMT 供体排序。结果仅用于科研分析。</p></div><label><span>样本 ID</span><input className="input" required pattern="[A-Za-z0-9][A-Za-z0-9_.-]{0,79}" value={uploadSampleId} onChange={e=>setUploadSampleId(e.target.value)} placeholder="PATIENT_001"/></label><label><span>测序布局</span><select className="select" value={layout} onChange={e=>setLayout(e.target.value as "single"|"paired")}><option value="paired">双端 paired-end</option><option value="single">单端 single-end</option></select></label><label><span>{layout==="paired"?"R1 · 必填":"FASTQ · 必填"}</span><input required type="file" accept=".fastq.gz,.fq.gz,.fastq,.fq" onChange={e=>setRead1(e.target.files?.[0]||null)}/></label>{layout==="paired"&&<label><span>R2 · 必填</span><input required type="file" accept=".fastq.gz,.fq.gz,.fastq,.fq" onChange={e=>setRead2(e.target.files?.[0]||null)}/></label>}<button className="button button-primary" disabled={uploading||!read1||!uploadSampleId.trim()||(layout==="paired"&&!read2)} type="submit">{uploading?"正在上传…":"上传并开始分析"}</button>{uploadMessage&&<div className="success-banner">{uploadMessage}</div>}</form>}
+    {uploadOpen&&<form className="panel sample-upload" onSubmit={submitUpload}><div className="sample-upload-copy"><p className="eyebrow">Manual FASTQ intake</p><h2>上传患者 Shotgun 宏基因组样本</h2><p>文件会进入独立工作区，并沿用现有可恢复流程执行质控、去宿主、物种谱、功能分析及 FMT 供体排序。结果仅用于科研分析。</p></div><label><span>样本 ID</span><input className="input" disabled={uploading} required pattern="[A-Za-z0-9][A-Za-z0-9_.-]{0,79}" value={uploadSampleId} onChange={e=>setUploadSampleId(e.target.value)} placeholder="PATIENT_001"/></label><label><span>测序布局</span><select className="select" disabled={uploading} value={layout} onChange={e=>setLayout(e.target.value as "single"|"paired")}><option value="paired">双端 paired-end</option><option value="single">单端 single-end</option></select></label><label><span>{layout==="paired"?"R1 · 必填":"FASTQ · 必填"}</span><input disabled={uploading} required type="file" accept=".fastq.gz,.fq.gz,.fastq,.fq" onChange={e=>setRead1(e.target.files?.[0]||null)}/></label>{layout==="paired"&&<label><span>R2 · 必填</span><input disabled={uploading} required type="file" accept=".fastq.gz,.fq.gz,.fastq,.fq" onChange={e=>setRead2(e.target.files?.[0]||null)}/></label>}<button className="button button-primary" disabled={uploading||!read1||!uploadSampleId.trim()||(layout==="paired"&&!read2)} type="submit">{uploading?(uploadProgress?.phase==="submitting"?"正在提交分析…":`正在上传 ${uploadProgress?.percent||0}%…`):"上传并开始分析"}</button>{uploading&&<div className="sample-upload-progress" role="status" aria-live="polite"><progress aria-label="测序文件上传进度" max={100} value={uploadProgress?.percent||0}/><span>{uploadProgress?.phase==="submitting"?"文件已发送，服务器正在校验并提交分析任务…":uploadProgress?`已发送 ${number(uploadProgress.loaded/1024/1024,1)} / ${number(uploadProgress.total/1024/1024,1)} MiB（${uploadProgress.percent}%）`:"正在建立上传连接…"}</span></div>}{uploadMessage&&<div className="success-banner">{uploadMessage}</div>}</form>}
     <section className="sample-hero panel"><div><span className="hero-index">{String(total).padStart(2,"0")}</span><p>已纳入工作台的样本</p></div><div className="hero-flow"><span><CheckCircle2 size={15}/>完成或已有结果 <b>{counts.complete||0}</b></span><span><Activity size={15}/>正在运行 <b>{counts.running||0}</b></span><span><TestTube2 size={15}/>结构化分析 <b>{samples.filter(item=>item.artifacts.analysis?.exists).length}</b></span></div></section>
     {(error||indexError||detailError)&&<div className="error-banner">{error||indexError||detailError}</div>}
     <div className="sample-layout">

@@ -117,3 +117,5 @@ button,input,textarea,select{font:inherit} button{cursor:pointer} a{color:inheri
 @media (max-width: 760px) {
   .report-reader .artifact-ribbon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+.sample-upload-progress{width:100%;display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}.sample-upload-progress progress{width:180px;max-width:40%;height:10px;accent-color:var(--teal)}
