@@ -40,6 +40,12 @@ export interface SampleList { count: number; filtered_count: number; status_coun
 export interface SampleDetail { summary: SampleSummary; analysis: Record<string, any> }
 export interface ReportRow { sample_id: string; updated_at?: string | null; artifacts: Record<string, ArtifactInfo> }
 export interface ReportList { count: number; pdf_count: number; markdown_count: number; reports: ReportRow[] }
+export interface InteractiveReportItem { evidence_id:string;label:string;value:number;status:string;unit:string;p5?:number|null;p95?:number|null;record?:Record<string,any> }
+export interface InteractiveReportChart { id:string;title:string;kind:"bar";boundary:string;items:InteractiveReportItem[] }
+export interface InteractiveReport {
+  schema_version:string;sample_id:string;generated_at:string;summary:Record<string,any>;
+  charts:InteractiveReportChart[];available_modules:string[];disclaimer:string;
+}
 export interface KnowledgeStats {
   papers: number; full_text: number; pathways: number; metabolites: number; microbes: number;
   year_min?: number; year_max?: number; diseases: Array<{name:string;count:number}>;

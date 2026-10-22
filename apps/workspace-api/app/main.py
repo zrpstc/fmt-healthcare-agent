@@ -722,6 +722,8 @@ def _sample_artifacts(sample_id: str) -> dict[str, dict[str, Any]]:
         "knowledge": RESULTS_DIR / f"{sample_id}_knowledge.json",
         "markdown": RESULTS_DIR / f"{sample_id}_health_report.md",
         "pdf": RESULTS_DIR / f"{sample_id}_health_report.pdf",
+        "technical": RESULTS_DIR / f"{sample_id}_technical_appendix.md",
+        "interactive": RESULTS_DIR / f"{sample_id}_interactive_report.json",
         "fmt_plot": _fmt_plot_path(sample_id),
         "evidence": RESULTS_DIR / f"{sample_id}_report_evidence.json",
     }
@@ -870,6 +872,8 @@ def report_file(sample_id: str, kind: str) -> FileResponse:
         "analysis": (RESULTS_DIR / f"{sample_id}_analysis.json", "application/json"),
         "knowledge": (RESULTS_DIR / f"{sample_id}_knowledge.json", "application/json"),
         "evidence": (RESULTS_DIR / f"{sample_id}_report_evidence.json", "application/json"),
+        "technical": (RESULTS_DIR / f"{sample_id}_technical_appendix.md", "text/markdown; charset=utf-8"),
+        "interactive": (RESULTS_DIR / f"{sample_id}_interactive_report.json", "application/json"),
     }
     if kind not in mapping:
         raise HTTPException(404, "不支持的报告产物类型。")

@@ -7,6 +7,10 @@
 第一次接触本项目，请先阅读 `docs/PROJECT_ARCHITECTURE_GUIDE.md`，其中包含整体调用链、
 常用依赖、模块对应关系、数据存储方式和完整安装启动流程。
 
+参考人群筛选、公开数据来源以及“主报告 + 技术附录 + 交互展示”三层报告规范见
+`docs/REFERENCE_COHORTS_AND_REPORT_LAYERS.md`；首批队列清单位于
+`config/reference_cohorts.json`。
+
 ## 目录结构
 
 ```text

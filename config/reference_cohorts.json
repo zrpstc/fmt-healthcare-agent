@@ -1,0 +1,144 @@
+{
+  "catalog_version": "2026-10-22",
+  "scope": "human fecal whole-metagenome shotgun reference cohorts",
+  "selection_policy": {
+    "required": [
+      "fecal sample",
+      "shotgun metagenomics",
+      "sample-level phenotype metadata",
+      "public accession or reproducible processed profile"
+    ],
+    "exclusions": [
+      "16S-only cohorts",
+      "non-fecal body sites",
+      "unknown disease/control label",
+      "profiles without tool and database provenance"
+    ],
+    "important_note": "study_samples_total is not the final healthy-control count. Apply sample-level filters and retain one baseline sample per participant before computing reference percentiles."
+  },
+  "sources": [
+    {
+      "id": "curated-metagenomic-data",
+      "name": "curatedMetagenomicData",
+      "role": "primary_processed_profiles",
+      "url": "https://bioconductor.org/packages/release/data/experiment/html/curatedMetagenomicData.html",
+      "data_types": ["sample_metadata", "relative_abundance", "gene_families", "pathway_abundance", "pathway_coverage"],
+      "processing": "MetaPhlAn3 and HUMAnN3",
+      "status": "recommended"
+    },
+    {
+      "id": "hmp",
+      "name": "NIH Human Microbiome Project",
+      "role": "healthy_raw_and_qc_reference",
+      "url": "https://ihmpdcc.org/data.php",
+      "bioproject": "PRJNA43021",
+      "status": "recommended"
+    },
+    {
+      "id": "mgnify",
+      "name": "MGnify",
+      "role": "study_discovery_and_genome_catalogue",
+      "url": "https://www.ebi.ac.uk/metagenomics/api/v1/",
+      "status": "recommended_for_discovery"
+    },
+    {
+      "id": "gmrepo",
+      "name": "GMrepo",
+      "role": "phenotype_cross_check",
+      "url": "https://gmrepo.humangut.info/",
+      "status": "secondary_current_api_requires_revalidation"
+    }
+  ],
+  "cohorts": [
+    {
+      "study_name": "HMP_2012",
+      "bioproject": "PRJNA48479",
+      "pmid": "22699609",
+      "study_samples_total": 748,
+      "countries": ["United States"],
+      "phenotypes": ["Healthy"],
+      "role": ["healthy_core", "raw_reprocessing"],
+      "priority": 1
+    },
+    {
+      "study_name": "LifeLinesDeep_2016",
+      "bioproject": null,
+      "pmid": "27126040",
+      "study_samples_total": 1135,
+      "countries": ["Netherlands"],
+      "phenotypes": ["Healthy"],
+      "role": ["healthy_core", "processed_profile_only_until_accessions_resolved"],
+      "priority": 1
+    },
+    {
+      "study_name": "ZeeviD_2015",
+      "bioproject": "PRJEB11532",
+      "pmid": "26590418",
+      "study_samples_total": 900,
+      "countries": ["Israel"],
+      "phenotypes": ["Healthy"],
+      "role": ["healthy_core", "external_validation"],
+      "priority": 1
+    },
+    {
+      "study_name": "MehtaRS_2018",
+      "bioproject": "PRJNA354235",
+      "pmid": "29335554",
+      "study_samples_total": 928,
+      "countries": ["United States"],
+      "phenotypes": ["Healthy"],
+      "role": ["healthy_core", "external_validation"],
+      "priority": 1
+    },
+    {
+      "study_name": "JieZ_2017",
+      "bioproject": "PRJEB21528",
+      "pmid": "29018189",
+      "study_samples_total": 385,
+      "countries": ["China"],
+      "phenotypes": ["Healthy", "Atherosclerosis"],
+      "role": ["china_healthy_controls", "cardiometabolic_case_control"],
+      "priority": 1
+    },
+    {
+      "study_name": "QinJ_2012",
+      "bioproject": "PRJNA422434",
+      "pmid": "23023125",
+      "study_samples_total": 363,
+      "countries": ["China"],
+      "phenotypes": ["Healthy", "Type 2 Diabetes Mellitus"],
+      "role": ["china_healthy_controls", "t2d_case_control"],
+      "priority": 1
+    },
+    {
+      "study_name": "AsnicarF_2021",
+      "bioproject": "PRJEB39223",
+      "pmid": "33432175",
+      "study_samples_total": 1098,
+      "countries": ["United States", "United Kingdom"],
+      "phenotypes": ["Healthy"],
+      "role": ["nutrition_covariate_reference", "external_validation"],
+      "priority": 2
+    },
+    {
+      "study_name": "IaniroG_2022",
+      "bioproject": "PRJEB47909",
+      "pmid": "36109637",
+      "study_samples_total": 165,
+      "countries": ["Italy"],
+      "phenotypes": ["Healthy", "Clostridium difficile Infection", "Inflammatory Bowel Disease", "Diarrhea"],
+      "role": ["fmt_engraftment_validation"],
+      "priority": 1
+    },
+    {
+      "study_name": "NielsenHB_2014",
+      "bioproject": "PRJEB1220",
+      "pmid": "24997787",
+      "study_samples_total": 396,
+      "countries": ["Denmark", "Spain"],
+      "phenotypes": ["Healthy", "Inflammatory Bowel Disease", "Ulcerative Colitis", "Crohn Disease"],
+      "role": ["ibd_case_control"],
+      "priority": 2
+    }
+  ]
+}

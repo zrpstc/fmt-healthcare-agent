@@ -930,7 +930,7 @@ class ReportGeneratorTool(BaseTool):
             with open(evidence_path + ".tmp", "w", encoding="utf-8") as handle:
                 _json.dump({"sample_id": sid, "context": context, "evidence": evidence, "fmt_matching": fmt_matching}, handle, ensure_ascii=False, indent=2, default=str)
             os.replace(evidence_path + ".tmp", evidence_path)
-            markdown = build_full_report(
+            detailed_markdown = build_full_report(
                 sample_id=sid, species_data=species, compare_data=compare,
                 enterotype_data=enterotype, pathway_data=pathways,
                 metabolite_data=metabolites, drug_data=drugs,
@@ -938,14 +938,39 @@ class ReportGeneratorTool(BaseTool):
                 llm_advice=llm_advice, fmt_matching_data=fmt_matching,
                 protein_data=proteins, report_context=context,
             )
-            # Persist the Markdown artifact as well as returning it in the tool
-            # result so the online report center can preview the same matching
-            # section that is embedded in the PDF.
+            from wgs_agent.tools.report_layers import build_report_layers
+            layers = build_report_layers(
+                sample_id=sid,
+                full_report=detailed_markdown,
+                evidence=evidence,
+                species_data=species,
+                enterotype_data=enterotype,
+                pathway_data=pathways,
+                disease_data=diseases,
+                matching_data=fmt_matching,
+                context=context,
+            )
+            markdown = layers["main_markdown"]
+            technical_markdown = layers["technical_markdown"]
+            interactive_payload = layers["interactive"]
+            # The historical health_report names remain the user-facing layer so
+            # existing URLs keep working. The complete report is now a separate
+            # technical appendix and the browser receives a stable JSON view model.
             markdown_path = os.path.join(output_dir, f"{sid}_health_report.md")
             markdown_tmp = f"{markdown_path}.tmp"
             with open(markdown_tmp, "w", encoding="utf-8") as markdown_file:
                 markdown_file.write(markdown)
             os.replace(markdown_tmp, markdown_path)
+
+            technical_path = os.path.join(output_dir, f"{sid}_technical_appendix.md")
+            with open(technical_path + ".tmp", "w", encoding="utf-8") as technical_file:
+                technical_file.write(technical_markdown)
+            os.replace(technical_path + ".tmp", technical_path)
+
+            interactive_path = os.path.join(output_dir, f"{sid}_interactive_report.json")
+            with open(interactive_path + ".tmp", "w", encoding="utf-8") as interactive_file:
+                _json.dump(interactive_payload, interactive_file, ensure_ascii=False, indent=2, default=str)
+            os.replace(interactive_path + ".tmp", interactive_path)
 
             # PDF consumes exactly the same Markdown, including evidence and figures.
             pdf_path = os.path.join(output_dir, f"{sid}_health_report.pdf")
@@ -961,6 +986,8 @@ class ReportGeneratorTool(BaseTool):
             result = {
                 "markdown": markdown,
                 "markdown_path": markdown_path,
+                "technical_appendix_path": technical_path,
+                "interactive_report_path": interactive_path,
                 "pdf_path": pdf_path,
                 "sample_id": sid,
                 "renderer_used": renderer_used,

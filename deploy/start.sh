@@ -13,10 +13,14 @@ if [[ -f .env ]]; then
 fi
 
 DATA_ROOT="${WGS_WORKSPACE:-$ROOT/var}"
+LAYOUT_FMT_ROOT="$(cd -- "$ROOT/../.." 2>/dev/null && pwd || true)"
 if [[ -n "${WGS_ENV_ROOT:-}" ]]; then
   ENV_ROOT="$WGS_ENV_ROOT"
 elif [[ -x "${FMT_ROOT:-${WGS_FMT_RESOURCE_ROOT:-$ROOT/var}}/runtime/envs/wgs-fmt-agent-v2/bin/python" ]]; then
   ENV_ROOT="${FMT_ROOT:-${WGS_FMT_RESOURCE_ROOT:-$ROOT/var}}/runtime/envs/wgs-fmt-agent-v2"
+elif [[ -n "$LAYOUT_FMT_ROOT" && -x "$LAYOUT_FMT_ROOT/runtime/envs/wgs-fmt-agent-v2/bin/python" ]]; then
+  # Standard deployment layout: <fmt-root>/apps/WGS-FMT-Agent-v2.
+  ENV_ROOT="$LAYOUT_FMT_ROOT/runtime/envs/wgs-fmt-agent-v2"
 else
   ENV_ROOT="$ROOT/.venv"
 fi
