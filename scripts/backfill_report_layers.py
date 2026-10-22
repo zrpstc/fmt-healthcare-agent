@@ -29,7 +29,12 @@ def _atomic_json(path: Path, value: dict[str, Any]) -> None:
     _atomic_text(path, json.dumps(value, ensure_ascii=False, indent=2, default=str) + "\n")
 
 
-def backfill(results: Path, sample_id: str, dry_run: bool = False) -> dict[str, Any]:
+def backfill(
+    results: Path,
+    sample_id: str,
+    dry_run: bool = False,
+    render_pdf: bool = False,
+) -> dict[str, Any]:
     analysis_path = results / f"{sample_id}_analysis.json"
     evidence_path = results / f"{sample_id}_report_evidence.json"
     main_path = results / f"{sample_id}_health_report.md"
@@ -40,6 +45,9 @@ def backfill(results: Path, sample_id: str, dry_run: bool = False) -> dict[str, 
     analysis = _object(analysis_path)
     manifest = _object(evidence_path)
     detailed = technical_path.read_text(encoding="utf-8") if technical_path.is_file() else main_path.read_text(encoding="utf-8")
+    marker = "## 完整分析结果\n\n"
+    if marker in detailed:
+        detailed = detailed.split(marker, 1)[1]
     layers = build_report_layers(
         sample_id=sample_id,
         full_report=detailed,
@@ -55,7 +63,17 @@ def backfill(results: Path, sample_id: str, dry_run: bool = False) -> dict[str, 
         _atomic_text(main_path, layers["main_markdown"])
         _atomic_text(technical_path, layers["technical_markdown"])
         _atomic_json(interactive_path, layers["interactive"])
-    return {"sample_id": sample_id, "status": "planned" if dry_run else "complete", "technical": str(technical_path), "interactive": str(interactive_path)}
+        if render_pdf:
+            from wgs_agent.tools.report_maker import _generate_fpdf_report
+
+            _generate_fpdf_report(layers["main_markdown"], sample_id, str(results / f"{sample_id}_health_report.pdf"))
+    return {
+        "sample_id": sample_id,
+        "status": "planned" if dry_run else "complete",
+        "technical": str(technical_path),
+        "interactive": str(interactive_path),
+        "pdf_rendered": bool(render_pdf and not dry_run),
+    }
 
 
 def main() -> int:
@@ -63,9 +81,10 @@ def main() -> int:
     parser.add_argument("--results-dir", type=Path, required=True)
     parser.add_argument("--sample-id", action="append", default=[])
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--render-pdf", action="store_true", help="render the user-facing PDF from the new main report")
     args = parser.parse_args()
     sample_ids = args.sample_id or sorted(path.name.removesuffix("_analysis.json") for path in args.results_dir.glob("*_analysis.json"))
-    print(json.dumps([backfill(args.results_dir, sample_id, args.dry_run) for sample_id in sample_ids], ensure_ascii=False, indent=2))
+    print(json.dumps([backfill(args.results_dir, sample_id, args.dry_run, args.render_pdf) for sample_id in sample_ids], ensure_ascii=False, indent=2))
     return 0
 
 
