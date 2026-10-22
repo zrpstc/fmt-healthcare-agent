@@ -124,6 +124,9 @@ def test_delete_requires_confirmation_and_exact_id(runtime, payload):
 def test_delete_permanently_removes_owned_files_and_preserves_other_samples(runtime):
     targets = create_sample(runtime, full=True)
     neighbours = create_sample(runtime, "p2_other", full=True)
+    targets += [write(runtime, "results/p2_key_taxa_bifidobacteria_kg_012345abcdef.png"),
+                write(runtime, "results/p2_metabolites_scfa_kg_987654fedcba.png")]
+    neighbours += [write(runtime, "results/p2_other_key_taxa_bifidobacteria_kg_012345abcdef.png")]
     shared = write(runtime, "reference/cohort.tsv", "shared reference")
     runner = write(runtime, "bioinformatics/status/runner_status.tsv", "sample_id\tstate\np2\tcomplete\np2_other\tcomplete\n")
     with TestClient(main.app) as client:

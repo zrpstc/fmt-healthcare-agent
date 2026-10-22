@@ -817,6 +817,7 @@ class ReportGeneratorTool(BaseTool):
         from wgs_agent.reporting.document import build_document
         from wgs_agent.reporting.inputs import load_existing_report_inputs
         from wgs_agent.reporting.narrative import generate_narrative
+        from wgs_agent.reporting.knowledge_graph import enrich_document, attach_subgraphs, render_graph_figures
         from wgs_agent.tools.detailed_report import load_gene_family_evidence, resolve_report_model
         from wgs_agent.tools.report_maker import _generate_fpdf_report, build_full_report
 
@@ -886,27 +887,35 @@ class ReportGeneratorTool(BaseTool):
                 module("metabolites"), module("drugs"), module("diseases"), knowledge,
                 proteins, module("fmt_matching"), context,
             )
+            await enrich_document(document)
             document = generate_narrative(document, resolve_report_model())
+            attach_subgraphs(document)
             document["audit"]["generation_id"] = uuid.uuid4().hex
             context["report_document"] = document
-            markdown = build_full_report(
-                sid, module("species"), module("compare"), module("enterotype"), pathways,
-                module("metabolites"), module("drugs"), module("diseases"), knowledge,
-                protein_data=proteins, report_context=context,
-            )
             evidence_manifest = {
                 "sample_id": sid, "report_version": VERSION,
                 "context": document["audit"], "evidence": document["evidence"],
                 "fmt_matching": document["fmt_matching"],
+                "knowledge_subgraphs": {t["id"]: t["knowledge_subgraph"] for s in document["sections"] for t in s["topics"]},
             }
             # Stage all artifacts first. A renderer failure preserves the last
             # complete report instead of publishing new Markdown with an old PDF.
             with tempfile.TemporaryDirectory(prefix=f".{sid}-report-", dir=output_dir) as temporary:
                 staging = Path(temporary)
+                figure_names = render_graph_figures(document, staging)
+                markdown = build_full_report(
+                    sid, module("species"), module("compare"), module("enterotype"), pathways,
+                    module("metabolites"), module("drugs"), module("diseases"), knowledge,
+                    protein_data=proteins, report_context=context,
+                )
                 (staging / filenames["markdown"]).write_text(markdown, encoding="utf-8")
                 (staging / filenames["structured"]).write_text(json.dumps(document, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
                 (staging / filenames["evidence"]).write_text(json.dumps(evidence_manifest, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
                 _generate_fpdf_report(markdown, sid, str(staging / filenames["pdf"]))
+                # Content-addressed figures are published only after PDF succeeds.
+                # An interrupted publication leaves the previous report figures valid.
+                for name in figure_names.values():
+                    os.replace(staging / name, output_dir / name)
                 for name in filenames.values():
                     os.chmod(staging / name, 0o600)
                     os.replace(staging / name, output_dir / name)
@@ -918,7 +927,7 @@ class ReportGeneratorTool(BaseTool):
                 "renderer_used": "health_markdown_fpdf", "template_path": VERSION,
                 "llm_status": document["audit"]["llm_status"],
                 "llm_accepted_topics": document["audit"].get("accepted_topics", 0),
-                "figure_paths": {}, "pdf_error": "",
+                "figure_paths": {key: str(output_dir / name) for key, name in figure_names.items()}, "pdf_error": "",
             }
             return _make_result(f"报告已生成: {result['pdf_path']}\n报告版本: {VERSION}", result)
         except Exception as exc:

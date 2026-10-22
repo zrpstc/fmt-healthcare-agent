@@ -541,8 +541,11 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
         if image_match:
             in_table = False
             from pathlib import Path
-            image_path = Path(image_match.group(2)).resolve()
             allowed_root = Path(output_path).resolve().parent
+            image_path = Path(image_match.group(2))
+            if not image_path.is_absolute():
+                image_path = allowed_root / image_path
+            image_path = image_path.resolve()
             if image_path.is_file() and image_path.is_relative_to(allowed_root):
                 from PIL import Image
                 with Image.open(image_path) as im:

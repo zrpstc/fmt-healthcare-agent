@@ -241,6 +241,7 @@ bash deploy/check-bioinformatics-runtime.sh
 ## 更多说明
 
 - [项目架构](docs/PROJECT_ARCHITECTURE_GUIDE.md)
+- [报告相关知识子图](docs/REPORT_KNOWLEDGE_SUBGRAPHS.md)
 - [环境说明](docs/ENVIRONMENT.md)
 - [单服务器部署与数据目录](docs/SINGLE_SERVER.md)
 - [资源清单与离线迁移](runtime/resources/README.md)

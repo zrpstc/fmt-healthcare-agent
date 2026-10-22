@@ -155,7 +155,14 @@ async def main() -> None:
         action="store_true",
         help="Use the configured model service; sends selected sample evidence",
     )
+    parser.add_argument(
+        "--use-knowledge-graph",
+        action="store_true",
+        help="Retrieve related claims from the configured LitKG service",
+    )
     args = parser.parse_args()
+    if not args.use_knowledge_graph:
+        os.environ["WGS_REPORT_GRAPH_RETRIEVAL_DISABLED"] = "1"
     if not args.use_llm:
         os.environ["WGS_REPORT_LLM_DISABLED"] = "1"
     else:

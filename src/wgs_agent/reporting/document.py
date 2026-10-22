@@ -493,7 +493,7 @@ def build_document(
         )
         if context.get(key) not in (None, "")
     }
-    return _safe_json(
+    document = _safe_json(
         {
             "schema_version": VERSION,
             "title": TITLE,
@@ -517,6 +517,11 @@ def build_document(
             "fmt_matching": matching or {},
         }
     )
+
+    from .knowledge_graph import attach_subgraphs
+
+    attach_subgraphs(document)
+    return document
 
 
 def _topic_note(section: str, topic: str, ids: list[str], evidence: dict, missing: str) -> str:
@@ -559,6 +564,9 @@ def _finding(ids: list[str], evidence: dict, missing: str) -> str:
 
 def render_markdown(document: dict) -> str:
     """Both PDF and online preview consume this exact, reader-facing content."""
+    from .knowledge_graph import attach_subgraphs, graph_markdown
+
+    attach_subgraphs(document)
     output = [
         f"# {document['title']}",
         f"样本编号：{text(document['sample_id'])}  \n报告日期：{document['generated_at'][:10]}  \n报告版本：{document['schema_version']}",
@@ -644,6 +652,7 @@ def render_markdown(document: dict) -> str:
             ]
             if citations:
                 output.append("参考依据：" + "、".join(f"[{key}]" for key in citations))
+            output.extend(graph_markdown(topic))
             if len(topic["evidence_ids"]) > 8:
                 output.append("本表展示部分条目，完整明细见结构化报告。")
         if missing:

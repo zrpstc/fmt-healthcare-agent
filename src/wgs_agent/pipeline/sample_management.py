@@ -6,6 +6,7 @@ from contextlib import ExitStack
 from datetime import UTC, datetime
 import fcntl
 import os
+import re
 from pathlib import Path
 import shutil
 
@@ -42,6 +43,16 @@ def _targets(sample_id: str, settings: UploadWorkflowSettings, results_dir: Path
         candidates.append((results_dir, f"{sample_id}{suffix}"))
         if suffix.endswith(".png"):
             candidates.append((results_dir, f"figures/{sample_id}{suffix}"))
+    # Match a fixed catalog topic after the exact sample ID. A p2_other graph
+    # cannot become p2's deletion target even though their IDs share a prefix.
+    from wgs_agent.reporting.catalog import SECTIONS
+
+    topics = "|".join(re.escape(f"{s.id}_{t.id}") for s in SECTIONS for t in s.topics)
+    graph_name = re.compile(re.escape(sample_id) + rf"_(?:{topics})_kg_[0-9a-f]{{12}}\.png")
+    if results_dir.is_dir():
+        for path in sorted(results_dir.iterdir()):
+            if graph_name.fullmatch(path.name):
+                candidates.append((results_dir, path.name))
     # Retain the job until the last file is removed, so a partial failure can be
     # retried using the original job record and running-process checks.
     candidates.append((settings.job_root, f"jobs/{sample_id}.json"))
