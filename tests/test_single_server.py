@@ -1,6 +1,7 @@
 """Regression coverage for local addressing and fresh, relocatable data."""
 
 import os
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -110,6 +111,13 @@ with TestClient(app) as client:
 
 
 def test_shell_config_matches_python_from_other_directory(clean_runtime_env, tmp_path):
+    # The production .env overrides shell variables. Exercise relocation in a
+    # clean project instead of sourcing live server settings during this test.
+    isolated_root = tmp_path / "project"
+    deploy = isolated_root / "deploy"
+    deploy.mkdir(parents=True)
+    for name in ("common.sh", "status.sh"):
+        shutil.copyfile(PROJECT_ROOT / "deploy" / name, deploy / name)
     env = {**os.environ, "WGS_WORKSPACE": "var-relocated", "WGS_API_PORT": "8603"}
     result = subprocess.run(
         [
@@ -117,7 +125,7 @@ def test_shell_config_matches_python_from_other_directory(clean_runtime_env, tmp
             "-c",
             'source "$1"; printf "%s\\n" "$WGS_WORKSPACE" "$WGS_API_PORT"',
             "bash",
-            str(PROJECT_ROOT / "deploy/common.sh"),
+            str(deploy / "common.sh"),
         ],
         env=env,
         cwd=tmp_path,
@@ -125,10 +133,10 @@ def test_shell_config_matches_python_from_other_directory(clean_runtime_env, tmp
         capture_output=True,
         text=True,
     )
-    assert result.stdout.splitlines() == [str(PROJECT_ROOT / "var-relocated"), "8603"]
+    assert result.stdout.splitlines() == [str(isolated_root / "var-relocated"), "8603"]
     env["WGS_API_PORT"] = "invalid"
     result = subprocess.run(
-        ["bash", str(PROJECT_ROOT / "deploy/status.sh")],
+        ["bash", str(deploy / "status.sh")],
         env=env,
         cwd=tmp_path,
         capture_output=True,

@@ -110,6 +110,29 @@ def test_first_report_bootstraps_real_artifacts_from_uploaded_profiles(runtime):
     assert before == (taxonomy.read_bytes(), pathways.read_bytes())
 
 
+def test_first_uploaded_report_automatically_compares_existing_reference(runtime, monkeypatch):
+    upload(runtime)
+    profiles(runtime)
+    reference = runtime / "reference/species_reference_overall.csv"
+    reference.parent.mkdir(parents=True)
+    reference.write_text(
+        "species,p5,p95,median,n_samples,cond_n\n"
+        "Bifidobacterium longum,1,10,3,120,100\n"
+        "Bifidobacterium breve,0,50,10,120,80\n"
+    )
+    monkeypatch.setenv("WGS_SPECIES_REFERENCE_FILE", str(reference))
+    with TestClient(main.app) as client:
+        response = client.post("/api/reports/SYNTHETIC/generate", json={"confirmed": True})
+        assert response.status_code == 200, response.text
+    data = json.loads((runtime / "results/SYNTHETIC_analysis.json").read_text())
+    assert data["species"]["n_high"] == data["species"]["n_normal"] == 1
+    assert data["species"]["n_unknown"] == 0
+    assert data["species"]["species_list"][0]["n_reference"] == 120
+    document = json.loads((runtime / "results/SYNTHETIC_report.json").read_text())
+    assert document["evidence"]["S1"]["comparison"] == "above"
+    assert "参考样本 n=120" in (runtime / "results/SYNTHETIC_health_report.md").read_text()
+
+
 @pytest.mark.parametrize("problem", ["running", "missing", "invalid_taxonomy", "empty_functions"])
 def test_incomplete_or_invalid_profiles_do_not_publish_placeholder_analysis(runtime, problem):
     upload(runtime, state="running" if problem == "running" else "complete")
@@ -162,7 +185,8 @@ def test_analysis_publication_does_not_overwrite_a_concurrent_writer(runtime, mo
 
 def test_pdf_failure_can_be_retried_without_rerunning_bioinformatics(runtime, monkeypatch):
     upload(runtime)
-    profiles(runtime)
+    taxonomy, pathways = profiles(runtime)
+    before_profiles = (taxonomy.read_bytes(), pathways.read_bytes())
     renderer = report_maker._generate_fpdf_report
 
     def fail(*args):
@@ -179,4 +203,10 @@ def test_pdf_failure_can_be_retried_without_rerunning_bioinformatics(runtime, mo
         monkeypatch.setattr(report_maker, "_generate_fpdf_report", renderer)
         retry = client.post("/api/reports/SYNTHETIC/generate", json={"confirmed": True})
         assert retry.status_code == 200, retry.text
-        assert target.read_bytes() == original
+        # Successful generation may now add reference provenance, while the
+        # original observations and bioinformatics artifacts stay unchanged.
+        refreshed, before = json.loads(target.read_text()), json.loads(original)
+        for module in ("species", "taxonomy", "pathways"):
+            assert refreshed[module] == before[module]
+        assert refreshed["metadata"]["analysis_source"] == before["metadata"]["analysis_source"]
+        assert (taxonomy.read_bytes(), pathways.read_bytes()) == before_profiles

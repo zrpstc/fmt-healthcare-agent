@@ -10,7 +10,9 @@ from datetime import datetime
 from typing import Tuple, List, Dict
 
 from fpdf import FPDF
-from wgs_fmt_platform.paths import legacy_output_root, project_path, runtime_path
+from wgs_fmt_platform.paths import (
+    legacy_output_root, project_path, runtime_path, species_reference_path,
+)
 
 # ============================================================================
 # 路径配置
@@ -35,7 +37,7 @@ DRUG_ANALYSIS_FILE = os.path.join(DRUG_ANALYSIS_DIR, "drug_analysis_report_{samp
 METABOLITE_DRUG_FILE = os.path.join(DRUG_ANALYSIS_DIR, "metabolite_drug_links.tsv")
 METHOD_COMPARISON_FILE = os.path.join(DRUG_ANALYSIS_DIR, "method_comparison_summary.tsv")
 SPECIES_REF_FILE = os.path.join(DATA_DIR, "species_matrix_P5_P95.csv")
-SPECIES_REF_EXTENDED = str(project_path(os.environ.get("WGS_SPECIES_REFERENCE_FILE") or _REFERENCE_DIR / "species_reference_overall.csv"))
+SPECIES_REF_EXTENDED = str(species_reference_path())
 SPECIES_STATS_FILE = os.path.join(DATA_DIR, "health_species_stats.csv")
 GENUS_STATS_FILE = os.path.join(DATA_DIR, "health_genus_stats.csv")
 PHENOTYPE_FILE = os.path.join(DATA_DIR, "phenotype_species_stats.csv")

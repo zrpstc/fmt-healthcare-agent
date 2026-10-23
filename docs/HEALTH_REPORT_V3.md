@@ -37,6 +37,29 @@
 常规报告不启动 FMT 计算或聚类绘图。已有 FMT 结果可保留在附录。
 旧的 `detailed_report.build_detailed_report()` 是科研报告兼容实现，已不作为网页健康报告正文入口。
 
+### 自动参考比较
+
+网页和对话的 `ReportGeneratorTool` 在每次生成时调用 `reporting/reference.py`：
+
+- 从既有完整物种谱恢复全部物种（包括 SGB），或沿用分析文件已有物种条目，重新计算参考比较。
+- 优先使用 `WGS_SPECIES_REFERENCE_FILE`，其次使用 `WGS_REFERENCE_DIR/species_reference_overall.csv`。
+  默认工作区下，`var/reference` 没有该文件时兼容读取 `data/reference/species_reference_overall.csv`。
+  显式配置的路径缺失时不偷偷切换其他人群；自定义工作区也不读取默认工作区的存量数据。
+- 参考表采用 CSV 或 TSV 长表，`species/p5/p95` 必需，丰度单位为百分数；支持 `median/p50`、
+  `n_samples`、`n_detected/cond_n`、`detection_rate`、`stratum`。总体样本数和检出数分别保存。
+  物种未覆盖、零宽区间、单位不可比或观测无效分别记录原因，不能作为正常结果。
+- 完整且有效的样本谱还可与 `WGS_FMT_MATCHING_DIR`（默认 `var/data/fmt-matching`）中的
+  `species_abundance_train.csv`、`match.xlsx` 建立探索性多样性比较。仅纳入 `donor + healthy`，
+  排除当前样本；存在 `subject_id` 时按个体去重并排除当前个体，不足 30 份有效参考时不建立比较。
+  参考和样本使用相同多样性公式。该子集未作人口学匹配，数据库和完整特征口径仍需核验；
+  经验百分位不是疾病概率。已有纵向记录继续保留。
+- 新比较与参考文件内容哈希进入分析 JSON、结构化报告和证据 JSON。全部报告产物渲染成功后
+  才替换更新后的分析文件；PDF 失败或分析文件被其他写入者更新时，不发布本次比较和报告。
+- 不运行新的测序分析、FMT 模型或外部数据下载，也不将实测代谢物浓度资料套用到预测产能。
+
+现有总体表的所有物种 P5 均为零，因此按该表不能判断偏低；多数物种 P5=P95=0，继续保留
+未比较状态。参考表健康筛选、独立人数和软件数据库版本尚未核验，报告会呈现此适用范围。
+
 同一目录发布以下文件：
 
 - `{sample_id}_health_report.md`：网页预览和正文。

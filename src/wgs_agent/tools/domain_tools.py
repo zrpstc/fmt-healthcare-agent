@@ -816,6 +816,7 @@ class ReportGeneratorTool(BaseTool):
         from wgs_agent.reporting.catalog import VERSION
         from wgs_agent.reporting.document import build_document
         from wgs_agent.reporting.inputs import load_existing_report_inputs
+        from wgs_agent.reporting.reference import refresh_reference_comparisons
         from wgs_agent.reporting.narrative import generate_narrative
         from wgs_agent.reporting.graph_labels import resolve_graph_model, translate_graph_labels
         from wgs_agent.reporting.knowledge_graph import enrich_document, attach_subgraphs, render_graph_figures
@@ -828,11 +829,6 @@ class ReportGeneratorTool(BaseTool):
             if not re.fullmatch(r"[A-Za-z0-9_.-]+", sid) or sid in {".", ".."}:
                 raise ValueError("样本编号格式无效")
             analysis_path = Path(str(params["analysis_json_path"])).resolve()
-            data = json.loads(analysis_path.read_text(encoding="utf-8"))
-            if not isinstance(data, dict):
-                raise ValueError("分析结果必须是 JSON 对象")
-            if data.get("sample_id") not in (None, "", sid):
-                raise ValueError("分析文件中的样本编号与请求不一致")
             output_dir = analysis_path.parent
             filenames = {
                 "markdown": f"{sid}_health_report.md", "pdf": f"{sid}_health_report.pdf",
@@ -848,6 +844,13 @@ class ReportGeneratorTool(BaseTool):
             except BlockingIOError:
                 return ToolResult(content="该样本的报告正在生成，请稍后查看。", is_error=True)
 
+            original_analysis = analysis_path.read_bytes()
+            data = json.loads(original_analysis)
+            if not isinstance(data, dict):
+                raise ValueError("分析结果必须是 JSON 对象")
+            if data.get("sample_id") not in (None, "", sid):
+                raise ValueError("分析文件中的样本编号与请求不一致")
+
             def module(key: str) -> dict:
                 value = data.get(key)
                 return value if isinstance(value, dict) else {}
@@ -861,19 +864,26 @@ class ReportGeneratorTool(BaseTool):
                 if not isinstance(supplied, dict):
                     raise ValueError("知识结果必须是 JSON 对象")
                 knowledge = supplied
-            metadata = module("metadata")
-            context = dict(metadata)
-            context.update({
-                "analysis_sha256": hashlib.sha256(analysis_path.read_bytes()).hexdigest(),
-                "knowledge_sha256": hashlib.sha256(json.dumps(knowledge, sort_keys=True, ensure_ascii=False).encode()).hexdigest(),
-                "report_version": VERSION,
-            })
             # Read existing canonical artifacts to recover complete taxonomy and
             # pathways from historical analysis JSONs that only retained Top N.
             inputs = load_existing_report_inputs(sid)
             for key in ("taxonomy", "diversity", "functional_modules", "nutrition", "diet", "symptoms", "gut_brain", "resistance", "pathogens", "disease_models"):
                 if isinstance(data.get(key), (dict, list)):
                     inputs[key] = data[key]
+            refreshed = refresh_reference_comparisons(data, inputs)
+            analysis_payload = (
+                json.dumps(refreshed, ensure_ascii=False, indent=2, allow_nan=False).encode("utf-8")
+                if refreshed != data else original_analysis
+            )
+            data = refreshed
+            if isinstance(data.get("diversity"), dict):
+                inputs["diversity"] = data["diversity"]
+            context = dict(module("metadata"))
+            context.update({
+                "analysis_sha256": hashlib.sha256(analysis_payload).hexdigest(),
+                "knowledge_sha256": hashlib.sha256(json.dumps(knowledge, sort_keys=True, ensure_ascii=False).encode()).hexdigest(),
+                "report_version": VERSION,
+            })
             context["health_inputs"] = inputs
             pathways = module("pathways")
             if inputs.get("pathways") and pathways.get("is_complete") is not True:
@@ -916,6 +926,12 @@ class ReportGeneratorTool(BaseTool):
                 (staging / filenames["structured"]).write_text(json.dumps(document, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
                 (staging / filenames["evidence"]).write_text(json.dumps(evidence_manifest, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
                 _generate_fpdf_report(markdown, sid, str(staging / filenames["pdf"]))
+                if analysis_path.read_bytes() != original_analysis:
+                    raise ValueError("报告生成期间分析文件已更新，请重新生成。")
+                staged_analysis = staging / "analysis.json"
+                if analysis_payload != original_analysis:
+                    staged_analysis.write_bytes(analysis_payload)
+                    os.chmod(staged_analysis, 0o600)
                 # Content-addressed figures are published only after PDF succeeds.
                 # An interrupted publication leaves the previous report figures valid.
                 for name in figure_names.values():
@@ -923,6 +939,8 @@ class ReportGeneratorTool(BaseTool):
                 for name in filenames.values():
                     os.chmod(staging / name, 0o600)
                     os.replace(staging / name, output_dir / name)
+                if staged_analysis.is_file():
+                    os.replace(staged_analysis, analysis_path)
             result = {
                 "markdown": markdown, "markdown_path": str(output_dir / filenames["markdown"]),
                 "pdf_path": str(output_dir / filenames["pdf"]), "sample_id": sid,
@@ -931,6 +949,7 @@ class ReportGeneratorTool(BaseTool):
                 "renderer_used": "health_markdown_fpdf", "template_path": VERSION,
                 "llm_status": document["audit"]["llm_status"],
                 "llm_accepted_topics": document["audit"].get("accepted_topics", 0),
+                "reference_comparison": document["audit"].get("reference_comparison", {}),
                 "figure_paths": {key: str(output_dir / name) for key, name in figure_names.items()}, "pdf_error": "",
             }
             return _make_result(f"报告已生成: {result['pdf_path']}\n报告版本: {VERSION}", result)

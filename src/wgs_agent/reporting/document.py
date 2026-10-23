@@ -172,11 +172,16 @@ def build_document(
             return  # NaN, infinity and malformed measurements never become results.
         if "risk_score" in item:
             item["unit"] = "关联分（非患病概率）"
-        reference = "未建立参考比较"
+        reference = {
+            "species_not_in_reference": "参考库未覆盖该物种",
+            "zero_width_reference_interval": "参考分布为零宽区间，暂不判定高低",
+            "incompatible_unit": "当前单位与参考库不兼容，暂不比较",
+            "invalid_observation": "输入值无效，暂不比较",
+        }.get(item.get("comparison_reason"), "未建立参考比较")
         p5, p95 = finite(item.get("p5")), finite(item.get("p95"))
         item["comparison"] = "unknown"
         if (
-            item.get("status") in {"normal", "high", "low"}
+            item.get("status") in {"normal", "high", "low", "absent"}
             and p5 is not None
             and p95 is not None
             and p95 > p5
@@ -205,6 +210,19 @@ def build_document(
                 + {"above": "高于参考", "below": "低于参考", "within": "区间内"}[item["comparison"]]
                 + "）"
             )
+            item["reference_text"] = reference
+        if item["comparison"] != "unknown":
+            median = finite(item.get("reference_median"))
+            if median is not None:
+                reference += f"；中位数 {number(median)}"
+            n_reference = finite(item.get("n_reference"))
+            if n_reference is not None:
+                reference += f"；参考样本 n={int(n_reference)}"
+            percentile = finite(item.get("percentile"))
+            if percentile is not None:
+                reference += f"；供体子集经验百分位 {number(percentile)}"
+            if item.get("generated_by") == "reference-comparison-v1":
+                reference += "（探索性）"
             item["reference_text"] = reference
         item["result_text"] = result
         item["finding"] = (
@@ -278,7 +296,7 @@ def build_document(
                 },
                 "calculated",
             )
-    for row in records(diversity, "reference_comparisons", "longitudinal"):
+    for row in records(diversity.get("reference_comparisons")) + records(diversity.get("longitudinal")):
         add("div_reference", "V", row, "calculated")
     if complete_sp:
         values = [finite(row.get("abundance")) for row in complete_sp]
@@ -507,6 +525,7 @@ def build_document(
                 "knowledge_sha256": context.get("knowledge_sha256"),
                 "pipeline_version": context.get("pipeline_version"),
                 "reference_version": context.get("reference_version"),
+                "reference_comparison": context.get("reference_comparison", {}),
                 "omitted_unvalidated_predictions": skipped_predictions,
                 "pathway_annotation": pathways.get("special_rows", {}),
                 "gene_family_count": (proteins or {}).get("n_total"),
@@ -606,6 +625,23 @@ def render_markdown(document: dict) -> str:
             ]
         )
     output.append(table(["分析板块", "结果覆盖", "本次主要结果"], overview))
+    reference = document["audit"].get("reference_comparison") or {}
+    species_reference = reference.get("species") or {}
+    if species_reference.get("status") == "available":
+        output.append(
+            f"参考比较：本次 {species_reference.get('compared_count', 0)} 个物种条目有可用参考区间，"
+            f"{species_reference.get('uncovered_count', 0)} 个条目因覆盖、单位或参考分布限制暂不比较。"
+            "物种 P5–P95 描述参考人群中央 90% 的分布；参考人群的健康筛选和分析数据库版本尚待核验。"
+        )
+    elif species_reference:
+        output.append("参考比较：当前物种参考表不可用，未自动建立新的物种比较；输入中已有比较予以保留。")
+    diversity_reference = reference.get("diversity") or {}
+    if diversity_reference.get("status") == "available":
+        output.append(
+            f"多样性参照：使用 {diversity_reference['n_reference']} 份标注健康供体的研究样本，"
+            "与本样本采用相同公式计算。该子集未按年龄、性别和地区匹配，数据库与完整特征口径尚待核验，"
+            "仅呈现探索性人群位置；样本数不等同于已核验的独立人数。"
+        )
     output.append(
         "> 阅读提示：本报告分别标识菌群估计、功能潜能、检测结果和模型推算。未评估项目不表示正常，报告用于健康管理与研究参考，不能替代临床诊断。"
     )

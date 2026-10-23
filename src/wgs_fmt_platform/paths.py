@@ -23,6 +23,20 @@ def runtime_path(variable: str, *parts: str) -> Path:
     return project_path(value) if value else workspace_root().joinpath(*parts)
 
 
+def species_reference_path() -> Path:
+    """Honor configured resources; retain bundled data for the default workspace."""
+    explicit = os.environ.get("WGS_SPECIES_REFERENCE_FILE", "").strip()
+    if explicit:
+        return project_path(explicit)
+    primary = runtime_path("WGS_REFERENCE_DIR", "reference") / "species_reference_overall.csv"
+    if primary.is_file() or os.environ.get("WGS_REFERENCE_DIR", "").strip():
+        return primary
+    legacy = PROJECT_ROOT / "data/reference/species_reference_overall.csv"
+    if workspace_root() == PROJECT_ROOT / "var" and legacy.is_file():
+        return legacy
+    return primary
+
+
 def knowledge_db_path() -> Path:
     # Both names are retained for existing API and knowledge-tool callers.
     value = os.environ.get("WGS_KNOWLEDGE_DB") or os.environ.get("WGS_KB_SQLITE_PATH")
