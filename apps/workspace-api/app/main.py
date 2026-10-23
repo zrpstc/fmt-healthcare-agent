@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import mimetypes
 import os
@@ -30,6 +31,7 @@ from wgs_agent.pipeline.sample_registry import (
     update_metadata,
 )
 from app.local_chat import LocalChatError, list_models
+from app.sample_graph import build_sample_graph
 from wgs_agent.tools.knowledge_tools import claim_record_to_reference
 from wgs_fmt_platform.config import get_settings
 from wgs_fmt_platform.paths import knowledge_db_path, project_path, runner_status_path, runtime_path, workspace_root
@@ -1234,6 +1236,49 @@ async def bind_litkg_claim(claim_id: int, payload: EvidenceBindPayload) -> dict[
     if analysis_path.is_file():
         analysis = _json_object(analysis_path); analysis["knowledge"] = knowledge; _atomic_json(analysis_path, analysis)
     return {"bound": True, "created": not existed, "sample_id": sample_id, "claim": claim}
+
+
+@app.get("/api/knowledge/samples/{sample_id}/graph")
+async def sample_knowledge_graph(
+    sample_id: str,
+    limit: int = Query(default=40, ge=1, le=150),
+) -> dict[str, Any]:
+    sample_id = _safe_sample_id(sample_id)
+    paths = [RESULTS_DIR / f"{sample_id}{suffix}" for suffix in
+             ("_analysis.json", "_knowledge.json", "_report.json")]
+    if not any(path.is_file() for path in paths):
+        raise HTTPException(404, "该样本尚无分析结果或绑定证据，请先完成样本分析。")
+    analysis, knowledge, report = (_json_object(path) for path in paths)
+    settings = get_settings()
+    kb = settings.claim_api_knowledge_base_id
+    claims: list[dict] = []
+    total = None
+    scan_limit = 10000
+    retrieval: dict[str, Any] = {"status": "complete", "scan_limit": scan_limit}
+    try:
+        # Bound the entire paginated scan as well as the upstream per-request timeout.
+        async with asyncio.timeout(45):
+            while len(claims) < scan_limit:
+                size = min(500, scan_limit - len(claims))
+                payload = await _litkg_get(f"/knowledge-bases/{kb}/claims", {"limit": size, "offset": len(claims)})
+                page = payload.get("claims")
+                if not isinstance(page, list) or any(not isinstance(row, dict) for row in page):
+                    raise ValueError("invalid Claim response")
+                total = payload.get("total")
+                claims.extend(page[:size])
+                if len(page) < size or (isinstance(total, int) and len(claims) >= total):
+                    break
+    except (HTTPException, TimeoutError, ValueError) as exc:
+        retrieval.update(status="partial" if claims else "unavailable",
+                         message="知识库检索未完成，当前仅展示已获取的关系和样本已保存的证据。",
+                         error_type=type(exc).__name__)
+    retrieval.update(scanned_claims=len(claims), total_claims=total,
+                     scan_truncated=(isinstance(total, int) and total > len(claims))
+                     or (total is None and len(claims) == scan_limit))
+    result = build_sample_graph(analysis, knowledge, report, claims, sample_id=sample_id,
+                                knowledge_base_id=kb, limit=limit)
+    result.update(source=_litkg_source(), retrieval=retrieval)
+    return result
 
 
 @app.get("/api/knowledge/remote/graph")

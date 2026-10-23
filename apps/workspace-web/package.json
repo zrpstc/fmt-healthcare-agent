@@ -15,7 +15,8 @@
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "vis-network": "^9.1.13"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

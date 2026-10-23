@@ -46,3 +46,6 @@ src/wgs_agent/tools/fonts/*.TTC
 
 tmp/
 fmt-databases/
+
+apps/workspace-web/.next-knowledge/
+apps/workspace-web/.next-preview/

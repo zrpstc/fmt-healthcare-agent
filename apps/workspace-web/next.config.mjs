@@ -14,6 +14,7 @@ if (!Number.isInteger(proxyTimeout) || proxyTimeout < 30000 || proxyTimeout > 18
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  distDir: process.env.WGS_WEB_DIST_DIR || ".next",
   // Multi-section report narration can outlast Next's default 30-second proxy.
   experimental: { proxyTimeout },
   async rewrites() {

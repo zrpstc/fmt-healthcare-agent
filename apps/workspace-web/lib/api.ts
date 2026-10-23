@@ -67,16 +67,21 @@ export interface LitkgDocument {
   id:number; filename:string; title?:string; status:string; error?:string|null; created_at?:string; updated_at?:string;
   chunk_count?:number; chunk_done_count?:number; chunk_failed_count?:number; claim_count?:number;
 }
-export interface GraphNode { id:number|string; label:string; type:string; normalized_id?:string|null }
-export interface GraphEvidence { claim_id?:number|string; document_id?:number; filename?:string; section?:string; sentence?:string; confidence?:number }
+export interface GraphNode { id:number|string; label:string; type:string; normalized_id?:string|null; matched_features?:string[] }
+export interface GraphEvidence { claim_id?:number|string; document_id?:number; filename?:string; section?:string; sentence?:string; confidence?:number; title?:string; doi?:string; page?:number }
 export interface GraphEdge {
   id:number|string; source:number|string; target:number|string; label:string; predicate?:string; confidence?:number;
   max_confidence?:number; negated?:boolean; speculative?:boolean; evidence_count?:number; document_count?:number;
   evidence?:string; evidence_samples?:GraphEvidence[]; qualifiers?:Record<string,any>;
+  claim_id?:string; display_negated?:boolean; review_status?:string; result_status?:string;
+  relevance_score?:number; match_reasons?:string[]; matched_features?:string[];
 }
 export interface KnowledgeGraph {
   nodes:GraphNode[]; edges:GraphEdge[]; summary:{node_count:number;relation_count:number;represented_document_count:number};
   knowledge_base_id:number; document_id?:number|null; source:LitkgSource;
+  sample_id?:string;
+  selection?:{method:string;candidate_count:number;feature_count:number;matched_feature_count:number;truncated:boolean;ranking:string};
+  retrieval?:{status:string;scanned_claims:number;total_claims?:number|null;scan_truncated:boolean;message?:string};
 }
 
 const BASE = "/backend/api";
@@ -142,6 +147,7 @@ export const api = {
     const query=new URLSearchParams(); Object.entries(params).forEach(([key,value])=>{if(value!==undefined&&value!=="")query.set(key,String(value))});
     return request<KnowledgeGraph>(`/knowledge/remote/graph?${query.toString()}`);
   },
+  sampleKnowledgeGraph: (sampleId:string,limit=40) => request<KnowledgeGraph>(`/knowledge/samples/${encodeURIComponent(sampleId)}/graph?limit=${limit}`,{cache:"no-store"}),
 };
 
 export const backendUrl=(path:string)=>`/backend/api${path}`;
