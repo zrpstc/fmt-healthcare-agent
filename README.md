@@ -240,6 +240,16 @@ bash deploy/check-bioinformatics-runtime.sh
 
 ## 更多说明
 
+重启 Elasticsearch 时，HTTP 端口可能先于认证状态就绪。启动脚本会在
+`WGS_ELASTICSEARCH_START_TIMEOUT`（默认 120 秒）内重试临时的 401/403；
+持续认证失败才报告凭据错误，认证成功但集群未就绪则报告启动超时。
+
+需要核查时，可从项目目录运行以下命令；它只启动已有的本项目容器并输出脱敏诊断，保留密码和数据卷：
+
+```bash
+sudo bash deploy/diagnose-elasticsearch.sh --start-existing --duration 60
+```
+
 - [项目架构](docs/PROJECT_ARCHITECTURE_GUIDE.md)
 - [报告相关知识子图](docs/REPORT_KNOWLEDGE_SUBGRAPHS.md)
 - [环境说明](docs/ENVIRONMENT.md)

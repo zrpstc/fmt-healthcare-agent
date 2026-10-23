@@ -166,22 +166,31 @@ class ManagedElasticsearch:
 
     def _wait_ready(self, password: str) -> None:
         deadline = time.monotonic() + self.timeout
+        last_auth_status = None
         while time.monotonic() < deadline:
             try:
                 health = self._request("GET", "/_cluster/health?wait_for_status=yellow&timeout=1s", password)
+                last_auth_status = None
                 if health.get("cluster_name") != self.name:
                     raise ManagedElasticsearchError("Unexpected cluster at the configured local port")
                 if health.get("status") in {"yellow", "green"} and not health.get("timed_out"):
                     return
             except HTTPError as exc:
-                if exc.code in {401, 403}:
-                    raise ManagedElasticsearchError("Elasticsearch rejected the saved credentials") from exc
+                # HTTP can listen before persisted security state is ready.
+                # A single early 401/403 must not abort and stop a valid node.
+                last_auth_status = exc.code if exc.code in {401, 403} else None
             except (URLError, TimeoutError, OSError, ValueError):
-                pass
+                last_auth_status = None
             container = self._inspect("container", self.name)
             if not container or not container["State"]["Running"]:
                 raise ManagedElasticsearchError(f"Elasticsearch exited; inspect docker logs {self.name}")
             time.sleep(1)
+        if last_auth_status is not None:
+            raise ManagedElasticsearchError(
+                "Elasticsearch rejected the saved credentials after the startup wait "
+                f"({self.timeout}s, HTTP {last_auth_status}); verify the existing credentials. "
+                "The data volume and saved passwords have not been reset."
+            )
         raise ManagedElasticsearchError(f"Elasticsearch startup timed out; inspect docker logs {self.name}")
 
     def start(self) -> None:

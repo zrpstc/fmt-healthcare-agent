@@ -166,12 +166,41 @@ class ManagedElasticsearchTests(unittest.TestCase):
         self.assertFalse(self.docker.container["State"]["Running"])
         self.assertTrue((self.manager.directory / "password").exists())
 
-    def test_auth_failure_does_not_loop_or_expose_http_body(self):
+    def test_persistent_auth_failure_waits_until_deadline_without_exposing_secrets(self):
         self.manager._request = Mock(side_effect=HTTPError("local", 401, "Unauthorized", {}, None))
-        with self.assertRaisesRegex(managed.ManagedElasticsearchError, "rejected the saved credentials"):
-            self.manager.start()
+        with patch.object(managed.time, "monotonic", side_effect=[0, 0, 1, 121]), patch.object(managed.time, "sleep"):
+            with self.assertRaisesRegex(managed.ManagedElasticsearchError, "rejected the saved credentials after the startup wait"):
+                self.manager.start()
         self.assertFalse(self.docker.container["State"]["Running"])
-        self.assertEqual(self.manager._request.call_count, 1)
+        self.assertEqual(self.manager._request.call_count, 2)
+
+    def test_transient_auth_failures_during_restart_do_not_stop_the_container(self):
+        self.manager.start()
+        self.manager.stop()
+        before = (self.manager.directory / "password").read_bytes()
+        self.docker.commands.clear()
+        healthy = {"cluster_name": self.manager.name, "status": "yellow", "timed_out": False}
+        self.manager._request = Mock(side_effect=[
+            HTTPError("local", 401, "Unauthorized", {}, None),
+            HTTPError("local", 403, "Forbidden", {}, None),
+            healthy, {}, {},
+        ])
+        with patch.object(managed.time, "monotonic", side_effect=[0, 0, 1, 2]), patch.object(managed.time, "sleep"):
+            self.manager.start()
+        self.assertTrue(self.docker.container["State"]["Running"])
+        self.assertEqual((self.manager.directory / "password").read_bytes(), before)
+        self.assertEqual(self.manager._request.call_count, 5)
+        self.assertFalse(any(command[:2] == ("container", "stop") for command in self.docker.commands))
+
+    def test_valid_auth_with_unhealthy_cluster_reports_startup_timeout(self):
+        self.manager.start()
+        self.manager._request = Mock(side_effect=[
+            HTTPError("local", 401, "Unauthorized", {}, None),
+            {"cluster_name": self.manager.name, "status": "red", "timed_out": True},
+        ])
+        with patch.object(managed.time, "monotonic", side_effect=[0, 0, 1, 121]), patch.object(managed.time, "sleep"):
+            with self.assertRaisesRegex(managed.ManagedElasticsearchError, "startup timed out"):
+                self.manager._wait_ready("synthetic-password")
 
     def test_external_urls_invalid_resources_and_wildcard_index_fail_before_docker(self):
         cases = [
