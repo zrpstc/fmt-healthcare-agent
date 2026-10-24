@@ -49,7 +49,7 @@ def test_real_subagent_runs_readonly_and_returns_to_primary(monkeypatch):
     assert result['agent_id'] == MAIN_AGENT_ID
     assert result['tool_call_count'] == 2
     child_tools = {t['function']['name'] for t in client.requests[1]['tools']}
-    assert child_tools == {'search_pubmed', 'search_knowledge_base'}
+    assert child_tools == {'search_pubmed', 'search_knowledge_base', 'litkg_graph_rag'}
     assert any(t['agent_id'] == EVIDENCE_AGENT_ID for t in result['trace'])
     assert result['answer'].startswith('综合样本')
 

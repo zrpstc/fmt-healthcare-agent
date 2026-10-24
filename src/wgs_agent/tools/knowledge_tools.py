@@ -7,6 +7,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from wgs_agent.core.tools.base import BaseTool, ToolResult
+from wgs_agent.tools.litkg_graphrag import LitKGGraphRAGTool
 from wgs_fmt_platform.paths import knowledge_db_path, runtime_path
 from wgs_fmt_platform.knowledge.litkg_retrieval import (
     LitkgRetrievalError, evidence_references, render_evidence, retrieve_litkg,
@@ -266,9 +267,11 @@ class PubmedSearchTool(BaseTool):
 KNOWLEDGE_TOOLS: list[type[BaseTool]] = [
     KnowledgeSearchTool,
     PubmedSearchTool,
+    LitKGGraphRAGTool,
 ]
 
 KNOWLEDGE_TOOL_POLICIES: dict[str, dict[str, object]] = {
+    "litkg_graph_rag": {"default":"allow", "reason":"只读检索 LitKG 原生图谱、完整事实与证据，不修改数据"},
     "search_knowledge_base": {
         "default": "allow",
         "reason": "本地只读搜索，无副作用",

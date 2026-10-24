@@ -28,6 +28,7 @@ from wgs_agent.tools.domain_tools import (
     ReportGeneratorTool,
 )
 from wgs_agent.tools.knowledge_tools import KnowledgeSearchTool, PubmedSearchTool
+from wgs_agent.tools.litkg_graphrag import LitKGGraphRAGTool
 from wgs_agent.tools.pipeline_runner import PipelineCheckTool, PipelineRunStepTool
 from wgs_fmt_platform.paths import runner_status_path, runtime_path
 from app.agent_prompts import MAIN_SYSTEM_PROMPT
@@ -60,6 +61,7 @@ def _function(name: str, description: str, properties: dict[str, Any], required:
 _SID = {"sample_id": {"type": "string", "description": "平台样本 ID"}}
 
 TOOLS = [
+    _function(LitKGGraphRAGTool.name, LitKGGraphRAGTool.description, LitKGGraphRAGTool.input_schema["properties"], ["question", "entities"]),
     _function("delegate_evidence_review", "委派只读循证整理 subagent，检索并交叉核验知识库/PubMed；返回主 Agent 汇总，不直接面向用户或写文件。", {"task": {"type": "string", "description": "完整研究问题、已确认样本发现及单位、待核验主张和证据缺口"}}, ["task"]),
     _function("list_samples", "列出平台已知样本及其状态摘要。", {"limit": {"type": "integer", "minimum": 1, "maximum": 200, "default": 30}}),
     _function("get_sample_status", "读取上传样本的实际 Pipeline 状态、进度和产物。", _SID, ["sample_id"]),
@@ -85,6 +87,7 @@ TOOLS = [
 
 
 _READ_TOOLS = {
+    "litkg_graph_rag": LitKGGraphRAGTool,
     "pipeline_check": PipelineCheckTool,
     "load_species_data": LoadSpeciesDataTool,
     "compare_reference": CompareReferenceTool,

@@ -67,9 +67,9 @@ class AgentRunner:
 
         # ── 知识检索工具 ──
         try:
-            from wgs_agent.tools.knowledge_tools import PubmedSearchTool, KnowledgeSearchTool
-            registry.register(KnowledgeSearchTool())
-            registry.register(PubmedSearchTool())
+            from wgs_agent.tools.knowledge_tools import KNOWLEDGE_TOOLS
+            for tool_cls in KNOWLEDGE_TOOLS:
+                registry.register(tool_cls())
         except ImportError:
             pass
 

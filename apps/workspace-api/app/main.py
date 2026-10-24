@@ -34,6 +34,7 @@ from app.agent_prompts import MAIN_AGENT_ID, EVIDENCE_AGENT_ID, MAIN_SYSTEM_PROM
 from app.local_chat import LocalChatError, list_models
 from app.sample_graph import build_sample_graph
 from wgs_agent.tools.knowledge_tools import claim_record_to_reference
+from wgs_agent.tools.litkg_graphrag import GRAPHRAG_SKILL_INSTRUCTIONS
 from wgs_fmt_platform.config import get_settings
 from wgs_fmt_platform.paths import knowledge_db_path, project_path, runner_status_path, runtime_path, workspace_root
 from wgs_fmt_platform.infrastructure.api import router as infrastructure_router
@@ -61,6 +62,12 @@ def _now() -> str:
 
 
 DEFAULT_SKILLS = [
+    {
+        "id": "litkg-graphrag", "name": "LitKG 图谱检索",
+        "description": "只读检索原生实体、关系路径与原文事实。", "category": "知识检索",
+        "tool_names": ["litkg_graph_rag"], "risk_level": "read", "enabled": True,
+        "instructions": GRAPHRAG_SKILL_INSTRUCTIONS,
+    },
     {
         "id": "sample-observer", "name": "样本状态观察", "description": "查询样本、Pipeline进度和报告产物。",
         "category": "数据访问", "tool_names": ["list_samples", "get_sample_status", "pipeline_check", "get_report_status"],
@@ -92,13 +99,13 @@ DEFAULT_AGENTS = [
     {
         "id": "fmt-researcher", "name": "FMT科研助手", "description": "面向宏基因组与FMT研究的综合分析智能体。",
         "model": "", "system_prompt": MAIN_SYSTEM_PROMPT, "kind": "agent", "parent_agent_id": "",
-        "skill_ids": ["sample-observer", "microbiome-analysis", "evidence-retrieval", "controlled-actions"],
+        "skill_ids": ["sample-observer", "microbiome-analysis", "evidence-retrieval", "controlled-actions", "litkg-graphrag"],
         "color": "ocean", "enabled": True, "created_at": _now(), "updated_at": _now(),
     },
     {
         "id": "evidence-curator", "name": "循证整理助手", "description": "聚焦知识库、PubMed与报告证据链。",
         "model": "", "system_prompt": EVIDENCE_SYSTEM_PROMPT, "kind": "subagent", "parent_agent_id": MAIN_AGENT_ID,
-        "skill_ids": ["evidence-retrieval"], "color": "coral", "enabled": True,
+        "skill_ids": ["evidence-retrieval", "litkg-graphrag"], "color": "coral", "enabled": True,
         "created_at": _now(), "updated_at": _now(),
     },
 ]

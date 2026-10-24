@@ -35,7 +35,7 @@ with TestClient(main.app) as client:
     response = client.post('/api/chat', json={'agent_id':'evidence-curator','message':'继续历史会话'})
     assert response.status_code == 200, response.text
     assert response.json()['answer'] == '完整结果'
-    assert seen[0]['subagent_config']['allowed_tools'] == ['search_knowledge_base','search_pubmed']
+    assert seen[0]['subagent_config']['allowed_tools'] == ['litkg_graph_rag','search_knowledge_base','search_pubmed']
     assert '唯一面向用户' in seen[0]['system_prompt']
     assert client.post('/api/chat', json={'agent_id':'unknown-subagent','message':'x'}).status_code == 422
     stored = client.get('/api/backend/conversations/' + response.json()['conversation_id']).json()

@@ -21,8 +21,9 @@ def main() -> None:
     for row in rows:
         if row["id"] == MAIN_AGENT_ID:
             row.update(system_prompt=MAIN_SYSTEM_PROMPT, description="统一负责宏基因组与FMT样本分析、循证委派及结果交付。")
+            row["skill_ids"] = list(dict.fromkeys([*row.get("skill_ids", []), "litkg-graphrag"]))
         elif row["id"] == EVIDENCE_AGENT_ID:
-            row.update(system_prompt=EVIDENCE_SYSTEM_PROMPT, skill_ids=["evidence-retrieval"],
+            row.update(system_prompt=EVIDENCE_SYSTEM_PROMPT, skill_ids=["evidence-retrieval", "litkg-graphrag"],
                        description="由FMT科研助手按需调用的只读循证检索与交叉核验 subagent。")
         row["updated_at"] = datetime.now(UTC).isoformat()
     path.parent.mkdir(parents=True, exist_ok=True)
