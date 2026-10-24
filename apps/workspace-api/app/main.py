@@ -1157,6 +1157,9 @@ def _litkg_source() -> dict[str, Any]:
         "label": f"LitKG · Knowledge Base {settings.claim_api_knowledge_base_id}",
         "knowledge_base_id": settings.claim_api_knowledge_base_id,
         "endpoint": settings.claim_api_url.rstrip("/"),
+        "agent_retrieval": {"path": f"/knowledge-bases/{settings.claim_api_knowledge_base_id}/ask", "generate": False,
+                            "hops": int(os.environ.get("WGS_CLAIM_API_ASK_HOPS", "1")),
+                            "local_fallback": os.environ.get("WGS_CLAIM_API_LOCAL_FALLBACK", "false").lower() in {"true", "1"}},
     }
 
 

@@ -71,7 +71,7 @@ TOOLS = [
     _function("analyze_metabolites", "分析可用的代谢物数据或代谢潜能。", _SID, ["sample_id"]),
     _function("analyze_drugs", "只读分析药物与微生物组关联；结果不构成用药建议。", _SID, ["sample_id"]),
     _function("analyze_diseases", "只读分析疾病关联；结果不构成诊断。", _SID, ["sample_id"]),
-    _function("search_knowledge_base", "搜索本地 LitKG/文献知识库。", {"query": {"type": "string"}, "max_results": {"type": "integer", "minimum": 1, "maximum": 20, "default": 8}}, ["query"]),
+    _function("search_knowledge_base", "检索正式 LitKG 知识库的事实与原文引用（/ask, generate=false）；优先用英文科研问题或术语，保留 citations 与 warnings。", {"query": {"type": "string", "minLength": 1, "maxLength": 2000}, "max_results": {"type": "integer", "minimum": 1, "maximum": 20, "default": 8}}, ["query"]),
     _function("search_pubmed", "检索 PubMed 生物医学文献。", {"query": {"type": "string"}, "max_results": {"type": "integer", "minimum": 1, "maximum": 10, "default": 5}}, ["query"]),
     _function("get_report_status", "检查样本分析 JSON、知识 JSON、Markdown 和 PDF 报告是否存在。", _SID, ["sample_id"]),
     _function("list_sandbox_files", "列出当前会话沙盒中的文件。", {"directory": {"type": "string", "description": "相对于会话沙盒的目录，默认根目录"}}),

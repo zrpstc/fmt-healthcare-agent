@@ -8,10 +8,13 @@ from pydantic import BaseModel, Field
 
 from wgs_agent.core.tools.base import BaseTool, ToolResult
 from wgs_fmt_platform.paths import knowledge_db_path, runtime_path
+from wgs_fmt_platform.knowledge.litkg_retrieval import (
+    LitkgRetrievalError, evidence_references, render_evidence, retrieve_litkg,
+)
 
 
 class KnowledgeSearchParams(BaseModel):
-    query: str = Field(..., description="搜索查询词（如物种名、疾病名）")
+    query: str = Field(..., min_length=1, max_length=2000, description="具体科研问题，优先英文专业术语")
     max_results: int = Field(10, ge=1, le=50, description="最大返回结果数")
 
 
@@ -28,14 +31,14 @@ class PubmedSearchParams(BaseModel):
 class KnowledgeSearchTool(BaseTool):
     name = "search_knowledge_base"
     description = (
-        "搜索本地知识库中与微生物组相关的文献/知识文档。"
-        "支持物种名、疾病名、代谢物名等关键词检索。返回匹配的文档片段和来源路径。"
+        "检索正式 LitKG 知识库的 /ask 接口（generate=false），返回关联事实、原文引用、"
+        "页码、条件和检索告警。优先用英文科研问题/术语；不生成最终答案、不扫描首批 Claim。"
     )
     input_schema: dict[str, object] = {
         "type": "object",
         "properties": {
-            "query": {"type": "string", "description": "搜索查询词"},
-            "max_results": {"type": "integer", "description": "最大返回数", "default": 10},
+            "query": {"type": "string", "minLength": 1, "maxLength": 2000, "description": "具体科研问题，优先英文术语/同义词"},
+            "max_results": {"type": "integer", "minimum": 1, "maximum": 30, "description": "最多返回的事实条数", "default": 12},
         },
         "required": ["query"],
     }
@@ -43,55 +46,34 @@ class KnowledgeSearchTool(BaseTool):
 
     async def invoke(self, params: dict[str, object]) -> ToolResult:
         try:
-            query = str(params["query"])
-            max_results = int(params.get("max_results", 10))
-
-            # 1. 统一知识网关：优先检索 LitKG Claim REST API。
-            #    API 不可用或没有匹配时继续保留原 SQLite/Markdown 降级能力。
-            try:
-                claim_results = await search_claim_references(query, max_results)
-                if claim_results:
-                    return ToolResult(content=_format_claim_results(query, claim_results))
-            except Exception as e:
-                print(f"[knowledge] Claim API search failed ({e}), falling back to local KB...")
-
-            # 2. 使用原 SQLite 结构化搜索
-            kb_dir = _get_kb_dir()
-            db_path = str(knowledge_db_path())
-
-            if os.path.isfile(db_path):
-                try:
-                    results_db = _sql_search(db_path, query, max_results)
-                    if results_db:
-                        return ToolResult(content=results_db)
-                except Exception as e:
-                    print(f"[knowledge] SQLite search failed ({e}), falling back to grep...")
-
-            # 3. 最终降级：grep 搜索 Markdown
-            results = _grep_search(kb_dir, query, max_results)
-            if not results:
-                return ToolResult(
-                    content=f"未找到与 '{query}' 相关的知识文档。(知识库路径: {kb_dir})"
-                )
-
-            lines = [f"知识库搜索结果 ({len(results)} 条, 查询: '{query}'):\n"]
-            for i, r in enumerate(results, 1):
-                lines.append(
-                    f"---\n"
-                    f"[{i}] {r['title']}\n"
-                    f"路径: {r['path']}\n"
-                    f"匹配数: {r['match_count']}\n"
-                    f"{r['snippet'][:500]}"
-                )
-
-            return ToolResult(content="\n".join(lines))
-
+            values = self.params_model.model_validate(params)
+            result = await retrieve_litkg(values.query, values.max_results)
+            # An empty /ask result is authoritative for this query. Never silently
+            # replace it with a different local knowledge base.
+            return ToolResult(content=render_evidence(result))
         except Exception as exc:
-            return ToolResult(
-                content=f"知识库搜索失败: {exc}",
-                is_error=True,
-                error_type="runtime_error",
-            )
+            message = str(exc) if isinstance(exc, LitkgRetrievalError) else f"知识库检索异常（{type(exc).__name__}）"
+            if os.environ.get("WGS_CLAIM_API_LOCAL_FALLBACK", "false").lower() not in {"true", "1"}:
+                return ToolResult(content=json.dumps({"source": "litkg-ask", "status": "unavailable", "error": message,
+                    "warnings": ["未取得 LitKG 证据；不能据此判断没有相关研究。可重试或使用 PubMed 补充。"]}, ensure_ascii=False), is_error=True, error_type="runtime_error")
+            return self._local_fallback(params, message)
+
+    @staticmethod
+    def _local_fallback(params: dict[str, object], error: str) -> ToolResult:
+        """An explicit offline option, always labelled as a different source."""
+        try:
+            query = str(params.get("query", ""))
+            limit = max(1, min(int(params.get("max_results", 12)), 30))
+            db_path = str(knowledge_db_path())
+            content = _sql_search(db_path, query, limit) if os.path.isfile(db_path) else ""
+            if not content:
+                rows = _grep_search(_get_kb_dir(), query, limit)
+                content = "\n\n".join(f"{r['title']}\n{r['path']}\n{r['snippet'][:500]}" for r in rows)
+            return ToolResult(content=json.dumps({"source": {"kind": "local-fallback", "primary": False},
+                "status": "degraded", "warnings": [error, "当前使用本地 SQLite/Markdown 降级结果，不是 LitKG /ask 召回。"],
+                "content": content or "本地降级检索也未命中"}, ensure_ascii=False))
+        except Exception as exc:
+            return ToolResult(content=f"LitKG 与本地降级检索均失败（{type(exc).__name__}）", is_error=True, error_type="runtime_error")
 
 
 # ============================================================================
@@ -309,61 +291,8 @@ def _get_kb_dir() -> str:
 
 
 async def search_claim_references(query: str, max_results: int = 10) -> list[dict[str, Any]]:
-    """Return report-ready LitKG Claim references using the documented REST route."""
-    import httpx
-
-    base_url = os.environ.get("WGS_CLAIM_API_URL", "").rstrip("/")
-    if not base_url:
-        return []
-    knowledge_base_id = int(os.environ.get("WGS_CLAIM_API_KNOWLEDGE_BASE_ID", "7"))
-    scan_limit = min(1000, max(1, int(os.environ.get("WGS_CLAIM_API_SCAN_LIMIT", "1000"))))
-    timeout = float(os.environ.get("WGS_CLAIM_API_TIMEOUT", "20"))
-    token = os.environ.get("WGS_CLAIM_API_TOKEN", "")
-    headers = {"Accept": "application/json"}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-
-    path = f"/knowledge-bases/{knowledge_base_id}/claims"
-    async with httpx.AsyncClient(base_url=base_url, timeout=timeout, headers=headers) as client:
-        response = await client.get(path, params={"limit": scan_limit, "offset": 0})
-        response.raise_for_status()
-    payload = response.json()
-    claims = payload.get("claims", []) if isinstance(payload, dict) else []
-    terms = [term.casefold() for term in query.split() if term]
-    matches: list[dict[str, Any]] = []
-    for claim in claims:
-        if not isinstance(claim, dict):
-            continue
-        haystack = " ".join(
-            str(claim.get(key, ""))
-            for key in (
-                "subject_text",
-                "subject_type",
-                "predicate",
-                "object_text",
-                "object_type",
-                "evidence_text",
-                "section_title",
-                "filename",
-            )
-        ).casefold()
-        score = sum(term in haystack for term in terms)
-        if score:
-            matches.append(
-                claim_record_to_reference(
-                    claim,
-                    base_url=base_url,
-                    knowledge_base_id=knowledge_base_id,
-                    query=query,
-                    retrieval_score=score,
-                )
-            )
-    matches.sort(
-        key=lambda item: (item["retrieval_score"], item.get("confidence") or 0),
-        reverse=True,
-    )
-    matches = matches[:max_results]
-    return matches
+    """Legacy report references now come from evidence-only LitKG /ask retrieval."""
+    return evidence_references(await retrieve_litkg(query, max_results))
 
 
 def claim_record_to_reference(
@@ -435,9 +364,8 @@ def _format_claim_results(query: str, matches: list[dict[str, Any]]) -> str:
 
 
 async def _claim_api_search(query: str, max_results: int) -> str:
-    """Backward-compatible text wrapper around structured Claim retrieval."""
-    matches = await search_claim_references(query, max_results)
-    return _format_claim_results(query, matches) if matches else ""
+    """Backward-compatible text wrapper using the official evidence contract."""
+    return render_evidence(await retrieve_litkg(query, max_results))
 
 
 def _sql_search(db_path: str, query: str, max_results: int) -> str:
