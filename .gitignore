@@ -19,6 +19,7 @@ resource-bundles/
 *.tar.zst
 *.conda
 apps/workspace-web/.next/
+apps/workspace-web/.next-agent-runtime/
 apps/workspace-web/node_modules/
 apps/workspace-web/npm-debug.log*
 apps/workspace-web/*.log

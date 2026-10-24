@@ -2,12 +2,13 @@
 set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+WEB_BUILD_DIR="${WGS_WEB_DIST_DIR:-.next}"
 
-if [[ ! -x "$WGS_ENV_ROOT/bin/python" || ! -x "$ROOT/apps/workspace-web/node_modules/.bin/next" || ! -f "$ROOT/apps/workspace-web/.next/BUILD_ID" ]]; then
+if [[ ! -x "$WGS_ENV_ROOT/bin/python" || ! -x "$ROOT/apps/workspace-web/node_modules/.bin/next" || ! -f "$ROOT/apps/workspace-web/$WEB_BUILD_DIR/BUILD_ID" ]]; then
   echo "Install Python/Web dependencies and build the Web app before starting." >&2
   exit 2
 fi
-"$WGS_ENV_ROOT/bin/python" - "$ROOT/apps/workspace-web/.next/routes-manifest.json" "$WGS_API_PORT" <<'PY'
+"$WGS_ENV_ROOT/bin/python" - "$ROOT/apps/workspace-web/$WEB_BUILD_DIR/routes-manifest.json" "$WGS_API_PORT" <<'PY'
 import json
 import sys
 

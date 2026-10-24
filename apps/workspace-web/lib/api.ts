@@ -8,14 +8,15 @@ export interface Skill {
   instructions: string; risk_level: RiskLevel; enabled: boolean;
 }
 export interface AgentConfig {
+  kind?: "agent"|"subagent"; parent_agent_id?: string;
   id: string; name: string; description: string; model: string; system_prompt: string;
   skill_ids: string[]; color: string; enabled: boolean; created_at?: string; updated_at?: string;
 }
 export interface ToolInfo { name: string; description: string }
-export interface TraceEvent { type: string; step?: number; content?: string; name?: string; params?: Record<string, unknown>; status?: "running"|"completed"|"failed" }
+export interface TraceEvent { agent_id?:string; type: string; step?: number; content?: string; name?: string; params?: Record<string, unknown>; status?: "running"|"completed"|"failed" }
 export interface PendingAction { id:string; kind:string; label:string; risk:string; params:Record<string,unknown> }
 export interface CanvasItem { id:string;title:string;path:string;kind:"image"|"pdf"|"table"|"json"|"text";bytes:number;modified_at?:string }
-export interface ChatTurn { answer: string; trace: TraceEvent[]; pending_actions: PendingAction[]; canvas_items:CanvasItem[]; model: string; run_id:string; tool_call_count:number;conversation_id:string }
+export interface ChatTurn { completion_status?:"completed"|"partial"; answer: string; trace: TraceEvent[]; pending_actions: PendingAction[]; canvas_items:CanvasItem[]; model: string; run_id:string; tool_call_count:number;conversation_id:string }
 export interface StoredMessage { id:string;role:"user"|"assistant";content:string;model:string;trace:{events?:TraceEvent[];canvas_items?:CanvasItem[];pending_actions?:PendingAction[]};created_at:string }
 export interface Conversation { id:string;user_id:string;title:string;agent_id:string;status:string;created_at:string;updated_at:string;message_count:number;messages?:StoredMessage[] }
 export interface AuthUser { id:string;username:string;email:string;display_name:string;role:"admin"|"researcher"|"viewer";is_active:boolean;created_at:string }
@@ -102,7 +103,7 @@ export const api = {
   logout: () => request<{logged_out:boolean}>("/backend/auth/logout",{method:"POST"}),
   authUsers: () => request<{users:AuthUser[];count:number}>("/backend/auth/users"),
   updateUserRole: (id:string,role:AuthUser["role"]) => request<AuthUser>(`/backend/auth/users/${encodeURIComponent(id)}/role`,{method:"PATCH",body:JSON.stringify({role})}),
-  agents: () => request<AgentConfig[]>("/agents"),
+  agents: (includeSubagents=false) => request<AgentConfig[]>(`/agents${includeSubagents?"?include_subagents=true":""}`),
   createAgent: (value: Partial<AgentConfig>) => request<AgentConfig>("/agents", { method: "POST", body: JSON.stringify(value) }),
   updateAgent: (id: string, value: Partial<AgentConfig>) => request<AgentConfig>(`/agents/${id}`, { method: "PUT", body: JSON.stringify(value) }),
   deleteAgent: (id: string) => request(`/agents/${id}`, { method: "DELETE" }),

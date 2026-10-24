@@ -16,8 +16,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from openai import OpenAI
-
 from wgs_agent.pipeline.upload_workflow import get_workflow_status, validate_sample_id
 from wgs_agent.tools.domain_tools import (
     CompareReferenceTool,
@@ -31,8 +29,8 @@ from wgs_agent.tools.domain_tools import (
 )
 from wgs_agent.tools.knowledge_tools import KnowledgeSearchTool, PubmedSearchTool
 from wgs_agent.tools.pipeline_runner import PipelineCheckTool, PipelineRunStepTool
-from app.local_chat import LocalChatError, base_url as configured_base_url
 from wgs_fmt_platform.paths import runner_status_path, runtime_path
+from app.agent_prompts import MAIN_SYSTEM_PROMPT
 
 
 MAX_AGENT_STEPS = 6
@@ -40,21 +38,7 @@ MAX_TOOL_OUTPUT = 18_000
 _SAMPLE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
 
 
-SYSTEM_PROMPT = """你是 WGS-FMT-Agent 的受控科研智能体。你的职责是把用户问题转化为可核验的平台操作。
-
-工作原则：
-1. 需要平台数据时必须调用工具，不得声称读取了未调用工具的数据。
-2. 先用一句简短的话说明计划，然后调用完成任务所需的最少工具。
-3. 查询状态、读取结果、统计分析和知识检索可以自主执行。
-4. 启动 Pipeline、生成或覆盖报告、覆盖或删除沙盒文件只能创建待确认动作；绝不能声称待确认动作已经执行。
-5. 不编造样本、文件、数值或文献。工具失败时说明失败原因和可行的下一步。
-6. 回答使用中文，清楚区分观测事实、文献证据和推断。
-7. 涉及疾病、药物或 FMT 的内容仅供科研教育参考，不能替代临床诊疗。
-8. 不提供或执行 Shell 命令，不尝试访问工具范围以外的路径。
-9. 文献汇总、分析笔记等 Markdown 应使用 create_sandbox_markdown 保存；不要声称没有创建文件的能力。
-10. 沙盒中新建文件可自主执行；覆盖、删除、导出或执行文件必须等待用户确认。
-11. 需要向用户直观展示文件时，调用 open_in_canvas；只打开与任务直接相关的文件，并说明展示目的。
-"""
+SYSTEM_PROMPT = MAIN_SYSTEM_PROMPT
 
 
 def _function(name: str, description: str, properties: dict[str, Any], required: list[str] | None = None) -> dict[str, Any]:
@@ -76,6 +60,7 @@ def _function(name: str, description: str, properties: dict[str, Any], required:
 _SID = {"sample_id": {"type": "string", "description": "平台样本 ID"}}
 
 TOOLS = [
+    _function("delegate_evidence_review", "委派只读循证整理 subagent，检索并交叉核验知识库/PubMed；返回主 Agent 汇总，不直接面向用户或写文件。", {"task": {"type": "string", "description": "完整研究问题、已确认样本发现及单位、待核验主张和证据缺口"}}, ["task"]),
     _function("list_samples", "列出平台已知样本及其状态摘要。", {"limit": {"type": "integer", "minimum": 1, "maximum": 200, "default": 30}}),
     _function("get_sample_status", "读取上传样本的实际 Pipeline 状态、进度和产物。", _SID, ["sample_id"]),
     _function("pipeline_check", "只读检查样本旧版 WGS Pipeline 各步骤产物缺口。", _SID, ["sample_id"]),
@@ -359,13 +344,16 @@ def _invoke_tool(
     elif name == "get_report_status":
         result = _report_status(params["sample_id"])
     elif name == "list_sandbox_files":
-        if sandbox is None: raise PermissionError("当前会话没有沙盒上下文。")
+        if sandbox is None:
+            raise PermissionError("当前会话没有沙盒上下文。")
         result = _list_sandbox(sandbox, str(params.get("directory", "")))
     elif name == "read_sandbox_file":
-        if sandbox is None: raise PermissionError("当前会话没有沙盒上下文。")
+        if sandbox is None:
+            raise PermissionError("当前会话没有沙盒上下文。")
         result = _read_sandbox(sandbox, str(params.get("path", "")))
     elif name == "create_sandbox_markdown":
-        if sandbox is None: raise PermissionError("当前会话没有沙盒上下文。")
+        if sandbox is None:
+            raise PermissionError("当前会话没有沙盒上下文。")
         result, action = _create_sandbox_markdown(sandbox, params)
         if action is not None:
             pending_actions.append(action)
@@ -374,9 +362,11 @@ def _invoke_tool(
     elif name == "open_in_canvas":
         path_value = str(params.get("path", ""))
         if path_value.startswith("sandbox://"):
-            if sandbox is None: raise PermissionError("当前会话没有沙盒上下文。")
+            if sandbox is None:
+                raise PermissionError("当前会话没有沙盒上下文。")
             prefix = f"sandbox://{sandbox.parts[-2]}/{sandbox.parts[-1]}/"
-            if not path_value.startswith(prefix): raise PermissionError("不能打开其他用户或会话的沙盒文件。")
+            if not path_value.startswith(prefix):
+                raise PermissionError("不能打开其他用户或会话的沙盒文件。")
             item = _sandbox_canvas_item(sandbox, _sandbox_path(sandbox, path_value[len(prefix):]), str(params.get("title", "")))
         else:
             item = _canvas_item(path_value, str(params.get("title", "")))
@@ -395,7 +385,9 @@ def _invoke_tool(
     else:
         raise ValueError(f"未授权工具: {name}")
     text = json.dumps(result, ensure_ascii=False, default=str)
-    return text[:MAX_TOOL_OUTPUT] + ("\n[工具输出已截断]" if len(text) > MAX_TOOL_OUTPUT else "")
+    if len(text) > MAX_TOOL_OUTPUT:
+        return json.dumps({"truncated": True, "original_chars": len(text), "content_preview": text[:MAX_TOOL_OUTPUT]}, ensure_ascii=False)
+    return text
 
 
 def _audit_params(name: str, params: dict[str, Any]) -> dict[str, Any]:
@@ -406,120 +398,10 @@ def _audit_params(name: str, params: dict[str, Any]) -> dict[str, Any]:
     return {**params, "content": f"[Markdown content: {len(content.encode('utf-8'))} bytes]"}
 
 
-def run_agent_turn(
-    *,
-    model: str,
-    history: list[dict[str, Any]],
-    prompt: str,
-    current_sample_id: str = "",
-    allowed_tools: list[str] | None = None,
-    extra_system_prompt: str = "",
-    base_url: str = "",
-    api_key: str = "",
-    max_steps: int = MAX_AGENT_STEPS,
-    max_tool_calls: int = 20,
-    tool_timeout_s: float = 120.0,
-    loop_repeat_limit: int = 2,
-    allow_sensitive: bool = False,
-    audit_enabled: bool = True,
-    sandbox_user_id: str = "",
-    sandbox_conversation_id: str = "",
-) -> dict[str, Any]:
-    """Run one bounded plan/tool/observe turn and return UI-ready trace data."""
-    client = OpenAI(
-        api_key=api_key or os.environ.get("WGS_LOCAL_LLM_API_KEY", "local-no-key-required"),
-        base_url=base_url or configured_base_url(),
-        timeout=180.0,
-    )
-    context = f"\n当前侧边栏样本 ID：{current_sample_id}" if current_sample_id else "\n当前未在侧边栏指定样本 ID。"
-    messages: list[dict[str, Any]] = [
-        {"role": "system", "content": SYSTEM_PROMPT + context + extra_system_prompt}
-    ]
-    allowed = set(allowed_tools) if allowed_tools is not None else None
-    exposed_tools = [
-        item for item in TOOLS
-        if allowed is None or item["function"]["name"] in allowed
-    ]
-    if not allow_sensitive:
-        exposed_tools = [
-            item for item in exposed_tools
-            if item["function"]["name"] not in {"analyze_drugs", "analyze_diseases"}
-        ]
-    for item in history[-12:]:
-        if item.get("role") in {"user", "assistant"} and item.get("content"):
-            messages.append({"role": item["role"], "content": str(item["content"])})
-    messages.append({"role": "user", "content": prompt})
+def run_agent_turn(**kwargs: Any) -> dict[str, Any]:
+    from app.agent_execution import run_agent_turn as execute
 
-    trace: list[dict[str, Any]] = []
-    pending_actions: list[dict[str, Any]] = []
-    canvas_items: list[dict[str, Any]] = []
-    final_text = ""
-    run_id = uuid.uuid4().hex
-    tool_call_count = 0
-    repeated_calls: dict[str, int] = {}
-    trace.append({"type": "understanding", "step": 0, "content": prompt[:1000], "status": "completed"})
-    if audit_enabled:
-        _audit("turn.started", {"run_id": run_id, "model": model, "prompt": prompt[:1000]})
-    try:
-        for step in range(1, max_steps + 1):
-            trace.append({"type": "status", "step": step, "content": "正在规划下一步", "status": "running"})
-            response = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                tools=exposed_tools,
-                tool_choice="auto",
-                temperature=0.1,
-            )
-            message = response.choices[0].message
-            content = message.content or ""
-            calls = message.tool_calls or []
-            if content:
-                trace.append({"type": "plan" if calls else "answer", "step": step, "content": content, "status": "completed"})
-            if not calls:
-                final_text = content or "本轮操作已结束。"
-                break
-            messages.append(message.model_dump(exclude_none=True))
-            for call in calls:
-                name = call.function.name
-                try:
-                    tool_call_count += 1
-                    if tool_call_count > max_tool_calls:
-                        raise RuntimeError(f"已达到工具调用上限（{max_tool_calls} 次）。")
-                    if allowed is not None and name not in allowed:
-                        raise ValueError(f"当前 Agent 未启用工具: {name}")
-                    params = json.loads(call.function.arguments or "{}")
-                    if not isinstance(params, dict):
-                        raise ValueError("工具参数必须是对象。")
-                    signature = json.dumps([name, params], ensure_ascii=False, sort_keys=True, default=str)
-                    repeated_calls[signature] = repeated_calls.get(signature, 0) + 1
-                    if repeated_calls[signature] > loop_repeat_limit:
-                        raise RuntimeError(f"检测到重复工具调用循环：{name}，已自动停止并要求重规划。")
-                    safe_params = _audit_params(name, params)
-                    trace.append({"type": "tool_started", "step": step, "name": name, "params": safe_params, "status": "running"})
-                    output = _invoke_tool(name, params, pending_actions, canvas_items, timeout_s=tool_timeout_s, sandbox_user_id=sandbox_user_id, sandbox_conversation_id=sandbox_conversation_id)
-                    trace.append({"type": "tool_finished", "step": step, "name": name, "content": output, "status": "completed"})
-                    if audit_enabled:
-                        _audit("tool.completed", {"run_id": run_id, "step": step, "tool": name, "params": safe_params})
-                except TimeoutError:
-                    output = json.dumps({"is_error": True, "error": f"工具执行超过 {tool_timeout_s} 秒"}, ensure_ascii=False)
-                    trace.append({"type": "tool_failed", "step": step, "name": name, "content": f"工具执行超时（{tool_timeout_s} 秒）", "status": "failed"})
-                except Exception as exc:
-                    output = json.dumps({"is_error": True, "error": str(exc)}, ensure_ascii=False)
-                    event_type = "replan" if "循环" in str(exc) else "tool_failed"
-                    trace.append({"type": event_type, "step": step, "name": name, "content": str(exc), "status": "failed"})
-                    if audit_enabled:
-                        _audit("tool.failed", {"run_id": run_id, "step": step, "tool": name, "error": str(exc)})
-                messages.append({"role": "tool", "tool_call_id": call.id, "content": output})
-        else:
-            final_text = f"已达到本轮最大执行步数（{max_steps}）。请缩小问题范围后继续。"
-            trace.append({"type": "limit", "step": max_steps, "content": final_text, "status": "failed"})
-    except Exception as exc:
-        raise LocalChatError(f"本地智能体调用失败：{exc}") from exc
-
-    result = {"answer": final_text, "trace": trace, "pending_actions": pending_actions, "canvas_items": canvas_items, "model": model, "run_id": run_id, "tool_call_count": tool_call_count}
-    if audit_enabled:
-        _audit("turn.completed", {"run_id": run_id, "model": model, "prompt": prompt[:1000], "tool_call_count": tool_call_count, "tool_names": [t.get("name") for t in trace if t.get("name")], "pending_action_ids": [a["id"] for a in pending_actions]})
-    return result
+    return execute(**kwargs)
 
 
 def execute_confirmed_action(action: dict[str, Any]) -> dict[str, Any]:

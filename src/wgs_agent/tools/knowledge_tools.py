@@ -179,12 +179,17 @@ class PubmedSearchTool(BaseTool):
             articles = []
             for article in root.findall(".//PubmedArticle"):
                 title_elem = article.find(".//ArticleTitle")
-                abstract_elem = article.find(".//Abstract/AbstractText")
                 pmid_elem = article.find(".//PMID")
 
-                title = title_elem.text if title_elem is not None else "无标题"
-                abstract = abstract_elem.text if abstract_elem is not None else "无摘要"
-                pmid = pmid_elem.text if pmid_elem is not None else ""
+                title = "".join(title_elem.itertext()).strip() if title_elem is not None else "无标题"
+                sections = []
+                for section in article.findall(".//Abstract/AbstractText"):
+                    text = "".join(section.itertext()).strip()
+                    if text:
+                        label = section.get("Label", "")
+                        sections.append(f"{label}: {text}" if label else text)
+                abstract = "\n".join(sections) or "无摘要"
+                pmid = (pmid_elem.text or "") if pmid_elem is not None else ""
 
                 # 作者
                 authors = []
@@ -220,7 +225,10 @@ class PubmedSearchTool(BaseTool):
                 articles.append({
                     "pmid": pmid,
                     "title": title,
-                    "abstract": abstract[:600],
+                    "abstract": abstract[:2000],
+                    "abstract_truncated": len(abstract) > 2000,
+                    "publication_types": ["".join(item.itertext()).strip() for item in article.findall(".//PublicationType")],
+                    "url": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid else "",
                     "authors": authors_str,
                     "journal": journal.text if journal is not None else "",
                     "year": year.text if year is not None else "",
@@ -253,7 +261,10 @@ class PubmedSearchTool(BaseTool):
                 "issue": a["issue"],
                 "pages": a["pages"],
                 "doi": a["doi"],
-                "abstract": a["abstract"][:600],
+                "abstract": a["abstract"],
+                "abstract_truncated": a["abstract_truncated"],
+                "publication_types": a["publication_types"],
+                "url": a["url"],
             } for a in articles]
             content = content + "\n" + json_key + "\n" + json.dumps(structured, ensure_ascii=False, default=str)
             return ToolResult(content=content)

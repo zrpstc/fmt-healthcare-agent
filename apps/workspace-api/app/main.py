@@ -30,6 +30,7 @@ from wgs_agent.pipeline.sample_registry import (
     SampleBusyError, SampleDeletedError, is_deleted, read_record, records as sample_records,
     update_metadata,
 )
+from app.agent_prompts import MAIN_AGENT_ID, EVIDENCE_AGENT_ID, MAIN_SYSTEM_PROMPT, EVIDENCE_SYSTEM_PROMPT, EVIDENCE_TOOL_NAMES, normalize_agents
 from app.local_chat import LocalChatError, list_models
 from app.sample_graph import build_sample_graph
 from wgs_agent.tools.knowledge_tools import claim_record_to_reference
@@ -90,14 +91,14 @@ DEFAULT_SKILLS = [
 DEFAULT_AGENTS = [
     {
         "id": "fmt-researcher", "name": "FMT科研助手", "description": "面向宏基因组与FMT研究的综合分析智能体。",
-        "model": "", "system_prompt": "围绕样本数据形成可核验的分析结论，清楚标注证据层级与不确定性。",
+        "model": "", "system_prompt": MAIN_SYSTEM_PROMPT, "kind": "agent", "parent_agent_id": "",
         "skill_ids": ["sample-observer", "microbiome-analysis", "evidence-retrieval", "controlled-actions"],
         "color": "ocean", "enabled": True, "created_at": _now(), "updated_at": _now(),
     },
     {
         "id": "evidence-curator", "name": "循证整理助手", "description": "聚焦知识库、PubMed与报告证据链。",
-        "model": "", "system_prompt": "优先检索和交叉验证来源，输出简洁的证据摘要与引用。",
-        "skill_ids": ["sample-observer", "evidence-retrieval"], "color": "coral", "enabled": True,
+        "model": "", "system_prompt": EVIDENCE_SYSTEM_PROMPT, "kind": "subagent", "parent_agent_id": MAIN_AGENT_ID,
+        "skill_ids": ["evidence-retrieval"], "color": "coral", "enabled": True,
         "created_at": _now(), "updated_at": _now(),
     },
 ]
@@ -115,6 +116,8 @@ class SkillPayload(BaseModel):
 
 
 class AgentPayload(BaseModel):
+    kind: str = Field(default="subagent", pattern="^(agent|subagent)$")
+    parent_agent_id: str = MAIN_AGENT_ID
     id: str | None = None
     name: str = Field(min_length=1, max_length=80)
     description: str = Field(default="", max_length=500)
@@ -441,13 +444,17 @@ def delete_skill(skill_id: str) -> dict[str, bool]:
 
 
 @app.get("/api/agents")
-def get_agents() -> list[dict[str, Any]]:
-    return _read(AGENTS_FILE, DEFAULT_AGENTS)
+def get_agents(include_subagents: bool = False) -> list[dict[str, Any]]:
+    rows = normalize_agents(_read(AGENTS_FILE, DEFAULT_AGENTS))
+    return rows if include_subagents else [row for row in rows if row["kind"] == "agent"]
 
 
 @app.post("/api/agents")
 def create_agent(payload: AgentPayload) -> dict[str, Any]:
     data = payload.model_dump(); data["id"] = _valid_id(data.get("id") or _slug(payload.name))
+    if data["id"] == MAIN_AGENT_ID or payload.kind != "subagent":
+        raise HTTPException(422, "项目唯一主 Agent 为 FMT科研助手；只能新增 subagent。")
+    data.update(kind="subagent", parent_agent_id=MAIN_AGENT_ID)
     skills = {item["id"] for item in _read(SKILLS_FILE, DEFAULT_SKILLS)}
     if set(data["skill_ids"]) - skills: raise HTTPException(422, "Agent引用了不存在的Skill。")
     data.update(created_at=_now(), updated_at=_now())
@@ -461,6 +468,8 @@ def create_agent(payload: AgentPayload) -> dict[str, Any]:
 @app.put("/api/agents/{agent_id}")
 def update_agent(agent_id: str, payload: AgentPayload) -> dict[str, Any]:
     agent_id = _valid_id(agent_id)
+    if agent_id == MAIN_AGENT_ID and not payload.enabled:
+        raise HTTPException(422, "FMT科研助手是唯一主 Agent，不能停用。")
     skills = {item["id"] for item in _read(SKILLS_FILE, DEFAULT_SKILLS)}
     if set(payload.skill_ids) - skills: raise HTTPException(422, "Agent引用了不存在的Skill。")
     with LOCK:
@@ -468,6 +477,7 @@ def update_agent(agent_id: str, payload: AgentPayload) -> dict[str, Any]:
         index = next((i for i, item in enumerate(items) if item["id"] == agent_id), None)
         if index is None: raise HTTPException(404, "Agent不存在。")
         data = {**payload.model_dump(), "id": agent_id, "created_at": items[index].get("created_at", _now()), "updated_at": _now()}
+        data = normalize_agents([data])[0] if agent_id == MAIN_AGENT_ID else {**data, "kind": "subagent", "parent_agent_id": MAIN_AGENT_ID}
         items[index] = data; _write(AGENTS_FILE, items)
     return data
 
@@ -475,6 +485,8 @@ def update_agent(agent_id: str, payload: AgentPayload) -> dict[str, Any]:
 @app.delete("/api/agents/{agent_id}")
 def delete_agent(agent_id: str) -> dict[str, bool]:
     agent_id = _valid_id(agent_id)
+    if agent_id == MAIN_AGENT_ID:
+        raise HTTPException(422, "FMT科研助手是唯一主 Agent，不能删除。")
     with LOCK:
         items = _read(AGENTS_FILE, DEFAULT_AGENTS)
         kept = [item for item in items if item["id"] != agent_id]
@@ -485,13 +497,22 @@ def delete_agent(agent_id: str) -> dict[str, bool]:
 
 @app.post("/api/chat")
 def chat(payload: ChatPayload) -> dict[str, Any]:
-    agents = _read(AGENTS_FILE, DEFAULT_AGENTS)
-    agent = next((item for item in agents if item["id"] == payload.agent_id and item.get("enabled", True)), None)
+    agents = normalize_agents(_read(AGENTS_FILE, DEFAULT_AGENTS))
+    # Continue historical evidence-curator conversations through the primary.
+    if payload.agent_id == EVIDENCE_AGENT_ID:
+        payload = payload.model_copy(update={"agent_id": MAIN_AGENT_ID})
+    if payload.agent_id != MAIN_AGENT_ID:
+        raise HTTPException(422, "对话入口仅支持 FMT科研助手；subagent 由主 Agent 委派。")
+    agent = next((item for item in agents if item["id"] == MAIN_AGENT_ID and item.get("enabled", True)), None)
     if agent is None: raise HTTPException(404, "Agent不存在或未启用。")
     skills_by_id = {item["id"]: item for item in _read(SKILLS_FILE, DEFAULT_SKILLS)}
     selected = [skills_by_id[sid] for sid in agent.get("skill_ids", []) if sid in skills_by_id and skills_by_id[sid].get("enabled", True)]
     allowed = sorted({name for skill in selected for name in skill.get("tool_names", []) if name in TOOL_NAMES})
     skill_context = "\n\n".join(f"Skill：{skill['name']}\n{skill.get('instructions', '')}" for skill in selected)
+    subagent = next((item for item in agents if item["id"] == EVIDENCE_AGENT_ID and item.get("enabled", True)), None)
+    if subagent:
+        subskills = [skills_by_id[sid] for sid in subagent.get("skill_ids", []) if sid in skills_by_id and skills_by_id[sid].get("enabled", True)]
+        subagent = {**subagent, "allowed_tools": sorted({name for skill in subskills for name in skill.get("tool_names", []) if name in EVIDENCE_TOOL_NAMES}), "skill_context": "\n".join(skill.get("instructions", "") for skill in subskills)}
     workspace = _settings()
     if workspace.get("canvas_enabled") and workspace.get("canvas_agent_access"):
         allowed.append("open_in_canvas")
@@ -526,8 +547,9 @@ def chat(payload: ChatPayload) -> dict[str, Any]:
             prompt=payload.message,
             current_sample_id=payload.sample_id,
             allowed_tools=allowed,
+            system_prompt=agent.get("system_prompt") or MAIN_SYSTEM_PROMPT,
+            subagent_config=subagent,
             extra_system_prompt=(
-                f"\n当前Agent配置：\n{agent.get('system_prompt', '')}"
                 f"\n\n工作区角色提示：\n{workspace.get('role_prompt', '')}"
                 f"\n\n回答语言：{workspace.get('language')}；详细程度：{workspace.get('response_style')}"
                 f"\n\n已启用Skills：\n{skill_context}"
