@@ -1,0 +1,4825 @@
+{
+  "version": "word-native-1-14-v2",
+  "sources": [
+    {
+      "name": "03_菌群组成与群落结构_正文模板.docx",
+      "sha256": "69b41bc99c869e8c844eed243ae81deb9797b1c1c9420854654571f295afa0fd"
+    },
+    {
+      "name": "04_菌群多样性与生态功能结构_正文模板.docx",
+      "sha256": "7786e3c7c5fd1d138d46dafff8bfbd3268d51fe51919f090de1cbb09debcb6e7"
+    },
+    {
+      "name": "05_重点健康相关菌与条件致病菌_正文模板.docx",
+      "sha256": "92c7611df644a60fbccba8b1be26678aa9d0d0ae7633ffd51a052f150ff84cf5"
+    },
+    {
+      "name": "06至16_肠道菌群报告正文模板_调整版.docx",
+      "sha256": "966735a0b273ceba176fd1af9b5cf9583f749261ae0de7e39757d3533730a7cc"
+    }
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "title": "菌群组成与群落结构",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "本章展示菌群的主要组成、优势与核心成员，以及与参考人群的比较。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "1.1 菌群分类与相对丰度"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 1-1  门水平群落组成",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "chart",
+              "id": "1.1.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "【菌门A】",
+                  "categories": [
+                    "本样本"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                },
+                {
+                  "name": "【菌门B】",
+                  "categories": [
+                    "本样本"
+                  ],
+                  "color": "4a86a4",
+                  "point_colors": []
+                },
+                {
+                  "name": "【菌门C】",
+                  "categories": [
+                    "本样本"
+                  ],
+                  "color": "8ab8c2",
+                  "point_colors": []
+                },
+                {
+                  "name": "【菌门D】",
+                  "categories": [
+                    "本样本"
+                  ],
+                  "color": "b5d2cd",
+                  "point_colors": []
+                },
+                {
+                  "name": "【菌门E】",
+                  "categories": [
+                    "本样本"
+                  ],
+                  "color": "c6b694",
+                  "point_colors": []
+                },
+                {
+                  "name": "其他",
+                  "categories": [
+                    "本样本"
+                  ],
+                  "color": "e7e9ec",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "percentStacked",
+              "legend": true,
+              "extent": [
+                6400800,
+                1005840
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 1-2  属水平与种水平主要成员",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "chart",
+              "id": "1.1.2",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "本次样本",
+                  "categories": [
+                    "【菌属A】",
+                    "【菌属B】",
+                    "【菌属C】",
+                    "【菌属D】",
+                    "【菌属E】"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                3136265,
+                1828800
+              ]
+            },
+            {
+              "type": "chart",
+              "id": "1.1.3",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "本次样本",
+                  "categories": [
+                    "【物种A】",
+                    "【物种B】",
+                    "【物种C】",
+                    "【物种D】",
+                    "【物种E】"
+                  ],
+                  "color": "4a86a4",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                3136265,
+                1828800
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "横向条形长度表示相对丰度。完整分类清单见附录【页码或表号】。",
+          "style": "Normal"
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "1.1.t1",
+          "rows": [
+            [
+              "分类层级",
+              "主要类群",
+              "相对丰度"
+            ],
+            [
+              "门",
+              "【类群名称】",
+              "【待填】%"
+            ],
+            [
+              "纲",
+              "【类群名称】",
+              "【待填】%"
+            ],
+            [
+              "目",
+              "【类群名称】",
+              "【待填】%"
+            ],
+            [
+              "科",
+              "【类群名称】",
+              "【待填】%"
+            ],
+            [
+              "属",
+              "【类群名称】",
+              "【待填】%"
+            ],
+            [
+              "种",
+              "【类群名称】",
+              "【待填】%"
+            ]
+          ],
+          "widths": [
+            1439,
+            6711,
+            2016
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "结果解读  【用一至两句话概括主要组成特征】",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "1.2 优势物种与核心菌群"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "优势物种【待填】    参考核心菌群定义【待填】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "图 1-3  优势物种排序与核心菌群检出概况",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 2,
+          "items": [
+            {
+              "type": "chart",
+              "id": "1.2.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "本次样本",
+                  "categories": [
+                    "【物种A】",
+                    "【物种B】",
+                    "【物种C】",
+                    "【物种D】",
+                    "【物种E】",
+                    "【物种F】"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                3657600,
+                2331720
+              ]
+            },
+            {
+              "type": "chart",
+              "id": "1.2.2",
+              "kind": "doughnutChart",
+              "series": [
+                {
+                  "name": "核心菌群覆盖",
+                  "categories": [
+                    "已检出核心菌群",
+                    "其余核心菌群"
+                  ],
+                  "color": "4f81bd",
+                  "point_colors": [
+                    "246a73",
+                    "e7e9ec"
+                  ]
+                }
+              ],
+              "grouping": "clustered",
+              "legend": true,
+              "extent": [
+                3657600,
+                2331720
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "1.2.t1",
+          "rows": [
+            [
+              "组成指标",
+              "本次结果"
+            ],
+            [
+              "丰度最高的物种",
+              "【物种名称】"
+            ],
+            [
+              "第一优势物种占比",
+              "【待填】%"
+            ],
+            [
+              "前五位物种合计占比",
+              "【待填】%"
+            ],
+            [
+              "核心成员检出数 / 参考成员数",
+              "【待填】 / 【待填】"
+            ],
+            [
+              "检出核心成员的合计相对丰度",
+              "【待填】%"
+            ]
+          ],
+          "widths": [
+            6192,
+            3973
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "表 1-1  核心成员明细",
+          "style": "Normal"
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "1.2.t2",
+          "rows": [
+            [
+              "参考核心成员",
+              "检出状态",
+              "相对丰度",
+              "备注"
+            ],
+            [
+              "【核心成员A】",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ],
+            [
+              "【核心成员B】",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ],
+            [
+              "【核心成员C】",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ],
+            [
+              "【核心成员D】",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            3599,
+            1801,
+            1943,
+            2822
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "结果解读  【概括优势及核心成员特点，说明是否出现单一物种占优】",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "1.3 肠型或群落组成倾向"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "本次群落组成倾向  【待填】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "图 1-4  本次样本在参考群落中的位置",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 3,
+          "items": [
+            {
+              "type": "chart",
+              "id": "1.3.1",
+              "kind": "scatterChart",
+              "series": [
+                {
+                  "name": "参考群落A",
+                  "categories": [],
+                  "color": "4a86a4",
+                  "point_colors": []
+                },
+                {
+                  "name": "参考群落B",
+                  "categories": [],
+                  "color": "8ab8c2",
+                  "point_colors": []
+                },
+                {
+                  "name": "参考群落C",
+                  "categories": [],
+                  "color": "c6b694",
+                  "point_colors": []
+                },
+                {
+                  "name": "本次样本",
+                  "categories": [],
+                  "color": "1f2937",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": true,
+              "extent": [
+                6400800,
+                3566160
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "黑色菱形代表本次样本，彩色圆点代表参考群落。图中位置仅用于版式展示。",
+          "style": "Normal"
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "1.3.t1",
+          "rows": [
+            [
+              "判读项目",
+              "填写内容"
+            ],
+            [
+              "群落组成倾向",
+              "【拟杆菌倾向 / 普雷沃氏菌倾向 / 其他或混合 / 无法归类】"
+            ],
+            [
+              "主要支持类群",
+              "【类群名称及其组成特征】"
+            ],
+            [
+              "分类方法与版本",
+              "【方法名称及版本】"
+            ],
+            [
+              "判定稳定性或不确定性",
+              "【待填】"
+            ],
+            [
+              "无法明确归类时的说明",
+              "【待填；不适用时删除】"
+            ]
+          ],
+          "widths": [
+            2880,
+            7285
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "结果解读  【用一至两句话说明群落倾向及判定依据】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "肠型用于描述群落组成特征。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "1.4 与匹配参考人群的组成比较"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "参考人群【待填】    样本量【待填】    匹配条件【待填】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "分析流程与参考版本【待填】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "图 1-5  重点物种相对丰度比较",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 4,
+          "items": [
+            {
+              "type": "chart",
+              "id": "1.4.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "本次样本",
+                  "categories": [
+                    "【物种A】",
+                    "【物种B】",
+                    "【物种C】",
+                    "【物种D】",
+                    "【物种E】"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                },
+                {
+                  "name": "参考人群中位数",
+                  "categories": [
+                    "【物种A】",
+                    "【物种B】",
+                    "【物种C】",
+                    "【物种D】",
+                    "【物种E】"
+                  ],
+                  "color": "b8cdd2",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": true,
+              "extent": [
+                6400800,
+                2148840
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "1.4.t1",
+          "rows": [
+            [
+              "重点物种",
+              "本次丰度",
+              "参考区间",
+              "人群分位数",
+              "比较结果"
+            ],
+            [
+              "【物种A】",
+              "【待填】%",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【物种B】",
+              "【待填】%",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【物种C】",
+              "【待填】%",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【物种D】",
+              "【待填】%",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【物种E】",
+              "【待填】%",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2534,
+            1799,
+            2016,
+            2016,
+            1801
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "主要差异  【列出最值得关注的一至三项组成差异】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "绝对丰度补充结果",
+          "style": "Heading2"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "仅在具有总菌量实测或其他经验证的定量结果时启用；无对应数据时删除本栏。",
+          "style": "Normal"
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "1.4.t2",
+          "rows": [
+            [
+              "定量项目",
+              "本次结果",
+              "测量或估算依据"
+            ],
+            [
+              "总菌量",
+              "【待填】【单位/g】",
+              "【待填】"
+            ],
+            [
+              "【重点物种】绝对丰度",
+              "【待填】【单位/g】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            3816,
+            2880,
+            3470
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【概括相对参考人群的组成差异；有定量结果时补充说明】",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "菌群多样性与生态功能结构",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "本章展示菌群多样性、人群位置，以及功能分工与潜在协作特征。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "2.1 菌群多样性"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 2-1  多样性指标的人群位置",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "chart",
+              "id": "2.1.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "人群分位数",
+                  "categories": [
+                    "观测物种数",
+                    "丰富度估计",
+                    "均匀度",
+                    "Shannon指数"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                6400800,
+                1188720
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "2.1.t1",
+          "rows": [
+            [
+              "多样性指标",
+              "本次结果",
+              "参考区间",
+              "人群分位数"
+            ],
+            [
+              "观测物种数",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "丰富度估计",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "均匀度",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "Shannon指数",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2880,
+            2160,
+            2591,
+            2534
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "指标介绍与解读：Shannon指数——",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "意义解读：                                                                                            参考区间解读：",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "2.2 与匹配参考人群的群落差异"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "图 2-2  群落组成与参考人群的比较",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 2,
+          "items": [
+            {
+              "type": "chart",
+              "id": "2.2.1",
+              "kind": "scatterChart",
+              "series": [
+                {
+                  "name": "匹配参考人群",
+                  "categories": [],
+                  "color": "8ab8c2",
+                  "point_colors": []
+                },
+                {
+                  "name": "本次样本",
+                  "categories": [],
+                  "color": "1f2937",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": true,
+              "extent": [
+                6400800,
+                1783080
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "参考人群【待填】    群落差异指标【待填】    本次结果【待填】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "结果解读  【用一至两句话概括多样性与群落差异】",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "2.3 功能冗余与贡献集中度"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "图 2-3  不同功能的微生物贡献构成",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 3,
+          "items": [
+            {
+              "type": "chart",
+              "id": "2.3.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "【贡献菌A】",
+                  "categories": [
+                    "丁酸合成",
+                    "乳酸利用",
+                    "复杂多糖降解"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                },
+                {
+                  "name": "【贡献菌B】",
+                  "categories": [
+                    "丁酸合成",
+                    "乳酸利用",
+                    "复杂多糖降解"
+                  ],
+                  "color": "4a86a4",
+                  "point_colors": []
+                },
+                {
+                  "name": "【贡献菌C】",
+                  "categories": [
+                    "丁酸合成",
+                    "乳酸利用",
+                    "复杂多糖降解"
+                  ],
+                  "color": "8ab8c2",
+                  "point_colors": []
+                },
+                {
+                  "name": "其他贡献菌",
+                  "categories": [
+                    "丁酸合成",
+                    "乳酸利用",
+                    "复杂多糖降解"
+                  ],
+                  "color": "e7e9ec",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "percentStacked",
+              "legend": true,
+              "extent": [
+                6400800,
+                1554480
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "2.3.t1",
+          "rows": [
+            [
+              "功能项目",
+              "贡献菌数",
+              "首位贡献菌占比",
+              "人群分位数"
+            ],
+            [
+              "丁酸合成",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ],
+            [
+              "乳酸利用",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ],
+            [
+              "复杂多糖降解",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2880,
+            2015,
+            2880,
+            2390
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "功能冗余  【是否由多个微生物共同承担同一功能】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "贡献集中度  【是否主要依赖少数贡献菌及其主要表现】",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "2.4 潜在代谢协作"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "图 2-4  底物与产物利用路径",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 4,
+          "items": [
+            {
+              "type": "flow",
+              "id": "2.4.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1828800,
+                    825480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "底物初级降解",
+                    "贡献菌【待填】",
+                    "底物【待填】"
+                  ]
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2260440,
+                    0,
+                    1828800,
+                    825480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "中间产物周转",
+                    "贡献菌【待填】",
+                    "产物【待填】"
+                  ]
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4521240,
+                    0,
+                    1828800,
+                    825480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "终产物生成",
+                    "贡献菌【待填】",
+                    "产物【待填】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1892160,
+                    419040,
+                    304920,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4152960,
+                    419040,
+                    304920,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                }
+              ],
+              "extent": [
+                6350040,
+                825480
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "2.4.t1",
+          "rows": [
+            [
+              "功能环节",
+              "主要贡献菌",
+              "关键功能或产物",
+              "连接证据"
+            ],
+            [
+              "底物初级降解",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "中间产物周转",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "终产物生成",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2303,
+            2305,
+            3167,
+            2390
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【概括潜在分工、衔接环节及证据充分程度】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "本栏描述潜在功能协作，不直接代表实际菌间相互作用或生态恢复力。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "重点健康相关菌与条件致病菌",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "本章展示重点微生物的检出结果、丰度及关联背景，并结合证据解读。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "3.1 重点健康相关菌"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 3-1  重点菌群的相对丰度比较",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "chart",
+              "id": "3.1.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "本次样本",
+                  "categories": [
+                    "双歧杆菌相关",
+                    "乳杆菌相关属",
+                    "粪杆菌相关",
+                    "阿克曼菌相关"
+                  ],
+                  "color": "246A73",
+                  "point_colors": []
+                },
+                {
+                  "name": "参考人群中位数",
+                  "categories": [
+                    "双歧杆菌相关",
+                    "乳杆菌相关属",
+                    "粪杆菌相关",
+                    "阿克曼菌相关"
+                  ],
+                  "color": "8AB8C2",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": true,
+              "extent": [
+                6400800,
+                1508760
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "3.1.t1",
+          "rows": [
+            [
+              "菌群范围",
+              "具体物种",
+              "功能背景",
+              "检出状态",
+              "相对丰度",
+              "人群分位数"
+            ],
+            [
+              "双歧杆菌相关",
+              "【物种名】",
+              "【功能背景】",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ],
+            [
+              "乳杆菌相关属",
+              "【物种名】",
+              "【功能背景】",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ],
+            [
+              "粪杆菌相关",
+              "【物种名】",
+              "【功能背景】",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ],
+            [
+              "阿克曼菌相关",
+              "【物种名】",
+              "【功能背景】",
+              "【待填】",
+              "【待填】%",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2088,
+            1800,
+            2304,
+            1296,
+            1296,
+            1382
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "展示层级与统计口径【待填】    功能背景文献【待填】",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "3.2 条件致病菌与其他重点关注微生物"
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "3.2.t1",
+          "rows": [
+            [
+              "关注类别",
+              "微生物名称",
+              "检出状态",
+              "相对丰度",
+              "人群分位数",
+              "关注说明"
+            ],
+            [
+              "条件致病菌",
+              "【名称】",
+              "【待填】",
+              "【待填】%",
+              "【待填】",
+              "【关联或检出背景】"
+            ],
+            [
+              "食源性致病菌",
+              "【名称】",
+              "【待填】",
+              "【待填】%",
+              "【待填】",
+              "【关联或检出背景】"
+            ],
+            [
+              "其他关注微生物",
+              "【名称】",
+              "【待填】",
+              "【待填】%",
+              "【待填】",
+              "【关联或检出背景】"
+            ]
+          ],
+          "widths": [
+            2088,
+            1584,
+            1296,
+            1296,
+            1440,
+            2462
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "检出状态  检出 / 本次未检出 / 覆盖不足无法判断。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "结果解读  【概括重点菌群特点及需要关注的检出结果】",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "3.3 检出状态与证据支持"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "图 3-2  重点结果的序列支持读段概览",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 3,
+          "items": [
+            {
+              "type": "chart",
+              "id": "3.3.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "序列支持读段",
+                  "categories": [
+                    "【微生物A】",
+                    "【微生物B】",
+                    "【微生物C】",
+                    "【微生物D】"
+                  ],
+                  "color": "4A86A4",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                6400800,
+                1417320
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "3.3.t1",
+          "rows": [
+            [
+              "重点结果",
+              "序列支持摘要",
+              "检出可信度",
+              "关联证据等级"
+            ],
+            [
+              "【微生物A】",
+              "【读段 / 覆盖 / 相似性】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【微生物B】",
+              "【读段 / 覆盖 / 相似性】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【微生物C】",
+              "【读段 / 覆盖 / 相似性】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【微生物D】",
+              "【读段 / 覆盖 / 相似性】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2304,
+            4118,
+            1728,
+            2016
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "序列支持口径【待填】    判定规则与证据分级版本【待填】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "检出可信度与健康关联证据分别填写；完整序列信息见附录【表号】。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "3.4 结果解释与适用范围"
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "3.4.t1",
+          "rows": [
+            [
+              "解读层次",
+              "本次可支持的结论",
+              "补充依据或信息"
+            ],
+            [
+              "物种层面",
+              "【检出、丰度特征及关联方向】",
+              "【文献及适用人群】"
+            ],
+            [
+              "菌株层面",
+              "【毒力或谱系等特征；未评估时注明】",
+              "【宿主归属及序列连接证据】"
+            ],
+            [
+              "感染层面",
+              "【综合判断；信息不足时注明无法判断】",
+              "【症状、临床检查及复核信息】"
+            ]
+          ],
+          "widths": [
+            1728,
+            4694,
+            3744
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "综合解读  【用一至两句话说明结果含义及仍需补充的证据】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "物种检出不直接等于感染；健康相关性结合具体物种、菌株与情境解读，不统一标记为有益或有害。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "菌株特征与毒力因子",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "本章说明是否具备菌株判断条件，并展示毒力相关功能与微生物归属证据。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "4.1 菌株与谱系判断"
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "4.1.t1",
+          "rows": [
+            [
+              "重点微生物",
+              "可分析层级",
+              "本次结果",
+              "证据状态"
+            ],
+            [
+              "【微生物A】",
+              "【亚种 / 谱系 / 菌株】",
+              "【待填】",
+              "【支持充分 / 无法判断】"
+            ],
+            [
+              "【微生物B】",
+              "【亚种 / 谱系 / 菌株】",
+              "【待填】",
+              "【支持充分 / 无法判断】"
+            ]
+          ],
+          "widths": [
+            2160,
+            2591,
+            1585,
+            3829
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "4.2 毒力相关功能概览"
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "4.2.t1",
+          "rows": [
+            [
+              "功能类别",
+              "关键标记或基因簇",
+              "检出与完整性",
+              "证据摘要"
+            ],
+            [
+              "毒素相关",
+              "【代表标记】",
+              "【待填】",
+              "【覆盖及相似性结论】"
+            ],
+            [
+              "黏附相关",
+              "【代表标记】",
+              "【待填】",
+              "【覆盖及相似性结论】"
+            ],
+            [
+              "侵袭相关",
+              "【代表标记】",
+              "【待填】",
+              "【覆盖及相似性结论】"
+            ],
+            [
+              "生物膜相关",
+              "【代表标记】",
+              "【待填】",
+              "【覆盖及相似性结论】"
+            ]
+          ],
+          "widths": [
+            1800,
+            2591,
+            2448,
+            3326
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "4.3 致病型与序列连接证据"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "图 4-1  物种与毒力标记的关联示意",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 3,
+          "items": [
+            {
+              "type": "flow",
+              "id": "4.3.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "微生物",
+                    "【物种或谱系】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    304920,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "序列连接",
+                    "【已支持 / 未确定】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    304920,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "毒力特征",
+                    "【标记或基因簇】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                609480
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "重点致病型【待填】。连接依据【同一组装片段等证据 / 未获得连接证据】。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "4.4 宿主归属与可解释范围"
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "4.4.t1",
+          "rows": [
+            [
+              "重点标记",
+              "微生物宿主归属",
+              "序列支持摘要"
+            ],
+            [
+              "【标记A】",
+              "【已归属 / 宿主未确定】",
+              "【覆盖、相似性及连接支持】"
+            ]
+          ],
+          "widths": [
+            1871,
+            3457,
+            4838
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【用一至两句话概括主要结果及证据边界】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "缺少连接证据时，标记与物种分别报告；基因检出不直接代表表达、产毒或实际感染。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "耐药组与可移动遗传元件",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "本章描述微生物耐药相关序列及其遗传背景，重点展示类别与证据。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "5.1 耐药决定因素"
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "5.1.t1",
+          "rows": [
+            [
+              "基因 家族或突变",
+              "检出状态",
+              "序列证据",
+              "注释等级"
+            ],
+            [
+              "【项目A】",
+              "【待填】",
+              "【覆盖与相似性摘要】",
+              "【待填】"
+            ],
+            [
+              "【项目B】",
+              "【待填】",
+              "【覆盖与相似性摘要】",
+              "【待填】"
+            ],
+            [
+              "【项目C】",
+              "【待填】",
+              "【覆盖与相似性摘要】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2592,
+            1584,
+            3887,
+            2102
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "5.2 对应药物类别与机制"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "图 5-1  各药物类别相关耐药标记的标准化丰度",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 2,
+          "items": [
+            {
+              "type": "chart",
+              "id": "5.2.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "【本次结果】",
+                  "categories": [
+                    "β-内酰胺类",
+                    "氨基糖苷类",
+                    "四环素类",
+                    "大环内酯类",
+                    "【其他类别】"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                6400800,
+                1234440
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "5.2.t1",
+          "rows": [
+            [
+              "对应类别",
+              "主要耐药机制",
+              "代表决定因素",
+              "结果与人群位置"
+            ],
+            [
+              "【类别A】",
+              "【机制】",
+              "【代表基因或突变】",
+              "【标准化丰度 / 分位数】"
+            ],
+            [
+              "【类别B】",
+              "【机制】",
+              "【代表基因或突变】",
+              "【标准化丰度 / 分位数】"
+            ]
+          ],
+          "widths": [
+            1800,
+            2304,
+            2880,
+            3181
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "丰度单位与统计口径【待填】；多类别标记的归类规则【待填】，不直接相加为总量。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "5.3 可能宿主与可移动元件关联"
+        },
+        {
+          "type": "visuals",
+          "sub": 3,
+          "items": [
+            {
+              "type": "flow",
+              "id": "5.3.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "耐药决定因素",
+                    "【标记】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    304920,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "遗传背景",
+                    "【质粒等元件 / 未确定】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    304920,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "微生物宿主",
+                    "【已归属 / 未确定】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                609480
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "连接证据【待填】；各连接分别判断，仅在序列证据支持时填写宿主或元件名称。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "5.4 结果解读"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【概括检出类别、证据强弱及遗传背景】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "本栏描述耐药相关序列，不等同于药敏试验或个体用药效果；不直接给出抗生素选择结论。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "古菌 真菌与DNA病毒组",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "按不同微生物类别分别展示检出结果与可报告范围。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "图 6-1  各类微生物内部的组成概览",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 0,
+          "items": [
+            {
+              "type": "chart",
+              "id": "6.0.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "【成员A】",
+                  "categories": [
+                    "古菌内部组成",
+                    "真菌内部组成",
+                    "DNA病毒内部组成"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                },
+                {
+                  "name": "【成员B】",
+                  "categories": [
+                    "古菌内部组成",
+                    "真菌内部组成",
+                    "DNA病毒内部组成"
+                  ],
+                  "color": "4a86a4",
+                  "point_colors": []
+                },
+                {
+                  "name": "【其余成员】",
+                  "categories": [
+                    "古菌内部组成",
+                    "真菌内部组成",
+                    "DNA病毒内部组成"
+                  ],
+                  "color": "8ab8c2",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "percentStacked",
+              "legend": true,
+              "extent": [
+                6400800,
+                1234440
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "每行独立归一化，成员名称分别填写；图中比例不用于比较三类微生物的总量。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "6.1 产甲烷古菌"
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "6.1.t1",
+          "rows": [
+            [
+              "重点成员",
+              "检出与相对丰度",
+              "甲烷代谢相关标记"
+            ],
+            [
+              "【古菌名称】",
+              "【待填】",
+              "【标记及功能支持】"
+            ]
+          ],
+          "widths": [
+            2592,
+            2880,
+            4694
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "6.2 真菌"
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "6.2.t1",
+          "rows": [
+            [
+              "重点成员",
+              "检出与相对丰度",
+              "检测能力说明"
+            ],
+            [
+              "【真菌名称】",
+              "【待填】",
+              "【裂解 建库及数据库覆盖】"
+            ]
+          ],
+          "widths": [
+            2592,
+            2880,
+            4694
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "6.3 DNA噬菌体与其他DNA病毒"
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "6.3.t1",
+          "rows": [
+            [
+              "重点成员或类别",
+              "检出状态",
+              "基因组质量",
+              "微生物宿主关联"
+            ],
+            [
+              "【DNA噬菌体】",
+              "【待填】",
+              "【完整性与质量】",
+              "【已支持 / 未确定】"
+            ],
+            [
+              "【其他DNA病毒】",
+              "【待填】",
+              "【完整性与质量】",
+              "【已支持 / 未确定】"
+            ]
+          ],
+          "widths": [
+            2592,
+            1727,
+            2737,
+            3109
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "6.4 检测范围与结果解读"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果状态  支持充分 / 本次检测能力内未检出 / 覆盖不足无法判断。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【概括各类微生物的主要检出及证据边界】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "各类别采用各自的判定条件【版本待填】；普通DNA宏基因组不覆盖完整RNA病毒组。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "膳食底物利用与营养物质代谢",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "展示微生物利用底物及合成、降解营养物质的基因功能潜力。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "7.1 复杂碳水底物利用潜力"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 7-1  不同底物利用潜力的人群位置",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "chart",
+              "id": "7.1.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "【本次结果】",
+                  "categories": [
+                    "抗性淀粉",
+                    "果胶",
+                    "菊粉",
+                    "木聚糖"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                6400800,
+                1005840
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "7.1.t1",
+          "rows": [
+            [
+              "底物",
+              "本次功能结果",
+              "主要贡献菌",
+              "关键功能与覆盖"
+            ],
+            [
+              "抗性淀粉",
+              "【结果 / 分位数】",
+              "【待填】",
+              "【代表标记及覆盖摘要】"
+            ],
+            [
+              "果胶",
+              "【结果 / 分位数】",
+              "【待填】",
+              "【代表标记及覆盖摘要】"
+            ],
+            [
+              "菊粉",
+              "【结果 / 分位数】",
+              "【待填】",
+              "【代表标记及覆盖摘要】"
+            ],
+            [
+              "木聚糖",
+              "【结果 / 分位数】",
+              "【待填】",
+              "【代表标记及覆盖摘要】"
+            ]
+          ],
+          "widths": [
+            1656,
+            2375,
+            2305,
+            3829
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "7.2 糖活性酶与相关基因簇"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "代表酶家族【待填】；相关基因簇【待填】；底物注释可信度【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "底物特异性支持不足时，仅展示酶家族或通路层级，不补填具体底物结论。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "7.3 其他营养物质的合成与降解"
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "7.3.t1",
+          "rows": [
+            [
+              "功能类别",
+              "合成潜力",
+              "降解潜力",
+              "主要贡献菌"
+            ],
+            [
+              "蛋白质及氨基酸",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "脂质",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "维生素与辅酶",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "嘌呤与嘧啶",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            3095,
+            1800,
+            1801,
+            3469
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "7.4 功能结果的证据摘要"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "所选功能【待填】；关键基因与覆盖【待填】；标准化丰度【待填】。贡献菌见上表，完整清单见附录。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【用一至两句话概括主要结果及证据边界】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "功能潜力不直接代表实际摄入、消化吸收效果或个人营养状态。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "微生物代谢物生成与利用潜力",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "按反应方向展示生成、利用及转化功能；本章仅呈现测序支持的功能潜力。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "8.1 短链脂肪酸相关功能"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 8-1  短链脂肪酸生成路径的贡献构成",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "chart",
+              "id": "8.1.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "【路径A】",
+                  "categories": [
+                    "乙酸生成",
+                    "丙酸生成",
+                    "丁酸生成"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                },
+                {
+                  "name": "【路径B】",
+                  "categories": [
+                    "乙酸生成",
+                    "丙酸生成",
+                    "丁酸生成"
+                  ],
+                  "color": "4a86a4",
+                  "point_colors": []
+                },
+                {
+                  "name": "【其他路径】",
+                  "categories": [
+                    "乙酸生成",
+                    "丙酸生成",
+                    "丁酸生成"
+                  ],
+                  "color": "8ab8c2",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "percentStacked",
+              "legend": true,
+              "extent": [
+                6400800,
+                1097280
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "8.1.t1",
+          "rows": [
+            [
+              "目标产物",
+              "主要生成路径",
+              "主要贡献菌",
+              "结果与证据"
+            ],
+            [
+              "乙酸",
+              "【路径及关键标记】",
+              "【待填】",
+              "【功能结果 / 证据】"
+            ],
+            [
+              "丙酸",
+              "【路径及关键标记】",
+              "【待填】",
+              "【功能结果 / 证据】"
+            ],
+            [
+              "丁酸",
+              "【路径及关键标记】",
+              "【待填】",
+              "【功能结果 / 证据】"
+            ]
+          ],
+          "widths": [
+            1511,
+            3312,
+            2305,
+            3037
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "各产物分别填写路径名称并归一化；不以图中比例比较不同产物的实际产量。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "8.2 乳酸与琥珀酸的周转"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "图 8-2  中间产物的生成与后续利用",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 2,
+          "items": [
+            {
+              "type": "flow",
+              "id": "8.2.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "上游生成",
+                    "【贡献菌与路径】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    304920,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "乳酸或琥珀酸",
+                    "【中间产物】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    304920,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    609480
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "下游利用",
+                    "【贡献菌与去向】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                609480
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "8.2.t1",
+          "rows": [
+            [
+              "中间产物",
+              "生成潜力",
+              "利用潜力",
+              "衔接证据"
+            ],
+            [
+              "乳酸",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "琥珀酸",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            1871,
+            2305,
+            2303,
+            3686
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "8.3 胆汁酸转化"
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "8.3.t1",
+          "rows": [
+            [
+              "转化分支",
+              "代表功能",
+              "本次结果",
+              "主要贡献菌与证据"
+            ],
+            [
+              "脱结合",
+              "BSH相关功能",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "7α脱羟基",
+              "bai相关功能",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2160,
+            2448,
+            1656,
+            3901
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "结果解读  【概括生成、利用及转化方向，说明潜在衔接环节】",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "8.4 色氨酸代谢的不同产物方向"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "图 8-3  色氨酸相关产物的路径示意",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 4,
+          "items": [
+            {
+              "type": "flow",
+              "id": "8.4.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "底物",
+                    "色氨酸"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "不同反应分支",
+                    "【关键路径】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "产物方向",
+                    "吲哚 吲哚乳酸 吲哚丙酸"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                787320
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "8.4.t1",
+          "rows": [
+            [
+              "产物方向",
+              "关键路径或标记",
+              "主要贡献菌",
+              "功能结果与证据"
+            ],
+            [
+              "吲哚",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "吲哚乳酸",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "吲哚丙酸",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            1871,
+            2880,
+            2233,
+            3181
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "各产物分别解读，生成与利用信息按相应路径填写。肠脑轴中的相关解读见第10章。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 5,
+          "text": "8.5 蛋白发酵与生物胺相关功能"
+        },
+        {
+          "type": "paragraph",
+          "sub": 5,
+          "text": "图 8-4  不同产物的生成与利用功能位置",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 5,
+          "items": [
+            {
+              "type": "chart",
+              "id": "8.5.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "生成相关功能",
+                  "categories": [
+                    "对甲酚",
+                    "组胺",
+                    "腐胺",
+                    "尸胺"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                },
+                {
+                  "name": "利用相关功能",
+                  "categories": [
+                    "对甲酚",
+                    "组胺",
+                    "腐胺",
+                    "尸胺"
+                  ],
+                  "color": "8ab8c2",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": true,
+              "extent": [
+                6400800,
+                1508760
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 5,
+          "id": "8.5.t1",
+          "rows": [
+            [
+              "目标产物",
+              "生成路径",
+              "利用路径",
+              "贡献菌与证据"
+            ],
+            [
+              "对甲酚",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "组胺",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "腐胺",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "尸胺",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            1800,
+            2448,
+            2448,
+            3469
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 5,
+          "text": "图中两类功能按各自参考分布展示；填写统一的展示口径【待填】，不以两条相减推算净生成量。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 5,
+          "text": "结果解读  【概括主要产物方向及其功能证据，避免推算粪便或体内浓度】",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 6,
+          "text": "8.6 气体的产生与消耗相关功能"
+        },
+        {
+          "type": "paragraph",
+          "sub": 6,
+          "text": "图 8-5  气体代谢路径概览",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 6,
+          "items": [
+            {
+              "type": "chart",
+              "id": "8.6.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "【本次结果】",
+                  "categories": [
+                    "产氢相关功能",
+                    "耗氢相关功能",
+                    "产甲烷相关功能",
+                    "硫化氢生成相关功能"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                6400800,
+                1371600
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 6,
+          "id": "8.6.t1",
+          "rows": [
+            [
+              "功能环节",
+              "关键路径",
+              "主要贡献菌",
+              "结果与证据"
+            ],
+            [
+              "产氢",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "耗氢",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "产甲烷",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "硫化氢生成",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            1728,
+            2880,
+            2376,
+            3181
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 6,
+          "text": "结合产生与消耗功能解释，不由基因丰度直接换算排气量或症状强度。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 7,
+          "text": "8.7 TMA生成相关功能"
+        },
+        {
+          "type": "paragraph",
+          "sub": 7,
+          "text": "图 8-6  不同底物通向TMA的功能分支",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 7,
+          "items": [
+            {
+              "type": "flow",
+              "id": "8.7.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "相关底物",
+                    "胆碱 肉碱等"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    368280,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "独立反应路径",
+                    "【路径与代表标记】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    368280,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "TMA生成潜力",
+                    "【结果与贡献菌】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                736560
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 7,
+          "id": "8.7.t1",
+          "rows": [
+            [
+              "底物分支",
+              "本次功能结果",
+              "主要贡献菌",
+              "证据等级"
+            ],
+            [
+              "胆碱相关路径",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "肉碱相关路径",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2375,
+            2376,
+            2880,
+            2534
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 8,
+          "text": "8.8 脂多糖与其他细胞组分合成特征"
+        },
+        {
+          "type": "table",
+          "sub": 8,
+          "id": "8.8.t1",
+          "rows": [
+            [
+              "功能项目",
+              "代表标记或路径",
+              "功能结果",
+              "证据摘要"
+            ],
+            [
+              "脂多糖相关合成",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【其他细胞组分】",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2447,
+            2881,
+            1728,
+            3109
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 8,
+          "text": "结果解读  【概括气体、TMA及细胞组分相关功能的重点发现】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 8,
+          "text": "基因证据不直接代表内毒素活性，也不用于推算TMA或其他分子的实际水平。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "肠道微生态与宿主互作相关特征",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "整合具体物种与功能证据，展示与宿主互作有关的线索。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "9.1 定植抗力相关线索"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 9-1  相关功能与宿主互作的解读路径",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "flow",
+              "id": "9.1.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "底物竞争与利用",
+                    "【相关功能】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    368280,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "代谢环境与抑菌",
+                    "【相关功能】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    368280,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "定植抗力线索",
+                    "【综合证据】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                736560
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "9.1.t1",
+          "rows": [
+            [
+              "相关维度",
+              "代表证据",
+              "本次结果",
+              "证据等级"
+            ],
+            [
+              "底物竞争",
+              "【物种 基因或通路】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "代谢环境",
+              "【物种 基因或通路】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "抑菌相关功能",
+              "【物种 基因或通路】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            1943,
+            3961,
+            1871,
+            2390
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "9.2 炎症与免疫互作相关特征"
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "9.2.t1",
+          "rows": [
+            [
+              "相关特征",
+              "关联方向",
+              "适用背景",
+              "证据等级"
+            ],
+            [
+              "【特征A】",
+              "【方向或不确定】",
+              "【人群及研究背景】",
+              "【待填】"
+            ],
+            [
+              "【特征B】",
+              "【方向或不确定】",
+              "【人群及研究背景】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2160,
+            2376,
+            3455,
+            2174
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "9.3 黏液糖链与宿主底物利用"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "黏蛋白相关酶【待填】；相关通路【待填】；主要贡献菌【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "结合通路完整性与生态背景解读，不将相关酶检出直接等同于屏障损伤。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "9.4 屏障相关线索的综合解释"
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "9.4.t1",
+          "rows": [
+            [
+              "引用结果",
+              "与本章的联系",
+              "本次可解释范围"
+            ],
+            [
+              "第7章底物利用",
+              "【关联环节】",
+              "【待填】"
+            ],
+            [
+              "第8章代谢功能",
+              "【关联环节】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2447,
+            3745,
+            3974
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【用一至两句话概括主要结果及证据边界】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "本章展示关联线索，不直接给出屏障、免疫或抗炎能力分；同一功能不重复计分。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "肠脑轴与内分泌相关代谢",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "展示神经活性分子与激素转化的微生物功能证据，并单列量表背景。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "10.1 神经活性分子的生成与降解相关功能"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 10-1  神经活性分子相关功能概览",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "chart",
+              "id": "10.1.1",
+              "kind": "barChart",
+              "series": [
+                {
+                  "name": "生成相关功能",
+                  "categories": [
+                    "GABA相关功能",
+                    "【分子或路径B】",
+                    "【分子或路径C】"
+                  ],
+                  "color": "246a73",
+                  "point_colors": []
+                },
+                {
+                  "name": "降解相关功能",
+                  "categories": [
+                    "GABA相关功能",
+                    "【分子或路径B】",
+                    "【分子或路径C】"
+                  ],
+                  "color": "8ab8c2",
+                  "point_colors": []
+                }
+              ],
+              "grouping": "clustered",
+              "legend": true,
+              "extent": [
+                6400800,
+                1188720
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "10.1.t1",
+          "rows": [
+            [
+              "分子或功能",
+              "本次功能结果",
+              "主要贡献菌",
+              "证据等级"
+            ],
+            [
+              "GABA相关功能",
+              "【生成 / 降解结果】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【其他功能】",
+              "【生成 / 降解结果】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2232,
+            3023,
+            2593,
+            2317
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "10.2 芳香族氨基酸代谢的关联解读"
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "10.2.t1",
+          "rows": [
+            [
+              "基础结果来源",
+              "关联线索",
+              "适用背景与证据"
+            ],
+            [
+              "第8章色氨酸结果",
+              "【产物方向与关联】",
+              "【待填】"
+            ],
+            [
+              "【其他芳香族氨基酸】",
+              "【路径与关联】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2880,
+            3167,
+            4119
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "10.3 雌激素等相关微生物转化功能"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "去结合等相关功能【待填】；关键标记【待填】；贡献菌【待填】；证据等级【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "10.4 量表背景与综合解读"
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "10.4.t1",
+          "rows": [
+            [
+              "背景信息",
+              "本次填写",
+              "来源与时间"
+            ],
+            [
+              "睡眠",
+              "【结果 / 未提供】",
+              "【量表名及日期】"
+            ],
+            [
+              "压力",
+              "【结果 / 未提供】",
+              "【量表名及日期】"
+            ],
+            [
+              "情绪",
+              "【结果 / 未提供】",
+              "【量表名及日期】"
+            ]
+          ],
+          "widths": [
+            1800,
+            3600,
+            4766
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【用一至两句话概括主要结果及证据边界】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "量表结果与测序结果分开解释；菌群基因不直接换算脑内递质或激素水平。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "title": "症状相关特征与问卷对照",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "将本次排便和症状记录与功能结果并列，帮助理解可能相关的线索。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "11.1 排便与症状记录"
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "11.1.t1",
+          "rows": [
+            [
+              "排便指标",
+              "本次记录",
+              "信息来源"
+            ],
+            [
+              "Bristol粪便类型",
+              "【1至7型 / 未提供】",
+              "【问卷及填写日期】"
+            ],
+            [
+              "排便频率",
+              "【次数及时间口径】",
+              "【问卷及填写日期】"
+            ]
+          ],
+          "widths": [
+            2447,
+            3600,
+            4119
+          ]
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "11.1.t2",
+          "rows": [
+            [
+              "症状项目",
+              "便秘",
+              "腹泻",
+              "腹胀",
+              "排气",
+              "腹痛"
+            ],
+            [
+              "本次记录",
+              "【待填】",
+              "【待填】",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            1727,
+            1689,
+            1688,
+            1688,
+            1688,
+            1687
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "11.2 症状与功能结果对照"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "图 11-1  从症状记录到功能线索",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 2,
+          "items": [
+            {
+              "type": "flow",
+              "id": "11.2.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "本次症状",
+                    "【主要症状】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    368280,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "对应功能结果",
+                    "【引用第8章】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    368280,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    736560
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "关联解读",
+                    "【方向与证据】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                736560
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "11.2.t1",
+          "rows": [
+            [
+              "功能方向",
+              "测序结果摘要",
+              "对应症状",
+              "关联证据"
+            ],
+            [
+              "产气与耗气",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "乳酸利用",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "蛋白发酵",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "胆汁酸转化",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2375,
+            2737,
+            2159,
+            2894
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "11.3 关联方向与可解释范围"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "重点关联【待填】；方向【同向 / 反向 / 不确定】；文献效应【待填】；证据等级【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "拓展关联【按证据及目标人群选填】；文献来源与适用人群【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "结果解读  【区分已记录的症状、检测结果及两者之间的研究关联】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "相关方向不直接代表个体症状的原因；没有症状信息时显示“未提供”。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "title": "疾病相关特征与经验证模型",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "先展示疾病研究关联，再单独呈现符合适用条件的模型结果。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "12.1 疾病关联模块与适用范围"
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "12.1.t1",
+          "rows": [
+            [
+              "关联模块",
+              "是否启用",
+              "目标用途或适用人群",
+              "结果类型"
+            ],
+            [
+              "炎症性肠病",
+              "【待填】",
+              "【待填】",
+              "【研究性关联 / 模型】"
+            ],
+            [
+              "肠易激综合征",
+              "【待填】",
+              "【待填】",
+              "【研究性关联 / 模型】"
+            ],
+            [
+              "结直肠癌",
+              "【待填】",
+              "【待填】",
+              "【研究性关联 / 模型】"
+            ],
+            [
+              "【代谢疾病模块】",
+              "【待填】",
+              "【待填】",
+              "【研究性关联 / 模型】"
+            ]
+          ],
+          "widths": [
+            2160,
+            1439,
+            3889,
+            2677
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 12-1  关联证据与模型输出的呈现关系",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "flow",
+              "id": "12.1.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "物种或功能特征",
+                    "【检测结果】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "疾病研究关联",
+                    "【方向与证据】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "适用性通过后",
+                    "【另列模型输出】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                787320
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "12.2 关联菌与功能特征"
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "12.2.t1",
+          "rows": [
+            [
+              "所选模块",
+              "关联特征",
+              "关联方向",
+              "证据等级"
+            ],
+            [
+              "【模块】",
+              "【物种特征A】",
+              "【同向 / 反向】",
+              "【待填】"
+            ],
+            [
+              "【模块】",
+              "【物种特征B】",
+              "【同向 / 反向】",
+              "【待填】"
+            ],
+            [
+              "【模块】",
+              "【功能特征A】",
+              "【同向 / 反向】",
+              "【待填】"
+            ],
+            [
+              "【模块】",
+              "【功能特征B】",
+              "【方向不确定】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            1800,
+            3455,
+            2520,
+            2390
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "所选模块的主要线索  【用一至两句话概括关联特征及研究背景】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "文献来源【待填】；效应与统计口径【待填】；研究人群及适用限制【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "关联特征与模型输出分别解释，不将关联菌数量直接换算为患病风险。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "12.3 模型适用条件与验证信息"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "所选模型【名称与版本待填】；本次状态【已启用 / 不适用 / 未启用】。",
+          "style": "Normal"
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "12.3.t1",
+          "rows": [
+            [
+              "模型信息",
+              "填写内容"
+            ],
+            [
+              "目标用途与预测终点",
+              "【识别当前状态 / 预测指定时间内事件等】"
+            ],
+            [
+              "适用人群与排除条件",
+              "【人群定义及不适用条件】"
+            ],
+            [
+              "输入与本次数据匹配",
+              "【所需特征及本次是否满足】"
+            ],
+            [
+              "外部验证",
+              "【独立队列 人数 地域及验证版本】"
+            ],
+            [
+              "主要性能",
+              "【区分度 校准及适用阈值表现】"
+            ],
+            [
+              "本次可报告范围",
+              "【符合条件 / 缺少验证 / 其他限制】"
+            ]
+          ],
+          "widths": [
+            2592,
+            7573
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "12.4 模型结果与分值含义"
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "12.4.t1",
+          "rows": [
+            [
+              "输出项目",
+              "本次结果",
+              "结果含义"
+            ],
+            [
+              "分类分值或类别",
+              "【待填 / 未启用】",
+              "【量尺与分值定义】"
+            ],
+            [
+              "未来发病概率",
+              "【待填 / 未启用】",
+              "【时间窗与适用验证】"
+            ],
+            [
+              "结果不确定性",
+              "【待填 / 无法估计】",
+              "【区间或主要限制】"
+            ]
+          ],
+          "widths": [
+            2592,
+            2591,
+            4983
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "图 12-2  模型结果解释顺序",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 4,
+          "items": [
+            {
+              "type": "flow",
+              "id": "12.4.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "核对适用条件",
+                    "【是否满足】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "读取相应输出",
+                    "【类别 分值或概率】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "结合限制解释",
+                    "【本次可解释结论】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                787320
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "结果解读  【明确这是何种输出、适用于谁，以及本次能够说明的内容】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "仅在对应验证支持时填写预测概率；缺少适用验证的模块只保留研究性关联。模型结果不替代疾病诊断。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "title": "专项代谢转化功能",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "逐项展示膳食成分及药物转化的序列功能线索，并说明验证阶段。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "13.1 多酚与异黄酮等膳食成分转化"
+        },
+        {
+          "type": "paragraph",
+          "sub": 1,
+          "text": "图 13-1  从底物到转化产物的专项路径",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 1,
+          "items": [
+            {
+              "type": "flow",
+              "id": "13.1.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "膳食成分",
+                    "【具体底物】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "微生物转化",
+                    "【路径与代表酶】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "产物方向",
+                    "【目标产物】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                787320
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "13.1.t1",
+          "rows": [
+            [
+              "专项底物",
+              "路径或酶证据",
+              "主要贡献菌",
+              "本次功能结果"
+            ],
+            [
+              "【多酚项目】",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【异黄酮项目】",
+              "【待填】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            2160,
+            2880,
+            2376,
+            2749
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "13.2 药物转化相关功能"
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "13.2.t1",
+          "rows": [
+            [
+              "专项项目",
+              "已知酶或序列变异",
+              "本次序列支持",
+              "适用用药背景"
+            ],
+            [
+              "【药物或底物A】",
+              "【待填】",
+              "【待填】",
+              "【记录 / 未提供】"
+            ],
+            [
+              "【药物或底物B】",
+              "【待填】",
+              "【待填】",
+              "【记录 / 未提供】"
+            ]
+          ],
+          "widths": [
+            2375,
+            2880,
+            2448,
+            2462
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "各项目独立填写反应方向、宿主归属与序列证据；底物范围及注释来源【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "13.3 验证阶段与适用范围"
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "13.3.t1",
+          "rows": [
+            [
+              "专项项目",
+              "路径注释证据",
+              "健康关联或应用证据",
+              "报告用途"
+            ],
+            [
+              "【项目A】",
+              "【待填】",
+              "【待填】",
+              "【研究性 / 已验证用途】"
+            ],
+            [
+              "【项目B】",
+              "【待填】",
+              "【待填】",
+              "【研究性 / 已验证用途】"
+            ]
+          ],
+          "widths": [
+            1800,
+            2591,
+            2880,
+            2894
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "结果解读  【说明哪些转化功能有序列支持，哪些应用解释仍不确定】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "功能潜力不直接代表体内转化量；本栏不直接输出药物剂量或疗效结论。",
+          "style": "Normal"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "title": "综合解读与行动建议",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "sub": 0,
+          "text": "按证据及实际相关性归纳结果，并将建议对应到明确的发现与观察目标。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 1,
+          "text": "14.1 关键发现与需要关注的内容"
+        },
+        {
+          "type": "table",
+          "sub": 1,
+          "id": "14.1.t1",
+          "rows": [
+            [
+              "优先级",
+              "本次发现",
+              "证据充分程度",
+              "实际相关性"
+            ],
+            [
+              "【优先关注】",
+              "【发现及来源章节】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【一般关注】",
+              "【发现及来源章节】",
+              "【待填】",
+              "【待填】"
+            ],
+            [
+              "【暂不能判断】",
+              "【项目及原因】",
+              "【待填】",
+              "【待填】"
+            ]
+          ],
+          "widths": [
+            1800,
+            3960,
+            2160,
+            2245
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 2,
+          "text": "14.2 饮食与生活方式观察目标"
+        },
+        {
+          "type": "paragraph",
+          "sub": 2,
+          "text": "图 14-1  从关键发现到具体行动",
+          "style": "Normal"
+        },
+        {
+          "type": "visuals",
+          "sub": 2,
+          "items": [
+            {
+              "type": "flow",
+              "id": "14.2.flow",
+              "shapes": [
+                {
+                  "geometry": "rect",
+                  "box": [
+                    0,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "本次发现",
+                    "【明确的结果】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    1854360,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    2273400,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "对应行动",
+                    "【具体可执行事项】"
+                  ]
+                },
+                {
+                  "geometry": "line",
+                  "box": [
+                    4127400,
+                    393840,
+                    368280,
+                    0
+                  ],
+                  "fill": "FFFFFF",
+                  "line": "246a73",
+                  "text": []
+                },
+                {
+                  "geometry": "rect",
+                  "box": [
+                    4546440,
+                    0,
+                    1803240,
+                    787320
+                  ],
+                  "fill": "e2edf0",
+                  "line": "b8cdd2",
+                  "text": [
+                    "观察目标",
+                    "【症状或执行记录】"
+                  ]
+                }
+              ],
+              "extent": [
+                6350040,
+                787320
+              ]
+            }
+          ],
+          "age_panel": false
+        },
+        {
+          "type": "table",
+          "sub": 2,
+          "id": "14.2.t1",
+          "rows": [
+            [
+              "目标",
+              "具体行动",
+              "依据",
+              "观察方式"
+            ],
+            [
+              "【饮食目标】",
+              "【一项具体调整】",
+              "【结果及来源章节】",
+              "【执行或耐受记录】"
+            ],
+            [
+              "【生活方式目标】",
+              "【一项具体调整】",
+              "【结果或症状记录】",
+              "【日常记录】"
+            ]
+          ],
+          "widths": [
+            1943,
+            2880,
+            2520,
+            2822
+          ]
+        },
+        {
+          "type": "heading",
+          "sub": 3,
+          "text": "14.3 待核实信息与结果复核"
+        },
+        {
+          "type": "table",
+          "sub": 3,
+          "id": "14.3.t1",
+          "rows": [
+            [
+              "待核实事项",
+              "目的",
+              "可用依据或行动"
+            ],
+            [
+              "【背景信息】",
+              "【补充解释情境】",
+              "【核对问卷或既有记录】"
+            ],
+            [
+              "【序列或注释结果】",
+              "【确认报告依据】",
+              "【复核现有序列及分析版本】"
+            ]
+          ],
+          "widths": [
+            2592,
+            2880,
+            4694
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "结果解读  【用一至两句话说明本次最值得关注的结果和优先行动】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 3,
+          "text": "建议结合症状、背景及证据解释；具体内容与行动强度【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "heading",
+          "sub": 4,
+          "text": "14.4 综合健康分 失衡分与肠龄"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "综合指标状态【未启用 / 研究性展示 / 已验证用途】；评分与模型版本【待填】。",
+          "style": "Normal"
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "14.4.t1",
+          "rows": [
+            [
+              "综合健康分",
+              "失衡分",
+              "模型肠龄"
+            ],
+            [
+              "【待填】",
+              "【待填】",
+              "【待填】岁"
+            ]
+          ],
+          "widths": [
+            3388,
+            3387,
+            3391
+          ]
+        },
+        {
+          "type": "visuals",
+          "sub": 4,
+          "items": [
+            {
+              "type": "chart",
+              "id": "14.4.1",
+              "kind": "doughnutChart",
+              "series": [
+                {
+                  "name": "核心菌群覆盖",
+                  "categories": [
+                    "得分占位",
+                    "其余量尺占位"
+                  ],
+                  "color": "4f81bd",
+                  "point_colors": [
+                    "246a73",
+                    "e7e9ec"
+                  ]
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                1874520,
+                1234440
+              ]
+            },
+            {
+              "type": "chart",
+              "id": "14.4.2",
+              "kind": "doughnutChart",
+              "series": [
+                {
+                  "name": "核心菌群覆盖",
+                  "categories": [
+                    "得分占位",
+                    "其余量尺占位"
+                  ],
+                  "color": "4f81bd",
+                  "point_colors": [
+                    "246a73",
+                    "e7e9ec"
+                  ]
+                }
+              ],
+              "grouping": "clustered",
+              "legend": false,
+              "extent": [
+                1874520,
+                1234440
+              ]
+            }
+          ],
+          "age_panel": true
+        },
+        {
+          "type": "table",
+          "sub": 4,
+          "id": "14.4.t2",
+          "rows": [
+            [
+              "解释字段",
+              "综合健康分",
+              "失衡分",
+              "模型肠龄"
+            ],
+            [
+              "量尺与方向",
+              "【范围及分值方向】",
+              "【范围及分值方向】",
+              "【单位及定义】"
+            ],
+            [
+              "参考人群与位置",
+              "【人群及分位数】",
+              "【人群及分位数】",
+              "【人群及误差】"
+            ],
+            [
+              "主要输入",
+              "【所用指标】",
+              "【所用指标】",
+              "【所用指标】"
+            ],
+            [
+              "验证与适用性",
+              "【依据及限制】",
+              "【依据及限制】",
+              "【依据及限制】"
+            ]
+          ],
+          "widths": [
+            2160,
+            2663,
+            2665,
+            2677
+          ]
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "综合指标解读  【分别说明三项指标的含义、可靠程度与本次适用范围】",
+          "style": "Normal"
+        },
+        {
+          "type": "paragraph",
+          "sub": 4,
+          "text": "健康分与失衡分分别定义，未必互为补数；模型肠龄是模型输出。量尺、验证或适用性不足时显示“未启用”，不填造分值。",
+          "style": "Normal"
+        }
+      ]
+    }
+  ],
+  "style": {
+    "page_mm": [
+      215.9,
+      279.4
+    ],
+    "margins_mm": [
+      18.2915,
+      15.9985,
+      18.2915,
+      15.24
+    ],
+    "chapter": "3465A4",
+    "subheading": "EA7500",
+    "table_header": "E2EDF0",
+    "alternate_row": "F6F8F9",
+    "border": "D9D9D9",
+    "series": [
+      "246A73",
+      "4A86A4",
+      "8AB8C2",
+      "B5D2CD",
+      "C6B694",
+      "E7E9EC"
+    ]
+  }
+}

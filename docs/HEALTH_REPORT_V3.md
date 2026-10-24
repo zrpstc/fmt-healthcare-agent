@@ -1,12 +1,17 @@
 # 健康报告 v3
 
+现行正文已升级为 health-report-v4：按四份 Word 重做固定正文、模型解读和图表样式，章节从1至14。
+新模板、字段绑定及部署说明见 [REPORT_BODY_TEMPLATES.md](REPORT_BODY_TEMPLATES.md)。本页保留v3证据模型的设计记录。
+
 网页的“重新生成报告”和 `generate_report` 工具现在生成 `health-report-v3`。
-正文参考商业检测报告的总览、分项结果、结果说明和日常关注顺序。
-目录与数值由程序确定；LLM 按固定主题撰写结构化中文解读。图片及装饰性矢量图不在这次改动范围。
+正文按用户提供的四份 DOCX 模板展示第03—16章，共14章58个小节，开头包括目录和筛选后的重点结果总览。
+目录、表格和数值由程序确定；LLM 按既有证据主题撰写结构化中文解读。
+模板对应、可选输入和正文落位见 [报告正文模板对应规则](REPORT_BODY_TEMPLATES.md)。
 
 ## 固定内容
 
-目录定义在 `src/wgs_agent/reporting/catalog.py`，包括 11 个板块、66 个固定细分方向：
+内部证据契约定义在 `src/wgs_agent/reporting/catalog.py`，保留11组66个主题，继续用于取证、模型、图谱及文献分组。
+实际正文目录由 `template_catalog.py` 定义，`template_body.py` 将原有主题及可选专项结果放入模板对应章节：
 
 | 板块 | 固定细分方向 |
 | --- | --- |
@@ -22,7 +27,8 @@
 | 疾病相关特征与风险模型 | 肠道、代谢、肝脏、心血管、神经精神、其他研究关联，经过验证的预测模型 |
 | 抗生素耐药性 | β-内酰胺、氨基糖苷、大环内酯、喹诺酮、四环素、磺胺及甲氧苄啶、其他及多重耐药、机制与基因背景 |
 
-有结果的主题展示指标表和短解读；其余固定方向汇总为简洁的未评估表。
+有结果的项目展示对应指标表和短解读；缺少专项数据时在对应正文小节注明未启用或无法判断。
+总览只筛选最多5项有依据的重点发现，不列出所有板块和缺失方向。
 “有可用结果”表示存在数据，不表示健康正常。缺失、零值、参考人群区间内分别处理。
 明确标为质控失败的样本不生成健康解读。
 
@@ -63,7 +69,7 @@
 同一目录发布以下文件：
 
 - `{sample_id}_health_report.md`：网页预览和正文。
-- `{sample_id}_health_report.pdf`：中文 PDF，带封面、总览、章节分页和书签。
+- `{sample_id}_health_report.pdf`：中文 PDF，带封面、实际页码目录、内部链接、总览、章节分页和书签。
 - `{sample_id}_report.json`：完整结构化报告，包括每个主题、证据和已接受模型文本。
 - `{sample_id}_report_evidence.json`：输入摘要、哈希、运行状态、引用检查及模型回退原因。
 
@@ -152,7 +158,7 @@ WGS_WEB_PROXY_TIMEOUT_MS=900000
 
 完整运行示例见 `scripts/preview_health_report.py` 中的 `demonstration()`；所有值均为合成数据。
 
-- `taxonomy.ranks` 支持 `phylum/genus/species` 列表；`complete: true` 表示完整物种谱。
+- `taxonomy.ranks` 支持 `phylum/class/order/family/genus/species` 列表；`complete: true` 表示完整物种谱。
 - 只有完整且有效的物种谱才计算多样性；保留未命名 SGB。Shannon 使用自然对数，Simpson 使用 `1−Σp²`，Pielou 使用 `H/ln(S)`，单物种时 Pielou 不定义。
 - `species.is_complete_profile: true` 只能用于未被 Top N、名称或参考库覆盖过滤的完整物种数据。
 - 已有单样本原始产物按 `profiles/metaphlan/{sample_id}_profile.tsv` 和 `profiles/humann/{sample_id}_pathabundance_relab.tsv` 读取。

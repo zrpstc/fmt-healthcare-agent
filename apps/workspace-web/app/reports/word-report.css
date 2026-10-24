@@ -1,0 +1,15 @@
+.markdown-preview.word-template-report {color:#000;background:#fff;font-family:"Noto Sans CJK SC","Microsoft YaHei",sans-serif;font-size:11pt;line-height:1.55;}
+.markdown-preview.word-template-report h1,.markdown-preview.word-template-report h2 {color:#3465a4;border:0;padding-bottom:0;}
+.markdown-preview.word-template-report h2 {font-size:23pt;font-weight:700;margin:2rem 0 .8rem;}
+.markdown-preview.word-template-report h3 {color:#ea7500;font-size:16pt;font-weight:700;margin:1.3rem 0 .6rem;}
+.markdown-preview.word-template-report h4 {color:#000;}
+.markdown-preview.word-template-report p {margin:.5rem 0;color:#000;}
+.markdown-preview.word-template-report table {width:100%;table-layout:fixed;border-collapse:collapse;margin:.8rem 0;font-size:10pt;}
+.markdown-preview.word-template-report table th {background:#e2edf0;color:#000;font-weight:700;}
+.markdown-preview.word-template-report table td,.markdown-preview.word-template-report table th {border:1px solid #d9d9d9;padding:.45rem .5rem;overflow-wrap:anywhere;vertical-align:middle;}
+.markdown-preview.word-template-report table tbody tr:nth-child(even) {background:#f6f8f9;}
+.markdown-preview.word-template-report table tbody tr:nth-child(odd) {background:#fff;}
+.markdown-preview.word-template-report blockquote {background:transparent;border:0;padding:.2rem 0;color:#000;}
+.markdown-preview.word-template-report img {display:block;width:100%;height:auto;margin:.5rem auto;}
+.markdown-preview.word-template-report a {color:#3465a4;}
+.markdown-preview.word-template-report .word-score-table tbody td {color:#3465a4;font-size:18pt;text-align:center;}

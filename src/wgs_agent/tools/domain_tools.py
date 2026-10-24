@@ -867,7 +867,8 @@ class ReportGeneratorTool(BaseTool):
             # Read existing canonical artifacts to recover complete taxonomy and
             # pathways from historical analysis JSONs that only retained Top N.
             inputs = load_existing_report_inputs(sid)
-            for key in ("taxonomy", "diversity", "functional_modules", "nutrition", "diet", "symptoms", "gut_brain", "resistance", "pathogens", "disease_models"):
+            from wgs_agent.reporting.template_catalog import TEMPLATE_INPUT_KEYS
+            for key in dict.fromkeys(("taxonomy", "diversity", "functional_modules", "nutrition", "diet", "symptoms", "gut_brain", "resistance", "pathogens", "disease_models", *TEMPLATE_INPUT_KEYS)):
                 if isinstance(data.get(key), (dict, list)):
                     inputs[key] = data[key]
             refreshed = refresh_reference_comparisons(data, inputs)
@@ -915,6 +916,8 @@ class ReportGeneratorTool(BaseTool):
             with tempfile.TemporaryDirectory(prefix=f".{sid}-report-", dir=output_dir) as temporary:
                 staging = Path(temporary)
                 figure_names = render_graph_figures(document, staging)
+                from wgs_agent.reporting.word_figures import render_word_figures
+                figure_names.update(render_word_figures(document, staging))
                 markdown = build_full_report(
                     sid, module("species"), module("compare"), module("enterotype"), pathways,
                     module("metabolites"), module("drugs"), module("diseases"), knowledge,
@@ -922,6 +925,10 @@ class ReportGeneratorTool(BaseTool):
                 )
                 evidence_manifest["module_bibliographies"] = document.get("module_bibliographies", [])
                 evidence_manifest["graph_label_translations"] = document.get("graph_label_translations", {})
+                evidence_manifest["presentation"] = document.get("presentation", {})
+                evidence_manifest["overview_findings"] = document.get("overview_findings", [])
+                evidence_manifest["word_figures"] = document.get("word_figures", {})
+                evidence_manifest["word_sections"] = document.get("word_sections", [])
                 (staging / filenames["markdown"]).write_text(markdown, encoding="utf-8")
                 (staging / filenames["structured"]).write_text(json.dumps(document, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
                 (staging / filenames["evidence"]).write_text(json.dumps(evidence_manifest, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")

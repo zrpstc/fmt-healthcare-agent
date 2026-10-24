@@ -1,4 +1,4 @@
-"""Deterministic observations and presentation for the eleven health-report sections.
+"""Deterministic evidence topics with a template-aligned reader-facing body.
 
 Keyword routing chooses which existing evidence to display. It does not calculate
 metabolite concentrations, host function scores, or disease probabilities.
@@ -30,6 +30,7 @@ TYPE_LABELS = {
     "prediction": "模型预测",
     "unverified": "来源类型待核实",
     "amr_detection": "耐药基因检测",
+    "sequence_detection": "专项序列检测",
 }
 
 
@@ -66,7 +67,7 @@ def table(headers: list[str], rows: list[list[Any]]) -> str:
 
 
 def _label(row: dict) -> str:
-    for key in ("chinese_name", "name", "species", "disease", "gene", "gene_family", "id"):
+    for key in ("chinese_name", "name", "species", "disease", "gene", "gene_family", "mutation", "marker", "id"):
         if row.get(key):
             return text(row[key])
     return "未命名条目"
@@ -196,6 +197,9 @@ def build_document(
             result = f"{number(item['value'])} {item['unit']}"
         else:
             result = text(item.get("result", item.get("answer", item.get("reported"))))
+            if result == "未提供" and (item.get("detected") is not None or item.get("detection_status") is not None):
+                state = item.get("detection_status", item.get("detected"))
+                result = "检出" if state is True else "本次未检出" if state is False else text(state)
             if (
                 isinstance(item.get("reported"), bool)
                 and not item.get("result")
@@ -248,7 +252,7 @@ def build_document(
         add("species", "S", row, "taxonomic_estimate", species)
     taxonomy = inputs.get("taxonomy") or species.get("taxonomy") or {}
     ranks = taxonomy.get("ranks", {})
-    for rank in ("phylum", "genus"):
+    for rank in ("phylum", "genus", "class", "order", "family"):
         for row in records(ranks.get(rank)):
             add(f"tax_{rank}", "T", row, "taxonomic_estimate", taxonomy)
     if not sp:
@@ -259,6 +263,7 @@ def build_document(
             "enterotype",
             "E",
             {
+                **enterotype,
                 "name": "优势菌群分型",
                 "result": enterotype.get("enterotype", enterotype.get("type")),
                 "method": enterotype.get("method", "输入算法，校准信息未提供"),
@@ -329,7 +334,7 @@ def build_document(
         ("diet", "diet", "H", "reported"),
         ("symptoms", "symptom", "Y", "reported"),
         ("gut_brain", "axis", "X", "functional_potential"),
-        ("pathogens", "pathogen", "J", "amr_detection"),
+        ("pathogens", "pathogen", "J", "sequence_detection"),
     ):
         parent = inputs.get(key) or {}
         for row in records(parent, "associations", "measurements"):
@@ -343,10 +348,21 @@ def build_document(
     resistance = inputs.get("resistance") or {}
     for row in records(resistance, "genes"):
         # A drug interaction score is not a resistance-gene detection.
-        if row.get("gene") or row.get("gene_family"):
+        if row.get("gene") or row.get("gene_family") or row.get("mutation"):
             add(
                 "amr", "A", row, "amr_detection", resistance if isinstance(resistance, dict) else {}
             )
+    for module, group, prefix, keys in (
+        ("virulence", "virulence", "Z", ("markers", "genes")),
+    ):
+        parent = inputs.get(module) or {}
+        for row in records(parent, *keys):
+            item = dict(row)
+            if not any(k in item for k in ("value", "abundance", "result")):
+                state = item.get("detection_status", item.get("detected"))
+                if state is not None:
+                    item["result"] = "检出" if state is True else "本次未检出" if state is False else str(state)
+            add(group, prefix, item, "sequence_detection", parent if isinstance(parent, dict) else {})
     skipped_predictions = 0
     for row in records(inputs.get("disease_models"), "predictions"):
         if (
@@ -519,6 +535,7 @@ def build_document(
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "metadata": metadata,
             "sections": sections,
+            "template_inputs": _template_inputs(inputs),
             "evidence": evidence,
             "audit": {
                 "analysis_sha256": context.get("analysis_sha256"),
@@ -541,6 +558,21 @@ def build_document(
 
     attach_subgraphs(document)
     return document
+
+
+def _template_inputs(inputs: dict) -> dict:
+    """Retain only declared report modules; never retain credentials in nested data."""
+    from .template_catalog import TEMPLATE_INPUT_KEYS
+
+    def clean(value):
+        if isinstance(value, dict):
+            return {k: clean(v) for k, v in value.items()
+                    if str(k).lower() not in {"api_key", "token", "password", "secret", "authorization"}}
+        if isinstance(value, list):
+            return [clean(v) for v in value]
+        return value
+
+    return _safe_json({key: clean(inputs[key]) for key in TEMPLATE_INPUT_KEYS if key in inputs})
 
 
 def _topic_note(section: str, topic: str, ids: list[str], evidence: dict, missing: str) -> str:
@@ -583,9 +615,12 @@ def _finding(ids: list[str], evidence: dict, missing: str) -> str:
 
 def render_markdown(document: dict) -> str:
     """Both PDF and online preview consume this exact, reader-facing content."""
-    from .knowledge_graph import attach_subgraphs, graph_markdown
+    from .knowledge_graph import attach_subgraphs
+    from .template_body import prepare_presentation, render_overview, render_toc
+    from .word_template import render_body
 
     attach_subgraphs(document)
+    prepare_presentation(document)
     output = [
         f"# {document['title']}",
         f"样本编号：{text(document['sample_id'])}  \n报告日期：{document['generated_at'][:10]}  \n报告版本：{document['schema_version']}",
@@ -613,18 +648,8 @@ def render_markdown(document: dict) -> str:
                 ],
             )
         )
-    output.extend(["## 检测结果总览", "先查看各板块的结果覆盖，再阅读与本次检测有关的具体发现。"])
-    overview = []
-    for index, section in enumerate(document["sections"], 1):
-        topics = [topic for topic in section["topics"] if topic["status"] != "missing"]
-        overview.append(
-            [
-                f"{index:02d} {section['title']}",
-                DATA_LABELS[section["status"]],
-                topics[0]["finding"] if topics else "本次暂未评估",
-            ]
-        )
-    output.append(table(["分析板块", "结果覆盖", "本次主要结果"], overview))
+    output.extend(render_toc())
+    output.extend(render_overview(document))
     reference = document["audit"].get("reference_comparison") or {}
     species_reference = reference.get("species") or {}
     if species_reference.get("status") == "available":
@@ -645,47 +670,7 @@ def render_markdown(document: dict) -> str:
     output.append(
         "> 阅读提示：本报告分别标识菌群估计、功能潜能、检测结果和模型推算。未评估项目不表示正常，报告用于健康管理与研究参考，不能替代临床诊断。"
     )
-    evidence = document["evidence"]
-    for index, section in enumerate(document["sections"], 1):
-        output.extend([f"## {index:02d} {section['title']}", section["introduction"]])
-        missing = []
-        for topic_index, topic in enumerate(section["topics"], 1):
-            if topic["status"] == "missing":
-                missing.append([f"{index}.{topic_index} {topic['title']}", topic["note"]])
-                continue
-            output.append(f"### {index}.{topic_index} {topic['title']}")
-            output.append("**检测结果**：" + topic["finding"])
-            values = []
-            for key in topic["evidence_ids"][:8]:
-                row = evidence[key]
-                values.append(
-                    [
-                        row["label"],
-                        row["result_text"],
-                        row["reference_text"],
-                        TYPE_LABELS[row["measurement_type"]],
-                    ]
-                )
-            output.append(table(["项目", "结果", "参考比较", "来源类型"], values))
-            if section["id"] == "diseases":
-                summaries = [
-                    [evidence[key]["label"], evidence[key]["feature_summary"]]
-                    for key in topic["evidence_ids"][:4]
-                    if evidence[key].get("feature_summary")
-                ]
-                if summaries:
-                    output.append(table(["关联主题", "涉及菌群与方向"], summaries))
-            if topic["interpretation"]:
-                output.append("**结果说明**：" + topic["interpretation"])
-            else:
-                output.append("**结果说明**：" + topic["note"])
-            if topic["advice"]:
-                output.append("**日常关注**：" + topic["advice"])
-            output.extend(graph_markdown(topic))
-            if len(topic["evidence_ids"]) > 8:
-                output.append("本表展示部分条目，完整明细见结构化报告。")
-        if missing:
-            output.extend(["**其余固定分析方向**", table(["分析方向", "本次状态"], missing)])
+    output.extend(render_body(document))
     output.extend(
         [
             "## 附录与参考资料",

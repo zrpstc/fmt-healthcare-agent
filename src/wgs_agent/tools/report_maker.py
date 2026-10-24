@@ -1,4 +1,4 @@
-"""完整 Markdown 报告生成器（参照 generate_pdf_report.py 的 8 章结构）"""
+"""按正文模板生成共享的 Markdown 与 PDF 健康报告。"""
 
 from __future__ import annotations
 
@@ -167,7 +167,7 @@ def build_full_report(
     metabolite_data, drug_data, disease_data, knowledge_data, llm_advice="",
     fmt_matching_data=None, protein_data=None, report_context=None,
 ):
-    """Render the versioned eleven-section health report for all report formats."""
+    """Render the template-aligned health report for all report formats."""
     from wgs_agent.reporting.document import build_document, render_markdown
     from wgs_agent.reporting.narrative import validate_payload
 
@@ -180,8 +180,10 @@ def build_full_report(
             protein_data, fmt_matching_data, context,
         )
         if llm_advice:
-            check = validate_payload(llm_advice, document, document["sections"])
-            for section in document["sections"]:
+            from wgs_agent.reporting.word_template import narrative_sections
+            document["word_sections"] = narrative_sections(document)
+            check = validate_payload(llm_advice, document, document["word_sections"])
+            for section in document["word_sections"]:
                 for topic in section["topics"]:
                     item = check["accepted"].get(topic["id"])
                     if item:
@@ -435,8 +437,8 @@ def build_full_report(
 def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> str:
     """Render a real Unicode PDF when a TeX distribution is unavailable.
 
-    The layout mirrors the report_template.tex visual language: WGS blue
-    headings, a cover page, restrained tables, running header and page number.
+    The supplied Word contract controls paper, colors, typography and tables.
+    Charts and diagrams are shared PNGs with the online preview.
     """
     import os
     import re
@@ -450,24 +452,13 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
 
     class WgsReportPDF(FPDF):
         def header(self):
-            if self.page_no() <= 1:
-                return
-            self.set_font("WgsCN", "", 8.5)
-            self.set_text_color(100, 100, 100)
-            self.cell(0, 6, "肠道菌群精准健康分析报告", align="L")
-            self.set_x(-98)
-            self.set_font("WgsCN", "", 7)
-            self.cell(80, 6, sample_id, align="R")
-            self.ln(8)
-            self.set_draw_color(0, 164, 166)
-            self.line(self.l_margin, self.y, self.w - self.r_margin, self.y)
-            self.ln(3)
+            pass
 
         def footer(self):
-            self.set_y(-13)
-            self.set_font("WgsCN", "", 8)
+            self.set_y(-12)
+            self.set_font("WgsCN", "", 7)
             self.set_text_color(120, 120, 120)
-            self.cell(0, 6, f"— {self.page_no()} —", align="C")
+            self.cell(0, 6, f"{getattr(self, 'chapter_title', '肠道菌群报告')}  |  {self.page_no()}", align="R")
 
     def clean(text: str) -> str:
         text = str(text).replace("\u2009", " ").replace("\u202f", " ")
@@ -479,9 +470,12 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
         text = text.replace("**", "").replace("`", "")
         return text.strip()
 
-    pdf = WgsReportPDF(format="A4", unit="mm")
-    pdf.set_margins(18, 18, 18)
-    pdf.set_auto_page_break(auto=True, margin=18)
+    from wgs_agent.reporting.word_template import contract
+    style = contract()["style"]
+    left, top, right, bottom = style["margins_mm"]
+    pdf = WgsReportPDF(format=tuple(style["page_mm"]), unit="mm")
+    pdf.set_margins(left, top, right)
+    pdf.set_auto_page_break(auto=True, margin=bottom)
     pdf.add_font("WgsCN", "", regular_font)
     pdf.add_font("WgsCN", "B", bold_font if os.path.isfile(bold_font) else regular_font)
     pdf.set_title(f"{TITLE} - {sample_id}")
@@ -492,11 +486,11 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
     pdf.add_page()
     pdf.set_y(44)
     pdf.set_font("WgsCN", "", 12)
-    pdf.set_text_color(0, 148, 151)
+    pdf.set_text_color(52, 101, 164)
     pdf.cell(0, 10, "WGS.FMT  /  微生态健康评估", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(17)
     pdf.set_font("WgsCN", "B", 29)
-    pdf.set_text_color(25, 60, 100)
+    pdf.set_text_color(52, 101, 164)
     pdf.multi_cell(0, 16, "肠道菌群\n精准健康分析报告", align="L", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(8)
     pdf.set_font("WgsCN", "", 12)
@@ -510,13 +504,13 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
         pdf.set_text_color(155, 102, 20)
         pdf.cell(0, 9, "合成数据演示 · 非真实检测报告", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(18)
-    pdf.set_fill_color(238, 248, 248)
-    pdf.set_draw_color(0, 164, 166)
+    pdf.set_fill_color(226, 237, 240)
+    pdf.set_draw_color(184, 205, 210)
     pdf.set_font("WgsCN", "", 10.5)
     pdf.multi_cell(
         0, 8,
-        "菌群结构与多样性 · 重点菌群 · 微生态功能\n营养与代谢 · 肠脑轴 · 症状关联 · 疾病特征 · 抗生素耐药性",
-        border="L", fill=True, align="L", new_x="LMARGIN", new_y="NEXT",
+        "菌群组成与生态结构 · 重点菌与菌株证据 · 耐药组\n底物与代谢功能 · 宿主互作 · 症状与模型 · 综合建议",
+        align="L", new_x="LMARGIN", new_y="NEXT",
     )
     pdf.set_y(242)
     pdf.set_font("WgsCN", "", 9)
@@ -527,13 +521,39 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
     in_table = False
     source_lines = report_md.splitlines()
     skip_until = -1
+
+    def render_toc(toc_pdf, outline):
+        toc_pdf.set_x(toc_pdf.l_margin)
+        toc_pdf.set_text_color(52, 101, 164)
+        toc_pdf.set_font("WgsCN", "B", 17)
+        toc_pdf.multi_cell(0, 10, "目录", new_x="LMARGIN", new_y="NEXT")
+        toc_pdf.ln(4)
+        for item in outline:
+            if item.level != 0:
+                continue
+            toc_pdf.set_font("WgsCN", "", 10.5)
+            toc_pdf.set_text_color(35, 45, 60)
+            link = toc_pdf.add_link(page=item.page_number)
+            toc_pdf.cell(toc_pdf.epw - 15, 8, item.name, link=link)
+            toc_pdf.cell(15, 8, str(item.page_number), align="R", link=link,
+                         new_x="LMARGIN", new_y="NEXT")
+
     for line_index, raw_line in enumerate(source_lines):
         if line_index <= skip_until:
             continue
         line = raw_line.strip()
+        if line == "## 目录":
+            # The PDF uses actual page destinations, not the Markdown link list.
+            cursor = line_index + 1
+            while cursor < len(source_lines) and not source_lines[cursor].startswith("## "):
+                cursor += 1
+            skip_until = cursor - 1
+            in_table = False
+            pdf.insert_toc_placeholder(render_toc, pages=1)
+            continue
         if not line:
             if not in_table:
-                pdf.ln(2)
+                pdf.ln(1.5)
             continue
         if re.fullmatch(r"[-|: ]{3,}", line):
             continue
@@ -550,9 +570,14 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
                 from PIL import Image
                 with Image.open(image_path) as im:
                     image_h = pdf.epw * im.height / im.width
+                image_w = pdf.epw
+                max_h = pdf.eph - 14
+                if image_h > max_h:
+                    image_w *= max_h / image_h
+                    image_h = max_h
                 if pdf.get_y() + image_h > pdf.h - pdf.b_margin:
                     pdf.add_page()
-                pdf.image(str(image_path), x=pdf.l_margin, w=pdf.epw)
+                pdf.image(str(image_path), x=pdf.l_margin + (pdf.epw-image_w)/2, w=image_w)
                 pdf.ln(3)
             else:
                 pdf.set_font("WgsCN", "", 9.5)
@@ -565,19 +590,38 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
             title = clean(heading.group(2))
             if level == 1:
                 continue  # The cover already carries the report title.
-            chapter = level == 2 and bool(re.match(r"^\d{2}\s", title))
+            chapter = level == 2 and bool(re.match(r"^\d+\s", title))
             if chapter or (level == 2 and title == "附录与参考资料"):
                 pdf.add_page()
-            elif pdf.will_page_break(48 if level == 3 else 35):
-                pdf.add_page()
+                pdf.chapter_title = title
+            else:
+                reserve = 48 if level == 3 else 35
+                if level == 3:
+                    # Word keeps a subsection heading with its first visual.
+                    leading = 0
+                    for candidate in source_lines[line_index+1:]:
+                        candidate = candidate.strip()
+                        if candidate.startswith(("##", "|")):
+                            break
+                        match = re.fullmatch(r"!\[[^\]]*\]\(([^)]+)\)", candidate)
+                        if match:
+                            from pathlib import Path
+                            from PIL import Image
+                            root=Path(output_path).resolve().parent
+                            path=(root/match[1]).resolve()
+                            if path.is_relative_to(root) and path.is_file():
+                                with Image.open(path) as im:
+                                    reserve=min(pdf.eph-2, 22+leading*6+pdf.epw*im.height/im.width)
+                            break
+                        if candidate:
+                            leading += 1
+                if pdf.will_page_break(reserve):
+                    pdf.add_page()
             pdf.start_section(title, level=0 if level == 2 else 1)
             pdf.ln(4 if level <= 2 else 2)
-            pdf.set_text_color(0, 136, 142) if level == 3 else pdf.set_text_color(25, 60, 100)
-            pdf.set_font("WgsCN", "B", {1: 18, 2: 14, 3: 12, 4: 10.5}[level])
-            pdf.multi_cell(0, 7, title, new_x="LMARGIN", new_y="NEXT")
-            if level <= 2:
-                pdf.set_draw_color(0, 164, 166)
-                pdf.line(pdf.l_margin, pdf.y, pdf.w - pdf.r_margin, pdf.y)
+            pdf.set_text_color(234, 117, 0) if level == 3 else pdf.set_text_color(52, 101, 164)
+            pdf.set_font("WgsCN", "B", {1: 23, 2: 23 if chapter else 17, 3: 16, 4: 10.5}[level])
+            pdf.multi_cell(0, 9 if level==2 else 7, title, new_x="LMARGIN", new_y="NEXT")
             continue
         if line.startswith("|") and line.endswith("|"):
             table_rows = []
@@ -594,15 +638,33 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
             in_table = False
             if table_rows:
                 from fpdf.fonts import FontFace
-                pdf.set_font("WgsCN", "", 9)
-                pdf.set_text_color(35, 45, 60)
+                pdf.set_font("WgsCN", "", 10)
+                pdf.set_text_color(0, 0, 0)
+                pdf.set_draw_color(217, 217, 217)
+                pdf.set_line_width(0.12)
                 ncols = len(table_rows[0])
-                widths = {2:(.34,.66), 3:(.29,.18,.53), 4:(.34,.20,.29,.17)}.get(ncols)
-                with pdf.table(col_widths=widths, line_height=5.6, padding=1.7,
-                               headings_style=FontFace(emphasis="BOLD", color=(255,255,255), fill_color=(0,158,161)),
-                               borders_layout="HORIZONTAL_LINES") as report_table:
-                    for cells in table_rows:
-                        row = report_table.row()
+                widths = {2:(.34,.66), 3:(.30,.35,.35), 4:(.25,.25,.25,.25),
+                          5:(.24,.23,.15,.22,.16), 6:(.15,.23,.20,.13,.15,.14)}.get(ncols)
+                widths = {
+                    ("关注顺序", "本次重点发现", "关注依据", "详见"): (.12,.30,.46,.12),
+                    ("优先级", "本次发现", "证据充分程度", "实际相关性"): (.12,.30,.16,.42),
+                    ("分类层级", "主要类群", "相对丰度"): (.12,.60,.28),
+                    ("微生物名称", "功能或关注背景", "检出状态", "相对丰度", "人群分位数"): (.27,.28,.16,.18,.11),
+                    ("重点物种", "本次丰度", "参考区间", "人群分位数", "比较结果"): (.28,.15,.34,.11,.12),
+                    ("功能或项目", "本次结果", "参考比较", "主要贡献菌与证据"): (.26,.16,.22,.36),
+                    ("产物或功能分支", "反应方向", "本次功能结果", "主要贡献菌与证据"): (.30,.17,.15,.38),
+                }.get(tuple(table_rows[0]), widths)
+                for chapter_spec in contract()["chapters"]:
+                    for block in chapter_spec["blocks"]:
+                        if block["type"]=="table" and block["rows"][0]==table_rows[0] and len(block["widths"])==ncols:
+                            widths=tuple(block["widths"])
+                with pdf.table(col_widths=widths, line_height=5.0, padding=1.4,
+                               headings_style=FontFace(emphasis="BOLD", color=(0,0,0), fill_color=(226,237,240)),
+                               cell_fill_color=(246,248,249), cell_fill_mode="ROWS",
+                               borders_layout="ALL") as report_table:
+                    for row_index, cells in enumerate(table_rows):
+                        score_style=FontFace(color=(52,101,164),size_pt=18) if row_index and table_rows[0]==["综合健康分","失衡分","模型肠龄"] else None
+                        row = report_table.row(style=score_style)
                         for cell in (cells + [""] * ncols)[:ncols]:
                             row.cell(cell)
             continue
@@ -620,11 +682,27 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
         text = clean(re.sub(r"^(?:>\s*|[-*+]\s+|\d+[.)]\s+)", "", line))
         if not text:
             continue
-        pdf.set_font("WgsCN", "", 10.5)
-        pdf.set_text_color(45, 55, 65)
+        pdf.set_font("WgsCN", "", 11)
+        pdf.set_text_color(0, 0, 0)
+        if re.match(r"^[图表]\s*\d+[- ]\d+", text) or text == "相关知识子图":
+            pdf.set_font("WgsCN", "B", 10)
+            # Keep the caption with its image when both fit on a fresh page.
+            next_image = next((v.strip() for v in source_lines[line_index+1:] if v.strip()), "")
+            match = re.fullmatch(r"!\[[^\]]*\]\(([^)]+)\)", next_image)
+            if match:
+                from pathlib import Path
+                from PIL import Image
+                root = Path(output_path).resolve().parent
+                path = (root / match[1]).resolve()
+                if path.is_relative_to(root) and path.is_file():
+                    with Image.open(path) as im:
+                        needed = 12 + pdf.epw * im.height / im.width
+                    if needed < pdf.eph and pdf.will_page_break(needed):
+                        pdf.add_page()
+            elif next_image.startswith("|") and pdf.will_page_break(30):
+                pdf.add_page()
         if quote:
-            pdf.set_fill_color(238, 248, 248)
-            pdf.multi_cell(0, 7, text, border="L", fill=True, new_x="LMARGIN", new_y="NEXT")
+            pdf.multi_cell(0, 6, text, new_x="LMARGIN", new_y="NEXT")
         elif bullet or numbered:
             marker = "• " if bullet else "– "
             pdf.multi_cell(0, 7, marker + text, align="L", wrapmode="CHAR", new_x="LMARGIN", new_y="NEXT")
@@ -633,7 +711,7 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
                 pdf.set_font("WgsCN", "", 9.5)
                 pdf.multi_cell(0, 6, text, align="L", wrapmode="WORD", new_x="LMARGIN", new_y="NEXT")
             else:
-                pdf.multi_cell(0, 7, text, align="L", wrapmode="CHAR", new_x="LMARGIN", new_y="NEXT")
+                pdf.multi_cell(0, 6, text, align="L", wrapmode="CHAR", new_x="LMARGIN", new_y="NEXT")
 
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     pdf.output(output_path)

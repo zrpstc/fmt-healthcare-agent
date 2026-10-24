@@ -52,7 +52,7 @@ def load_existing_report_inputs(sample_id: str, root: Path | None = None) -> dic
     root = Path(root).resolve()
     result: dict[str, Any] = {}
     profile = root / "profiles/metaphlan" / f"{sample_id}_profile.tsv"
-    ranks = {"p": "phylum", "g": "genus", "s": "species"}
+    ranks = {"p": "phylum", "c": "class", "o": "order", "f": "family", "g": "genus", "s": "species"}
     if profile.is_file() and profile.resolve().is_relative_to(root):
         taxonomy = {rank: [] for rank in ranks.values()}
         invalid = False

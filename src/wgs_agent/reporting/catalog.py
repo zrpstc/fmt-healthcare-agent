@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-VERSION = "health-report-v3"
+VERSION = "health-report-v4"
 TITLE = "肠道菌群精准健康分析报告"
 
 

@@ -137,14 +137,17 @@ def property_caption(edge: dict) -> str:
 
 
 def _wrap(draw, text: str, font, width: float, maximum=3) -> str:
-    lines, current = [], ""
-    for char in text:
-        if draw.textlength(current + char, font=font) > width:
-            lines.append(current)
-            current = char
-        else:
-            current += char
-    if current:
+    # Pillow textlength measures one line only. Respect explicit line breaks
+    # before measuring, including the relation/attribute break on self loops.
+    lines = []
+    for paragraph in text.splitlines() or [""]:
+        current = ""
+        for char in paragraph:
+            if current and draw.textlength(current + char, font=font) > width:
+                lines.append(current)
+                current = char
+            else:
+                current += char
         lines.append(current)
     if len(lines) > maximum:
         lines = lines[:maximum]
@@ -176,11 +179,23 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
             columns = 2 if len(components) > 1 and max(map(len, components)) <= 4 else 1
             cell_w = 880 if columns == 2 else 1680
 
-            def component_height(size):
-                return 300 if size <= 2 else 450 if size == 3 else 600 if size == 4 else 720
+            def caption_padding(component):
+                if any(
+                    e["source"] == e["target"]
+                    and e["source"] in component
+                    and e.get("display_attributes")
+                    for e in edges
+                ):
+                    return 160
+                return 0
+
+            def component_height(component):
+                size = len(component)
+                base = 300 if size <= 2 else 450 if size == 3 else 600 if size == 4 else 720
+                return base + caption_padding(component)
 
             row_heights = [
-                max(component_height(len(c)) for c in components[i : i + columns])
+                max(component_height(c) for c in components[i : i + columns])
                 for i in range(0, len(components), columns)
             ]
             width, height = cell_w * columns + 80, sum(row_heights) + 250
@@ -194,8 +209,9 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
             for index, component in enumerate(components):
                 left = 40 + (index % columns) * cell_w
                 row_index = index // columns
-                top = 110 + sum(row_heights[:row_index])
-                cell_h = row_heights[row_index]
+                padding = caption_padding(component)
+                top = 110 + sum(row_heights[:row_index]) + padding
+                cell_h = row_heights[row_index] - padding
                 ordered = sorted(component, key=lambda key: (-degree[key], key))
                 if len(ordered) == 1:
                     local = [(cell_w / 2, cell_h / 2)]
@@ -225,10 +241,11 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                     importance = min(4, degree[key] - 1)
                     label = node["display_label"]
                     label_font = font(30 + importance * 2, True)
-                    box_w = (
-                        min(344, max(190, draw.textlength(label[:9], font=label_font) + 42))
-                        + importance * 5
+                    label_width = max(
+                        (draw.textlength(line[:9], font=label_font) for line in label.splitlines()),
+                        default=0,
                     )
+                    box_w = min(344, max(190, label_width + 42)) + importance * 5
                     wrapped = _wrap(draw, label, label_font, box_w - 24, 3)
                     bounds = draw.multiline_textbbox((0, 0), wrapped, font=label_font, spacing=4)
                     box_h = max(108, bounds[3] - bounds[1] + 68) + importance * 4
@@ -260,8 +277,9 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                         label += "\n" + edge["display_attributes"]
                     label = _wrap(draw, label, font(23), 360, 3)
                     box = draw.multiline_textbbox((0, 0), label, font=font(23), spacing=4)
+                    label_y = min(by - h - 45, by - h - 12 - box[3])
                     draw.multiline_text(
-                        (bx - (box[2] - box[0]) / 2, by - h - 45),
+                        (bx - (box[2] - box[0]) / 2, label_y),
                         label,
                         font=font(23),
                         spacing=4,

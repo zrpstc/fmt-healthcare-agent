@@ -3,15 +3,30 @@
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useEffect, useMemo, useState } from "react";
+import { Children, isValidElement, useEffect, useMemo, useState, type ReactNode } from "react";
+import tableWidths from "./word-report-tables.json";
+import "./word-report.css";
 import { Archive, CheckCircle2, Download, FileJson, FileText, MessageSquare, RefreshCw, Search, ShieldAlert } from "lucide-react";
 import { api, backendUrl, ReportRow } from "@/lib/api";
 
 const bytes=(value=0)=>value>1024*1024?`${(value/1024/1024).toFixed(1)} MB`:value>1024?`${(value/1024).toFixed(1)} KB`:`${value} B`;
 const date=(value?:string|null)=>value?new Date(value).toLocaleString("zh-CN"):"暂无更新时间";
+const headingId=(children:ReactNode)=>Children.toArray(children).map(child=>typeof child==="string"||typeof child==="number"?String(child):"").join("").toLowerCase().replace(/\s+/g,"-");
+const nodeText=(node:ReactNode):string=>Children.toArray(node).map(child=>typeof child==="string"||typeof child==="number"?String(child):isValidElement<{children?:ReactNode}>(child)?nodeText(child.props.children):"").join("");
+function WordTable({children}:{children?:ReactNode}){
+  const head=Children.toArray(children).find(child=>isValidElement(child)&&child.type==="thead");
+  const key=nodeText(head).replace(/\s+/g,"");
+  const widths=(tableWidths as Record<string,number[]>)[key];
+  const total=widths?.reduce((a,b)=>a+b,0)||1;
+  return <table className={key==="综合健康分失衡分模型肠龄"?"word-score-table":undefined}>{widths&&<colgroup>{widths.map((width,index)=><col style={{width:`${100*width/total}%`}} key={index}/>)}</colgroup>}{children}</table>;
+}
 
 function MarkdownPreview({source,sampleId,revision}:{source:string;sampleId:string;revision:string}){
-  return <div className="markdown-preview markdown-body"><ReactMarkdown remarkPlugins={[remarkGfm]} components={{img:({src,alt})=>{
+  return <div className="markdown-preview markdown-body word-template-report"><ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+    table:({children})=><WordTable>{children}</WordTable>,
+    h2:({children})=><h2 id={headingId(children)} style={{scrollMarginTop:"1rem"}}>{children}</h2>,
+    h3:({children})=><h3 id={headingId(children)} style={{scrollMarginTop:"1rem"}}>{children}</h3>,
+    img:({src,alt})=>{
     const name=typeof src==="string"?src.split("/").pop()||"":"";
     if(!name.startsWith(sampleId+"_")||!name.endsWith(".png"))return <span>图表来源不可用</span>;
     return <img src={backendUrl(`/reports/${encodeURIComponent(sampleId)}/figures/${encodeURIComponent(name)}?v=${encodeURIComponent(revision)}`)} alt={alt||"分析图表"} style={{maxWidth:"100%",height:"auto"}}/>;

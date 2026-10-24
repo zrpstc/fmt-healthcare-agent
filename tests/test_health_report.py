@@ -72,7 +72,9 @@ def test_fixed_outline_is_complete_even_without_inputs():
     assert [s["title"] for s in doc["sections"]] == [s.title for s in SECTIONS]
     assert all(s["status"] == "missing" for s in doc["sections"])
     markdown = render_markdown(doc)
-    assert all(t.title in markdown for s in SECTIONS for t in s.topics)
+    from wgs_agent.reporting.template_catalog import CHAPTERS
+    assert all(f"## {n} {title}" in markdown for n, title, _, _ in CHAPTERS)
+    assert "结果覆盖" not in markdown
     assert "综合健康评分" not in markdown
     assert "模型解释状态" not in markdown
     assert "analysis_sha256" not in markdown
@@ -175,7 +177,7 @@ def test_observations_keep_zero_and_separate_potential_from_concentrations():
         pathways={"pathways": [{"name": "butyrate biosynthesis", "abundance": 1}]}
     )
     assert topic(potential_only, "metabolites.scfa")["status"] == "partial"
-    assert "尚不能判断代谢物浓度" in render_markdown(potential_only)
+    assert "仅呈现测序支持的功能潜力" in render_markdown(potential_only)
 
 
 def test_only_validated_applicable_models_appear_as_predictions():
@@ -361,13 +363,14 @@ def test_standard_chat_api_generates_topic_text_and_keeps_outline(monkeypatch):
     assert all(url == "http://127.0.0.1:30000/v1/chat/completions" for url, _ in calls)
     assert calls[0][1]["json"]["response_format"] == {"type": "json_object"}
     assert "thinking" not in calls[0][1]["json"]
-    assert topic(result, "composition.species")["narrative_source"] == "llm"
+    assert result["word_sections"][0]["topics"][0]["narrative_source"] == "llm"
     assert topic(doc, "composition.species")["narrative_source"] == "rule"
-    assert "**结果说明**：本项已记录" in render_markdown(result)
+    assert "结果解读  本项已记录" in render_markdown(result)
     assert "reasoning_content" not in render_markdown(result)
 
 
-def test_compatible_backend_format_fallback_and_bounded_repair():
+def test_compatible_backend_format_fallback_and_bounded_repair(monkeypatch):
+    monkeypatch.setenv("WGS_REPORT_LLM_CONCURRENCY", "1")
     calls = []
 
     def post(url, **kwargs):
@@ -384,7 +387,8 @@ def test_compatible_backend_format_fallback_and_bounded_repair():
         with_species(), {"base_url": "http://local/v1", "model": "test"}, post=post
     )
     assert result["audit"]["llm_status"] == "generated"
-    assert len(calls) == 3
+    # The Word contract adds a synthesis batch; each batch is bounded.
+    assert 3 <= len(calls) <= 6
     assert "response_format" not in calls[1]
     assert len(calls[2]["messages"]) == 3
 
@@ -457,7 +461,7 @@ async def test_generator_publishes_pdf_markdown_and_structured_artifacts(tmp_pat
         content = extracted.read_text()
         assert "TEST__001" in content
         assert "*检测结果" not in content
-        assert all(section["title"] in content for section in doc["sections"])
+        assert all(chapter["title"] in content for chapter in doc["presentation"]["chapters"])
 
 
 @pytest.mark.asyncio
