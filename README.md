@@ -238,6 +238,138 @@ bash deploy/check-bioinformatics-runtime.sh
 
 核对运行目录属主和 Docker 访问权限，由管理员修正后再运行。应用统一使用同一个普通用户管理。状态脚本无法读取 PID 时，不能据其输出判断服务是否已经停止。
 
+## 8. 准备健康人群对照数据（ENA）
+
+以下命令全部在 **gpu02 的项目根目录**执行：
+
+```bash
+cd /home/zhanghaiyang/fmt-healthcare-agent
+```
+
+数据准备顺序是：**样本信息 → ENA 下载清单 → R1/R2 FASTQ → 下载校验 → 生信处理 → 健康参考库**。
+下载完成还不能直接用于报告；需要按本项目分析版本生成完整物种谱，再构建参考库。
+
+### 第一步：准备样本信息（本机已完成）
+
+```bash
+Rscript scripts/export_cmd_metadata.R
+```
+
+该命令仅读取官方源码包中的元数据，不需要安装整套 R 分析包。
+结果为 `var/reference-sources/cmd/sample_metadata.tsv`，当前快照包含22,588条样本记录、141个字段。
+其中既有健康样本，也有疾病样本，不能直接把全部记录作为健康对照。
+
+### 第二步：生成明确的下载清单（不下载 FASTQ）
+
+下面以 `AsnicarF_2021 / PRJEB39223` 为演示批次，选择50名符合标签筛选的候选者：
+
+```bash
+.venv/bin/python scripts/healthy_ena.py prepare \
+  --study AsnicarF_2021 \
+  --ena-project PRJEB39223 \
+  --limit 50
+```
+
+脚本要求粪便、成年、明确标注 `control + healthy`、当前未使用抗生素，排除标注妊娠/哺乳者，
+同一研究的同一个体只选一份。未提供的妊娠/哺乳信息会列入 `review_flags`，不会被当成已确认的否定记录。
+这仍是**待审核候选批次**，需要核对原研究纳入条件和目标人群适用性。
+
+该 ENA 项目同时包含 WGS 和 AMPLICON 数据，不能直接下载整个项目。
+脚本只选与元数据 run 编号对应的 **Illumina 双端宏基因组 WGS**，不纳入16S扩增子。
+
+下载计划保存在 `var/reference-sources/healthy-ena-demo/`：
+
+| 文件 | 用途 | 是否测序数据 |
+|---|---|---|
+| `selected_samples.tsv` | 候选者、样本编号、个体编号、年龄、性别、地区；保留待审核状态 | 否 |
+| `ena_runs.tsv` | 所选 ENA run 的文件地址、MD5、字节数和测序类型 | 否 |
+| `download_manifest.tsv` | 每个要下载的文件对应的地址、大小、MD5和本地路径 | 否 |
+| `checksums.md5` | 预期 MD5 校验清单 | 否 |
+| `selection.json` | 候选人数、文件总数、预计下载量和来源哈希 | 否 |
+| `groups/*.json`、`processing_manifest.tsv` | 将本地 R1/R2 与生信处理样本对应起来 | 否 |
+| `raw/<run>/<run>_1.fastq.gz` | 真正需要下载的 R1 reads | **是** |
+| `raw/<run>/<run>_2.fastq.gz` | 真正需要下载的 R2 reads | **是** |
+
+示例计划已在 gpu02 生成：**50名候选者、50个run、100个FASTQ文件，压缩文件合计约217 GB（202.08 GiB）**。
+生信处理还需另留临时和结果空间。先查看计划和剩余空间：
+
+```bash
+cat var/reference-sources/healthy-ena-demo/selection.json
+df -h var/reference-sources
+```
+
+### 第三步：先下载一份样本的两个 FASTQ
+
+```bash
+.venv/bin/python -u scripts/healthy_ena.py download --runs 1
+.venv/bin/python scripts/healthy_ena.py verify --runs 1
+```
+
+本示例第一份样本是 `SAMEA7041133`，对应 run `ERR4330026`。会下载这**两个文件**，合计约4.07 GB：
+
+```text
+var/reference-sources/healthy-ena-demo/raw/ERR4330026/ERR4330026_1.fastq.gz
+var/reference-sources/healthy-ena-demo/raw/ERR4330026/ERR4330026_2.fastq.gz
+```
+
+`_1` 是R1、`_2` 是R2，两者必须成对。保留 `.gz` 压缩格式及原文件名，下载器会自动放到对应目录。
+下载中使用 `.part` 后缀；大小和 MD5 都通过后才改为正式文件名。中断后重新运行同一下载命令可续传。
+最终看到两条 `VERIFIED` 及 `Verified 2 FASTQ files` 才表示这一次下载完整。
+
+### 第四步：确认空间与试跑结果后，下载剩余批次
+
+```bash
+.venv/bin/python -u scripts/healthy_ena.py download --runs 50
+.venv/bin/python scripts/healthy_ena.py verify --runs 50
+```
+
+已经通过校验的文件会复用。`--runs 50` 表示下载计划中的前50个run，不是新增50个。
+本示例一人一份样本、一份样本一个run；其他研究可能一份生物样本对应多个run，需要全部保留并归并处理。
+本批次全部完成后应看到 `Verified 100 FASTQ files`，结果写入 `download_status.tsv`。
+
+### 第五步：生信处理后，才能构建健康参考库
+
+先对已经下载并校验的第一份样本试跑。此步骤会启动实际生信计算：
+
+```bash
+set -a
+source .env
+set +a
+
+bash runtime/scripts/postfmt_pipeline/process_postfmt_sample.sh \
+  --group-json var/reference-sources/healthy-ena-demo/groups/SAMEA7041133.json \
+  --output-root "$PWD/var/reference-sources/healthy-processed" \
+  --threads 4
+```
+
+该流程依次运行质控、去宿主、MetaPhlAn及HUMAnN。第一份完整物种谱将生成在：
+
+```text
+var/reference-sources/healthy-processed/profiles/metaphlan/SAMEA7041133_profile.tsv
+```
+
+下载的 MD5 通过只表示传输完整，不表示测序质控通过。`selected_samples.tsv` 中的
+`health_status=candidate`、空的 `qc_pass` 是待审核状态。完成健康条件核对和测序质控后，
+将符合条件者整理成建库用的 `metadata.tsv`（`health_status=healthy`、`qc_pass=true`），
+保留原来的 `sample_id/subject_id/study_id`，再按[健康对照建库说明](docs/HEALTHY_POPULATION_CONTROL.md#构建并接入)
+运行 `scripts/build_healthy_reference.py`。
+
+最终报告读取的是以下三个文件，而不是原始 FASTQ：
+
+```text
+var/reference/healthy/manifest.json
+var/reference/healthy/metadata.tsv
+var/reference/healthy/species_abundance.tsv
+```
+
+**目录区分：**原始健康样本放 `var/reference-sources/healthy-ena-demo/raw/`；处理结果放
+`var/reference-sources/healthy-processed/`；最终健康参考库放 `var/reference/healthy/`。
+`fmt-databases/` 存放物种/功能注释索引，不放这些样本的 FASTQ。
+
+字段和校验依据见 [ENA 文件报告](https://ena-docs.readthedocs.io/en/latest/retrieval/programmatic-access/file-reports.html)
+及 [ENA 下载说明](https://ena-docs.readthedocs.io/en/latest/retrieval/file-download.html)。
+
+
 ## 更多说明
 
 重启 Elasticsearch 时，HTTP 端口可能先于认证状态就绪。启动脚本会在

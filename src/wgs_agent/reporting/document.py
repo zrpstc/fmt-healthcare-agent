@@ -173,7 +173,7 @@ def build_document(
             return  # NaN, infinity and malformed measurements never become results.
         if "risk_score" in item:
             item["unit"] = "关联分（非患病概率）"
-        reference = {
+        reference = item.get("comparison_reason_cn") or {
             "species_not_in_reference": "参考库未覆盖该物种",
             "zero_width_reference_interval": "参考分布为零宽区间，暂不判定高低",
             "incompatible_unit": "当前单位与参考库不兼容，暂不比较",
@@ -224,7 +224,8 @@ def build_document(
                 reference += f"；参考样本 n={int(n_reference)}"
             percentile = finite(item.get("percentile"))
             if percentile is not None:
-                reference += f"；供体子集经验百分位 {number(percentile)}"
+                population = "健康人群" if item.get("generated_by") == "healthy-reference-v1" else "供体子集"
+                reference += f"；{population}经验百分位 {number(percentile)}"
             if item.get("generated_by") == "reference-comparison-v1":
                 reference += "（探索性）"
             item["reference_text"] = reference
@@ -651,17 +652,34 @@ def render_markdown(document: dict) -> str:
     output.extend(render_toc())
     output.extend(render_overview(document))
     reference = document["audit"].get("reference_comparison") or {}
+    healthy = reference.get("healthy_population") or {}
+    if healthy.get("status") == "available":
+        output.append(
+            f"健康人群对照：{text(healthy.get('cohort_id'))}，参考独立个体 n={healthy['n_subjects']}；"
+            f"队列版本：{text(healthy.get('cohort_version'))}。"
+            + " ".join(healthy.get("limitations", []))
+        )
+    elif healthy:
+        output.append("健康人群对照：未建立。" + text(healthy.get("reason_cn")) + "。")
     species_reference = reference.get("species") or {}
     if species_reference.get("status") == "available":
         output.append(
             f"参考比较：本次 {species_reference.get('compared_count', 0)} 个物种条目有可用参考区间，"
             f"{species_reference.get('uncovered_count', 0)} 个条目因覆盖、单位或参考分布限制暂不比较。"
-            "物种 P5–P95 描述参考人群中央 90% 的分布；参考人群的健康筛选和分析数据库版本尚待核验。"
+            + (
+                "物种 P5–P95 描述所选健康队列中央 90% 的分布。"
+                if healthy.get("status") == "available" else
+                "物种 P5–P95 描述参考人群中央 90% 的分布；参考人群的健康筛选和分析数据库版本尚待核验。"
+            )
         )
     elif species_reference:
-        output.append("参考比较：当前物种参考表不可用，未自动建立新的物种比较；输入中已有比较予以保留。")
+        output.append(
+            "参考比较：健康参考条件不满足，本次不发布物种高低判断。"
+            if healthy.get("configured") else
+            "参考比较：当前物种参考表不可用，未自动建立新的物种比较；输入中已有比较予以保留。"
+        )
     diversity_reference = reference.get("diversity") or {}
-    if diversity_reference.get("status") == "available":
+    if diversity_reference.get("status") == "available" and healthy.get("status") != "available":
         output.append(
             f"多样性参照：使用 {diversity_reference['n_reference']} 份标注健康供体的研究样本，"
             "与本样本采用相同公式计算。该子集未按年龄、性别和地区匹配，数据库与完整特征口径尚待核验，"

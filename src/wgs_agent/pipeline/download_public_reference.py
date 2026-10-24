@@ -7,7 +7,7 @@
 
 策略:
   1. 下载样本元数据 → 筛选健康成年人粪便样本
-  2. 下载 MetaPhlAn4 物种丰度 TSV
+  2. 下载物种丰度 TSV（必须另行核验实际分析版本）
   3. 下载 HUMAnN 通路丰度 → 通过 AGORA 模型推算代谢物参考范围
   4. 计算 P5/P50/P95 并保存
 
@@ -46,7 +46,7 @@ METADATA_URL = (
     "curatedMetagenomicData_sample_metadata_3.8.0.tsv.gz"
 )
 
-# MetaPhlAn4 物种丰度矩阵 (species × sample)
+# 历史物种矩阵 URL；不能据文件名推断为 MetaPhlAn4，使用前核验来源和版本。
 SPECIES_MATRIX_URL = (
     "https://zenodo.org/records/7919439/files/"
     "curatedMetagenomicData_metaphlan_bugs_species_3.8.0.tsv.gz"
@@ -119,20 +119,29 @@ def filter_healthy_adult_stool(metadata_path: Path) -> pd.DataFrame:
     # 过滤健康状态
     condition_col = "study_condition" if "study_condition" in stool.columns else "disease"
     if condition_col in stool.columns:
-        healthy_terms = ["control", "healthy", "health", "normal", "non-ibd", "non-crc"]
-        mask = stool[condition_col].str.lower().str.contains(
-            "|".join(healthy_terms), na=False
+        mask = stool[condition_col].astype("string").str.strip().str.casefold().isin(
+            {"control", "healthy"}
         )
         healthy = stool[mask]
+        if condition_col != "disease" and "disease" in healthy:
+            disease = healthy["disease"].astype("string").str.strip().str.casefold()
+            healthy = healthy[disease.isna() | disease.isin({"control", "healthy", "none"})]
         print(f"  健康样本: {len(healthy)}")
     else:
-        healthy = stool
-        print(f"  健康样本 (无状态列，全部保留): {len(healthy)}")
+        raise ValueError("缺少健康状态列，不能将全部样本作为健康对照")
 
     # 过滤成人 (age >= 18)
     if "age" in healthy.columns:
-        healthy = healthy[pd.to_numeric(healthy["age"], errors="coerce").ge(18) | healthy["age"].isna()]
+        healthy = healthy[pd.to_numeric(healthy["age"], errors="coerce").ge(18)]
         print(f"  成年健康样本: {len(healthy)}")
+    else:
+        raise ValueError("缺少年龄信息，不能建立健康成年人参考")
+    if not {"study_name", "subject_id"}.issubset(healthy.columns):
+        raise ValueError("缺少研究及个体标识，不能核验独立健康人数")
+    healthy = healthy.dropna(subset=["study_name", "subject_id"]).copy()
+    for column in ("study_name", "subject_id"):
+        healthy = healthy[healthy[column].astype(str).str.strip().ne("")]
+    healthy = healthy.sort_values("sample_id").drop_duplicates(["study_name", "subject_id"])
 
     # 去重按 study_name 均衡采样 (每研究最多取 500 样本)
     if "study_name" in healthy.columns:
@@ -140,7 +149,7 @@ def filter_healthy_adult_stool(metadata_path: Path) -> pd.DataFrame:
         for study, grp in healthy.groupby("study_name"):
             take = min(len(grp), 500)
             sampled.append(grp.sample(n=take, random_state=42) if take < len(grp) else grp)
-        healthy = pd.concat(sampled, ignore_index=True)
+        healthy = pd.concat(sampled, ignore_index=True) if sampled else healthy
 
     print(f"  最终健康样本: {len(healthy)} (来自 {healthy.get('study_name', pd.Series()).nunique()} 个研究)")
     return healthy
@@ -169,10 +178,7 @@ def build_species_reference_from_matrix(
     print(f"  匹配到 {len(avaliable)} 个目标样本")
 
     if len(avaliable) < 30:
-        print("  [警告] 健康样本不足 30 个，参考范围可能不可靠")
-        # 回退：使用矩阵中所有样本
-        avaliable = list(matrix.columns)
-        print(f"  回退到使用全部 {len(avaliable)} 个样本")
+        raise ValueError("匹配健康参考样本不足 30，禁止回退到包含疾病样本的全量矩阵")
 
     sub = matrix[avaliable]
     sub = sub.loc[sub.sum(axis=1) > 0]  # 移除全零行
@@ -235,8 +241,7 @@ def build_pathway_reference_from_matrix(
     print(f"  匹配到 {len(avaliable)} 个目标样本")
 
     if len(avaliable) < 30:
-        avaliable = list(matrix.columns)
-        print(f"  回退到使用全部 {len(avaliable)} 个样本")
+        raise ValueError("匹配健康参考样本不足 30，禁止回退到包含疾病样本的全量矩阵")
 
     sub = matrix[avaliable]
     sub = sub.loc[sub.sum(axis=1) > 0]
@@ -305,9 +310,7 @@ def main():
         download_file(METADATA_URL, meta_path, "样本元数据")
 
     if not meta_path.exists():
-        print("\n[跳过] 元数据未下载，尝试使用现有数据...")
-        # 回退：直接下载物种矩阵并使用全部样本
-        sample_ids = None
+        raise ValueError("缺少健康队列元数据，不能构建健康参考库")
     else:
         # ── Step 2: 筛选健康样本 ──
         healthy = filter_healthy_adult_stool(meta_path)
@@ -319,7 +322,7 @@ def main():
         print(f"  样本ID列表已保存: {out_dir / 'public_healthy_samples.tsv'}")
 
         if len(sample_ids) > args.max_samples:
-            sample_ids = set(list(sample_ids)[: args.max_samples])
+            sample_ids = set(sorted(sample_ids)[: args.max_samples])
             print(f"  限制样本数至: {len(sample_ids)}")
 
     # ── Step 3: 下载物种丰度矩阵 ──

@@ -55,9 +55,15 @@ def load_existing_report_inputs(sample_id: str, root: Path | None = None) -> dic
     ranks = {"p": "phylum", "c": "class", "o": "order", "f": "family", "g": "genus", "s": "species"}
     if profile.is_file() and profile.resolve().is_relative_to(root):
         taxonomy = {rank: [] for rank in ranks.values()}
+        pipeline = {"profiler": "MetaPhlAn"}
         invalid = False
         with profile.open(encoding="utf-8") as handle:
             for line in handle:
+                if line.startswith("#mpa_"):
+                    pipeline["database_version"] = line[1:].strip()
+                version = re.match(r"#\s*MetaPhlAn(?: version)?\s+([0-9]+\.[0-9]+(?:\.[0-9]+)?)", line, re.I)
+                if version:
+                    pipeline["profiler_version"] = version.group(1)
                 if not line.strip() or line.startswith("#"):
                     continue
                 fields = line.rstrip("\n").split("\t")
@@ -85,6 +91,7 @@ def load_existing_report_inputs(sample_id: str, root: Path | None = None) -> dic
             "unit": "%",
             "source_file": str(profile),
             "method": "MetaPhlAn taxonomic profile",
+            "pipeline": pipeline,
         }
         result["diversity"] = diversity_metrics(taxonomy["species"], complete=complete)
     pathway_file = root / "profiles/humann" / f"{sample_id}_pathabundance_relab.tsv"

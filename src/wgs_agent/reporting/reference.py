@@ -110,6 +110,11 @@ def _compare(row: dict, ref: dict | None, parent: dict, version: str) -> dict:
         "reference_median",
         "detection_rate",
         "reference_population",
+        "percentile",
+        "generated_by",
+        "n_subjects",
+        "reference_taxon",
+        "comparison_reason_cn",
     ):
         result.pop(field, None)
     result.update(status="unknown", status_cn=STATUS_LABELS["unknown"], reference_version=version)
@@ -132,7 +137,11 @@ def _compare(row: dict, ref: dict | None, parent: dict, version: str) -> dict:
     if ref is None:
         result["comparison_reason"] = "species_not_in_reference"
         return result
-    result.update(ref)
+    result.update({key: value for key, value in ref.items() if key != "_distribution"})
+    if ref.get("_distribution"):
+        from .healthy import percentile
+
+        result["percentile"] = percentile(ref["_distribution"], value / scale)
     result["p5"], result["p95"] = ref["p5"] * scale, ref["p95"] * scale
     if ref.get("reference_median") is not None:
         result["reference_median"] = ref["reference_median"] * scale
@@ -308,21 +317,44 @@ def refresh_reference_comparisons(data: dict, inputs: dict) -> dict:
             for r in full
             if isinstance(r, dict) and r.get("name")
         ]
-    if not rows:
-        return result
-    entries, audit = load_species_reference()
-    workflow = {"version": VERSION, "species": audit}
-    if entries:
+    if not full and species.get("is_complete_profile") is True and taxonomy.get("complete") is not False:
+        full = rows
+    from .healthy import VERSION as HEALTHY_VERSION, load_healthy_reference
+
+    healthy_entries, healthy_diversity, healthy_audit = load_healthy_reference(
+        str(data.get("sample_id", "")), full, {"unit": species.get("unit", "%"), **taxonomy},
+        data.get("metadata") if isinstance(data.get("metadata"), dict) else {},
+        complete=bool(full),
+    )
+    strict = healthy_audit["configured"]
+    if strict:
+        entries, audit = healthy_entries, dict(healthy_audit)
+        if entries and full:
+            # Absence is a measured zero only for a complete, compatible profile.
+            # Include cohort taxa absent from the sample so depletion is visible.
+            present = {species_key(r.get("species", r.get("name"))) for r in rows}
+            rows = [*rows, *(
+                {"species": entries[key]["reference_taxon"], "abundance": 0,
+                 "unit": taxonomy.get("unit", species.get("unit", "%"))}
+                for key in sorted(entries.keys() - present)
+            )]
+    else:
+        entries, audit = load_species_reference()
+    workflow = {"version": VERSION, "species": audit, "healthy_population": healthy_audit}
+    if entries or strict:
         compared = [
             _compare(
                 r,
                 entries.get(species_key(r.get("species", r.get("name")))),
                 species,
-                audit["version"],
+                audit.get("version", HEALTHY_VERSION),
             )
             for r in rows
             if isinstance(r, dict)
         ]
+        if strict and not entries:
+            for row in compared:
+                row.update(comparison_reason=audit["reason"], comparison_reason_cn=audit["reason_cn"])
         counts = {
             f"n_{status}": sum(r["status"] == status for r in compared) for status in STATUS_LABELS
         }
@@ -344,20 +376,21 @@ def refresh_reference_comparisons(data: dict, inputs: dict) -> dict:
         )
     # Compute both sample and reference metrics with this implementation. Never
     # compare an arbitrary upstream index with an unspecified logarithm/definition.
-    if not full and species.get("is_complete_profile") is True:
-        full = rows
     observed = diversity_metrics(full, complete=bool(full))
-    if observed:
-        comparisons, diversity_audit = _diversity_reference(
-            str(data.get("sample_id", "")), observed
-        )
+    if observed or strict:
+        if strict:
+            comparisons, diversity_audit = healthy_diversity, dict(healthy_audit)
+        else:
+            comparisons, diversity_audit = _diversity_reference(
+                str(data.get("sample_id", "")), observed
+            )
         workflow["diversity"] = diversity_audit
         diversity = copy.deepcopy(inputs.get("diversity") or {})
         diversity.update(observed)
         retained = [
             r
             for r in diversity.get("reference_comparisons", [])
-            if r.get("generated_by") != VERSION
+            if r.get("generated_by") not in {VERSION, HEALTHY_VERSION}
         ]
         diversity["reference_comparisons"] = retained + comparisons
         result["diversity"] = diversity

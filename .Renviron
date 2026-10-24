@@ -1,0 +1,2 @@
+# Project-local R package library; %v expands to the R major.minor version.
+R_LIBS_USER=./var/R/library/%v

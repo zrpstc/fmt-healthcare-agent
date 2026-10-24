@@ -821,10 +821,13 @@ def paragraph(document, block, chapter):
                 beta, "reference_population", default=_pick(ref, "reference_population", "source")
             ),
             "样本量": _pick(ref, "n_reference"),
-            "匹配条件": _pick(ref, "matching_criteria"),
+            "匹配条件": _pick(
+                ref, "matching_criteria",
+                default="、".join(ref.get("stratify_by", [])) or "总体（未匹配人口学）",
+            ) if ref.get("status") == "available" else _pick(ref, "reason_cn"),
             "群落差异指标": _pick(beta, "metric"),
             "本次结果": _pick(beta, "result"),
-            "分析流程与参考版本": _pick(ref, "reference_version", "reference_file"),
+            "分析流程与参考版本": _pick(ref, "reference_version", "version", "reference_file", "file"),
         }
     if chapter == 4 and sub == 3:
         rows = data.raw("virulence", "markers", "genes")

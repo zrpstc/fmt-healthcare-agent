@@ -293,10 +293,20 @@ class Body:
                             "reference_version",
                             "source",
                             "reference_file",
+                            "version",
+                            "file",
                             default="沿用分析记录；人群与版本详见证据文件",
                         )
                     )
                 )
+            healthy = reference.get("healthy_population", {})
+            if healthy.get("status") == "available":
+                self.out.append(
+                    f"健康参考独立人数：{healthy['n_subjects']}；"
+                    f"匹配字段：{'、'.join(healthy.get('stratify_by', [])) or '总体（未匹配人口学）'}。"
+                )
+            elif healthy:
+                self.out.append("健康人群对照未建立：" + str(healthy.get("reason_cn", "参考数据不足")) + "。")
             # Optional absolute quantities require an actual validated quantitative basis.
             absolute = [
                 r
