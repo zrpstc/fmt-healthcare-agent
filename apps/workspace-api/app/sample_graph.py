@@ -43,7 +43,11 @@ def sample_features(analysis: dict, report: dict) -> list[dict]:
                     return
             except (TypeError, ValueError):
                 pass
-            abnormal = value.get("status") in {"high", "low"} or value.get("comparison") in {"above", "below"}
+            # Container nodes can hold nested comparison rows instead of scalar flags.
+            abnormal = (
+                value.get("status") in ("high", "low")
+                or value.get("comparison") in ("above", "below")
+            )
             for field in names:
                 label = value.get(field)
                 if not isinstance(label, str):

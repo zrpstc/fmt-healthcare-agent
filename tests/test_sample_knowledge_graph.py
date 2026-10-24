@@ -72,6 +72,30 @@ def test_abnormal_entity_precedes_healthy_entity_and_cited_bound_comes_first():
     assert [e["claim_id"] for e in result["edges"]] == ["litkg:claim:1", "litkg:claim:2"]
 
 
+@pytest.mark.parametrize("field", ["status", "comparison"])
+@pytest.mark.parametrize("container_type", [list, dict], ids=["list", "dict"])
+def test_nested_comparison_containers_preserve_abnormal_features(field, container_type):
+    row = {"species": "Bifidobacterium longum", "abundance": 2, "comparison": "below"}
+    container = [row] if container_type is list else {"rows": [row]}
+    analysis = {
+        "compare": {field: container},
+        "species": {"species_list": [
+            {"species": "Other organism", "abundance": 2, "status": "normal"},
+        ]},
+    }
+    result = graph(
+        [claim(2, subject_text="Other organism", confidence=1), claim(confidence=.1)],
+        analysis=analysis,
+    )
+    assert [edge["claim_id"] for edge in result["edges"]] == [
+        "litkg:claim:1", "litkg:claim:2",
+    ]
+    assert result["edges"][0]["match_reasons"] == [
+        "异常检测实体：Bifidobacterium longum",
+    ]
+    assert result["edges"][1]["match_reasons"] == ["检测实体：Other organism"]
+
+
 def test_detected_entity_precedes_generic_saved_evidence_and_parenthetical_prose():
     saved = {"claim_id": "litkg:claim:9", "subject": "unrelated organism", "object": "unrelated pathway",
              "predicate": "ASSOCIATED_WITH", "evidence_text": "Saved background."}
@@ -108,6 +132,27 @@ def test_api_paginates_past_first_page_and_reports_scan_status(runtime, monkeypa
         assert calls[1]["offset"] == 500
         assert client.get("/api/knowledge/samples/S1/graph?limit=151").status_code == 422
         assert client.get("/api/knowledge/samples/MISSING/graph").status_code == 404
+
+
+def test_api_extracts_graph_from_nested_comparison_rows(runtime, monkeypatch):
+    analysis = {"compare": {"comparison": [
+        {"species": "Bifidobacterium longum", "abundance": 1, "comparison": "above"},
+    ]}}
+    (runtime / "S1_analysis.json").write_text(json.dumps(analysis))
+
+    async def upstream(path, params):
+        return {"claims": [claim()], "total": 1}
+
+    monkeypatch.setattr(main, "_litkg_get", upstream)
+    with TestClient(main.app) as client:
+        response = client.get("/api/knowledge/samples/S1/graph?limit=20")
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result["summary"]["relation_count"] == 1
+    assert result["edges"][0]["match_reasons"] == [
+        "异常检测实体：Bifidobacterium longum",
+    ]
+    assert result["retrieval"]["status"] == "complete"
 
 
 def test_api_outage_uses_saved_claims_and_deleted_sample_rejected(runtime, monkeypatch):
