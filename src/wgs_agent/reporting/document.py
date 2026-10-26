@@ -675,7 +675,12 @@ def render_markdown(document: dict) -> str:
     output.extend(render_overview(document))
     reference = document["audit"].get("reference_comparison") or {}
     healthy = reference.get("healthy_population") or {}
-    if healthy.get("status") == "available":
+    if healthy.get("status") == "available" and healthy.get("provider") == "mho":
+        output.append(
+            "对照组信息：MHOmicrobiome 对照，对照人群为原研究定义的代谢健康非肥胖人群，不是通用临床正常值。 "
+            "P5–P95 和经验百分位描述该参考队列，不代表疾病概率。对照组使用人群总体，未按年龄、性别或地区匹配。"
+        )
+    elif healthy.get("status") == "available":
         output.append(
             f"{'MHOmicrobiome 对照' if healthy.get('provider') == 'mho' else '健康人群对照'}：{text(healthy.get('cohort_id'))}，参考独立个体 n={healthy['n_subjects']}；"
             f"队列版本：{text(healthy.get('cohort_version'))}。"

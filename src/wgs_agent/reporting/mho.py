@@ -258,12 +258,20 @@ def compare(sample_id: str, metadata: dict) -> dict:
         return {**summary, **common, "percentile": percentile(ordered, value), "status": status,
                 "comparison_reason": "zero_width_reference_interval" if p5 == p95 else "compared"}
 
+    target_lineages = {}
+    for line in profile_raw.decode("utf-8-sig").splitlines():
+        lineage = line.split("	", 1)[0]
+        if lineage.rsplit("|", 1)[-1].startswith("s__"):
+            target_lineages[species_key(lineage)] = lineage
     for key in sorted(set(features) | set(target)):
         values = [matrix[sid].get(key, 0) for sid in selected]
+        positive = [value for value in values if value > 0]
         result["species"].append({**comparison(target.get(key, 0), values),
             "species": key, "abundance": target.get(key, 0), "unit": "%",
-            "n_detected": sum(value > 0 for value in values),
-            "detection_rate": sum(value > 0 for value in values) / len(selected)})
+            "n_detected": len(positive), "n_zero": len(selected) - len(positive),
+            "detection_rate": len(positive) / len(selected),
+            "reference_detected_median": distribution(positive)["reference_median"] if positive else None,
+            "taxonomy_lineage": target_lineages.get(key, "")})
     result["species"].sort(key=lambda row: (-row["abundance"], row["species"]))
     observed = diversity_metrics([{"abundance": value} for value in target.values()], complete=True)
     population_metrics = [diversity_metrics([{"abundance": value} for value in matrix[sid].values()], complete=True) for sid in selected]

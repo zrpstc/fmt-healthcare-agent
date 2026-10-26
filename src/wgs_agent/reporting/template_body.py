@@ -1185,8 +1185,7 @@ def render_toc():
 
 
 def render_overview(document):
-    from .document import table
-    from .document import TYPE_LABELS
+    from .overview_chart import render_overview_content
 
     rows = document["overview_findings"]
     output = [
@@ -1194,20 +1193,7 @@ def render_overview(document):
         "仅列出本次有结果支撑、值得优先关注或复核的发现，最多五项；按专项检出和参考偏离排序，不作为健康风险评分。",
     ]
     if rows:
-        output.append(
-            table(
-                ["关注顺序", "本次重点发现", "关注依据", "详见"],
-                [
-                    [
-                        r["priority"],
-                        r["finding"],
-                        f"{TYPE_LABELS.get(r['evidence_type'], r['evidence_type'])}；{r['reason']}",
-                        f"第{r['source']}节",
-                    ]
-                    for r in rows
-                ],
-            )
-        )
+        output.extend(render_overview_content(document))
     else:
         output.append(
             "现有结果尚不足以筛选具有明确健康关注依据的重点发现；这不表示全部结果正常。具体结果及适用范围见正文。"

@@ -81,7 +81,7 @@ def select_findings(document: dict, limit: int = MAX_FINDINGS) -> list[dict]:
                 continue
             focused = any(t.startswith("key_taxa.") for t in topics)
             rank = 2 if row.get("measurement_type") == "measured" else 3 if focused else 4
-            source = "1.4" if kind == "species" else source or "2.1"
+            source = "1.4" if kind in {"species", "healthy_species"} else source or "2.1"
             deviation = (value - p95 if value > p95 else p5 - value) / (p95 - p5)
             reason = "偏离所用参考人群区间；健康含义需结合具体项目、参考人群适用性及背景解释。"
         if rank is None:

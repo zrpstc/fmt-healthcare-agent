@@ -819,6 +819,7 @@ class ReportGeneratorTool(BaseTool):
         from wgs_agent.reporting.reference import refresh_reference_comparisons
         from wgs_agent.reporting.narrative import generate_narrative
         from wgs_agent.reporting.graph_labels import resolve_graph_model, translate_graph_labels
+        from wgs_agent.reporting.overview_chart import translate_overview_taxa, render_overview_figure
         from wgs_agent.reporting.knowledge_graph import enrich_document, attach_subgraphs, render_graph_figures
         from wgs_agent.tools.detailed_report import load_gene_family_evidence, resolve_report_model
         from wgs_agent.tools.report_maker import _generate_fpdf_report, build_full_report
@@ -907,6 +908,7 @@ class ReportGeneratorTool(BaseTool):
             document = generate_narrative(document, resolve_report_model())
             attach_subgraphs(document)
             translate_graph_labels(document, resolve_graph_model())
+            translate_overview_taxa(document, resolve_report_model() or resolve_graph_model())
             document["audit"]["generation_id"] = uuid.uuid4().hex
             context["report_document"] = document
             evidence_manifest = {
@@ -922,6 +924,7 @@ class ReportGeneratorTool(BaseTool):
                 figure_names = render_graph_figures(document, staging)
                 from wgs_agent.reporting.word_figures import render_word_figures
                 figure_names.update(render_word_figures(document, staging))
+                figure_names.update(render_overview_figure(document, staging))
                 markdown = build_full_report(
                     sid, module("species"), module("compare"), module("enterotype"), pathways,
                     module("metabolites"), module("drugs"), module("diseases"), knowledge,
@@ -932,6 +935,8 @@ class ReportGeneratorTool(BaseTool):
                 evidence_manifest["presentation"] = document.get("presentation", {})
                 evidence_manifest["overview_findings"] = document.get("overview_findings", [])
                 evidence_manifest["word_figures"] = document.get("word_figures", {})
+                evidence_manifest["overview_chart"] = document.get("overview_chart", {})
+                evidence_manifest["overview_taxon_labels"] = document.get("overview_taxon_labels", {})
                 evidence_manifest["word_sections"] = document.get("word_sections", [])
                 (staging / filenames["markdown"]).write_text(markdown, encoding="utf-8")
                 (staging / filenames["structured"]).write_text(json.dumps(document, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")

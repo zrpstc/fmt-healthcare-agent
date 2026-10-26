@@ -162,7 +162,7 @@ def test_document_separates_primary_abundance_and_mho_evidence(cohort):
     assert "MHNO 参考队列经验百分位" in doc["evidence"]["HS1"]["reference_text"]
     assert len([r for r in doc["evidence"].values() if r["kind"] == "healthy_diversity"]) == 4
     text = render_markdown(doc)
-    assert "MHOmicrobiome 对照：SYNTHETIC_MHNO" in text
+    assert "对照组信息：MHOmicrobiome 对照" in text
     assert "已分类物种总和归一化至 100%" in text
     assert "供体子集经验百分位" not in text
     assert doc["template_inputs"]["healthy_comparison"] == data["healthy_comparison"]
@@ -328,7 +328,7 @@ async def test_mho_comparison_reaches_analysis_json_markdown_pdf_and_evidence(co
     assert report["template_inputs"]["healthy_comparison"] == saved["healthy_comparison"]
     assert evidence["context"]["reference_comparison"]["healthy_population"]["provider"] == "mho"
     assert report["evidence"]["HS1"]["value"] == 50
-    assert "MHOmicrobiome 对照：SYNTHETIC_MHNO" in (tmp_path / "TARGET_health_report.md").read_text()
+    assert "对照组信息：MHOmicrobiome 对照" in (tmp_path / "TARGET_health_report.md").read_text()
     assert (tmp_path / "TARGET_health_report.pdf").read_bytes().startswith(b"%PDF-")
 
 

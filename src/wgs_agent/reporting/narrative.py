@@ -384,7 +384,7 @@ def _request(config: dict, messages: list[dict], schema: dict, post: Callable | 
         "max_tokens": _integer_setting("WGS_REPORT_MAX_TOKENS", 8192, 1024, 16384),
         "stream": False,
     }
-    response_format = os.environ.get("WGS_REPORT_RESPONSE_FORMAT", "json_object")
+    response_format = config.get("response_format", os.environ.get("WGS_REPORT_RESPONSE_FORMAT", "json_object"))
     if response_format == "json_schema":
         payload["response_format"] = {
             "type": "json_schema",
