@@ -27,9 +27,9 @@ def test_complete_word_contract_without_example_measurements():
     c = contract()
     assert [ch["number"] for ch in c["chapters"]] == list(range(1, 15))
     assert len(blocks("heading")) == 58
-    assert len(blocks("table")) == 52
+    assert len(blocks("table")) == 51
     widgets = [v for b in blocks("visuals") for v in b["items"]]
-    assert sum(v["type"] == "chart" for v in widgets) == 21
+    assert sum(v["type"] == "chart" for v in widgets) == 20
     assert sum(v["type"] == "flow" for v in widgets) == 12
     assert all(re.fullmatch(r"[a-f0-9]{64}", s["sha256"]) for s in c["sources"])
     assert '"values"' not in json.dumps(c)  # DOCX placeholder numbers never ship as results.
@@ -51,7 +51,7 @@ def test_complete_word_contract_without_example_measurements():
 def test_every_word_field_and_visual_has_a_missing_data_state(tmp_path):
     doc = build()
     names = render_word_figures(doc, tmp_path)
-    assert len(names) == 30  # 33 widgets, three pairs share one figure panel.
+    assert len(names) == 29  # 33 widgets, three pairs share one figure panel.
     for b in blocks("table"):
         rows = bind_table(doc, b)
         assert rows and all(len(r) == len(b["rows"][0]) for r in rows)
@@ -61,7 +61,7 @@ def test_every_word_field_and_visual_has_a_missing_data_state(tmp_path):
             if v["type"] == "chart":
                 assert chart_data(doc, v)["status"] == "missing"
     md = render_markdown(doc)
-    assert len(re.findall(r"!\[.*模板图示\]", md)) == 30
+    assert len(re.findall(r"!\[.*模板图示\]", md)) == 29
     assert "图形仅作占位" not in md and "【" not in md
     assert not re.search(r"第(?:0\d|15|16)章|^### (?:15|16)\.", md, re.M)
     assert all((tmp_path / name).is_file() for name in names.values())
@@ -89,7 +89,7 @@ def test_measured_abundance_reference_and_reads_are_not_substituted():
     assert ref["series"][1]["values"] == [None]  # No midpoint inferred from P5/P95.
     reads = chart_data(doc, visual("3.3.1"))
     assert 317 in reads["series"][0]["values"]
-    assert chart_data(doc, visual("1.3.1"))["status"] == "missing"  # No fake reference clouds.
+    assert chart_data(doc, visual('2.2.1'))["status"] == "missing"  # No fake reference clouds.
 
 
 def test_directions_and_contribution_denominators_remain_separate():

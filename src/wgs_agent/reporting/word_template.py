@@ -782,6 +782,16 @@ def _narrative(document, chapter, sub):
 
 
 def paragraph(document, block, chapter):
+    if (chapter, block["sub"]) == (1, 3):
+        from .ordination import composition_summary
+        return composition_summary(document)
+    if (chapter, block["sub"]) == (2, 2):
+        from .ordination import community_paragraph
+        text = block["text"]
+        if text.startswith("参考人群"):
+            return community_paragraph(document)
+        if text.startswith("结果解读"):
+            return community_paragraph(document, interpretation=True)
     s = block["text"].replace("图中位置仅用于版式展示。", "")
     sub = block["sub"]
     mho = document.get("template_inputs", {}).get("healthy_comparison") or {}

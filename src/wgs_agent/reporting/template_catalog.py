@@ -4,7 +4,7 @@ The evidence/narrative topic IDs remain stable so knowledge graphs and module
 bibliographies retain their existing contracts. Only their body placement changes.
 """
 
-TEMPLATE_VERSION = "word-native-1-14-v2"
+TEMPLATE_VERSION = 'word-native-1-14-v2-community-v1'
 
 # number, title, introduction, [(subheading, legacy evidence/narrative topic IDs)]
 CHAPTERS = (
@@ -36,7 +36,7 @@ CHAPTERS = (
                     "diversity.evenness",
                 ),
             ),
-            ("与匹配参考人群的群落差异", ("diversity.reference",)),
+            ("与参考人群的群落差异", ("diversity.reference",)),
             ("功能冗余与贡献集中度", ()),
             ("潜在代谢协作", ()),
         ),

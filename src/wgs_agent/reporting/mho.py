@@ -273,6 +273,10 @@ def compare(sample_id: str, metadata: dict) -> dict:
             result["diversity"].append({**comparison(observed[key], values), "metric": key,
                 "name": title, "value": observed[key], "unit": "种" if key == "richness" else "无量纲",
                 "definition": observed["definition"]})
+    from .ordination import community_ordination
+    result["ordination"] = community_ordination(
+        target, matrix, selected, reference_version=version, stratify_by=matching,
+    )
     limitations = ["MHNO 是原研究定义的代谢健康非肥胖人群，不是通用临床正常值。",
         "丰度为已分类物种内归一化比例；未分类部分不参与分母，不能与主分析原始百分数混用。",
         "原研究的抽样深度及研究间差异未统一校正；尤其检出丰富度仅作探索性比较。",

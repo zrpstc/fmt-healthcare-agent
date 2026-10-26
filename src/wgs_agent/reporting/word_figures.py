@@ -166,28 +166,21 @@ def chart_data(document, spec):
         module = data.inputs.get("diversity") or {}
         key = "enterotype_ordination" if chapter == 1 else "ordination"
         payload = module.get(key) or {}
+        if chapter == 2 and data.inputs.get("healthy_comparison"):
+            payload = data.inputs["healthy_comparison"].get("ordination") or {}
         points = []
         for row in payload.get("points", []):
+            if not isinstance(row, dict):
+                continue
             x, y = finite(row.get("x")), finite(row.get("y"))
             if x is not None and y is not None:
-                points.append(
-                    {
-                        "x": x,
-                        "y": y,
-                        "group": str(row.get("group", "参考人群")),
-                        "sample": row.get("is_sample") is True,
-                    }
-                )
-        ready = (
-            bool(points)
-            and any(p["sample"] for p in points)
-            and any(not p["sample"] for p in points)
-            and payload.get("method")
-        )
+                points.append({"x": x, "y": y, "group": str(row.get("group", "参考人群")), "sample": row.get("is_sample") is True})
+        ready = bool(points) and any(p["sample"] for p in points) and any(not p["sample"] for p in points) and bool(payload.get("method"))
         return _dataset(
-            points=points if ready else [],
-            status="available" if ready else "missing",
+            points=points if ready else [], status="available" if ready else "missing",
             reason="未提供可核对的样本与参考人群降维坐标",
+            axis_x=payload.get("axis_x", "PCoA 1"), axis_y=payload.get("axis_y", "PCoA 2"),
+            method=payload.get("method"), n_reference=payload.get("n_reference"),
         )
     if ident == "1.4.1":
         mho = bool(data.inputs.get("healthy_comparison"))
@@ -483,8 +476,8 @@ def draw_chart(spec, payload, width):
                 anchor="ma",
             )
             legend = "参考圆点与本次样本菱形仅在提供实际坐标后绘制"
-        _text(draw, ((left + right) / 2, height * 0.79), "群落组成维度一", small, anchor="ma")
-        axis_label = "群落组成维度二"
+        _text(draw, ((left + right) / 2, height * 0.79), payload.get("axis_x", '群落组成维度一'), small, anchor="ma")
+        axis_label = payload.get("axis_y", '群落组成维度二')
         axis = Image.new(
             "RGB", (int(draw.textlength(axis_label, font=small) + 8), small.size * 2), "white"
         )

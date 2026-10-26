@@ -330,3 +330,22 @@ async def test_mho_comparison_reaches_analysis_json_markdown_pdf_and_evidence(co
     assert report["evidence"]["HS1"]["value"] == 50
     assert "MHOmicrobiome 对照：SYNTHETIC_MHNO" in (tmp_path / "TARGET_health_report.md").read_text()
     assert (tmp_path / "TARGET_health_report.pdf").read_bytes().startswith(b"%PDF-")
+
+
+def test_mho_ordination_reaches_report_scatter(cohort):
+    from wgs_agent.reporting.word_figures import chart_data
+    _, _, data = cohort
+    result = refresh(data)
+    payload = result["healthy_comparison"]["ordination"]
+    assert payload["status"] == "available"
+    assert payload["n_reference"] == result["healthy_comparison"]["audit"]["n_reference"]
+    assert "ordination" not in result["diversity"]
+    document = {"metadata": {}, "template_inputs": result, "evidence": {}, "sections": []}
+    chart = chart_data(document, {"id": "2.2.1", "kind": "scatterChart"})
+    assert chart["status"] == "available"
+    assert len(chart["points"]) == payload["n_reference"] + 1
+    assert sum(p["sample"] for p in chart["points"]) == 1
+    result["metadata"]["qc_status"] = "failed"
+    refreshed = refresh(result)
+    assert "ordination" not in refreshed["healthy_comparison"]
+    assert chart_data({"metadata": {}, "template_inputs": refreshed, "evidence": {}, "sections": []}, {"id": "2.2.1", "kind": "scatterChart"})["status"] == "missing"
