@@ -325,4 +325,9 @@ def get_workflow_status(
             log_tail = "\n".join(pipeline_log.read_text(encoding="utf-8", errors="replace").splitlines()[-30:])
         except OSError:
             pass
-    return {**job, "state": state, "progress": progress, "artifacts": artifacts, "log_tail": log_tail}
+    from .mho_workflow import get_mho_status
+
+    healthy_reference = get_mho_status(sample_id)
+    artifacts["healthy_reference"] = healthy_reference["ready"]
+    return {**job, "state": state, "progress": progress, "artifacts": artifacts,
+            "healthy_reference": healthy_reference, "log_tail": log_tail}

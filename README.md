@@ -1,3 +1,5 @@
+> MHOmicrobiome automatic profiling is now supported: see [automatic setup](docs/MHO_AUTOMATIC.md).
+
 # WGS-FMT-Agent v2
 
 肠道菌群与 FMT 科研分析平台，支持 FASTQ 上传、物种和功能分析、供受体配型、知识检索及报告生成。前端使用 Next.js，后端使用 FastAPI。

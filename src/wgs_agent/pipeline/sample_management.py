@@ -55,6 +55,14 @@ def _targets(sample_id: str, settings: UploadWorkflowSettings, results_dir: Path
                 candidates.append((results_dir, path.name))
     # Retain the job until the last file is removed, so a partial failure can be
     # retried using the original job record and running-process checks.
+    from wgs_agent.reporting.mho import profiles_dir
+
+    mho_root = profiles_dir()
+    candidates.extend([
+        (mho_root, sample_id),
+        (mho_root, f".workflow/{sample_id}.json"),
+        (mho_root, f".history/{sample_id}"),
+    ])
     candidates.append((settings.job_root, f"jobs/{sample_id}.json"))
     seen = set()
     targets = []

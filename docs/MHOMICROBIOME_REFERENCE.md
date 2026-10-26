@@ -1,3 +1,5 @@
+> 2026-10-26: automatic target preparation is available. See [automatic workflow](MHO_AUTOMATIC.md); the manual commands below remain useful for migration and troubleshooting.
+
 # MHOmicrobiome 接入与准备数据指南
 
 适用：gpu02 `/home/zhanghaiyang/fmt-healthcare-agent`。实现基于当前代码；健康对照入口与提交 `ae89557a0055aa20b865fce5e9dd8730c53f515d` 一致。更新日期：2026-10-25。

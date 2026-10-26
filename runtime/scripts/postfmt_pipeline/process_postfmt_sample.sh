@@ -71,6 +71,22 @@ HUMANN_METAPHLAN_INDEX="${HUMANN_METAPHLAN_INDEX:-mpa_vJun23_CHOCOPhlAnSGB_20230
 HUMANN_NUC_DB="$DB_ROOT/humann3/chocophlan"
 HUMANN_PROT_DB="$DB_ROOT/humann3/uniref"
 
+prepare_healthy_comparison() {
+    [[ "${WGS_HEALTHY_REFERENCE_PROVIDER:-}" == "mho" ]] || return 0
+    local app_python="${WGS_MHO_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    if [[ ! -x "$app_python" ]]; then
+        printf 'HEALTHY_REFERENCE unavailable: application Python missing\n' >&2
+        return 0
+    fi
+    if ! ENV_ROOT="$ENV_ROOT" DB_ROOT="$DB_ROOT" \
+        PYTHONPATH="$APP_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" \
+        "$app_python" -m wgs_agent.pipeline.mho_workflow ensure \
+        --sample-id "$SAMPLE_ID" --output-root "$OUTPUT_ROOT" \
+        --group-json "$GROUP_JSON" --threads "${WGS_MHO_THREADS:-$METAPHLAN_THREADS}"; then
+        printf 'HEALTHY_REFERENCE failed; see independent workflow state\n' >&2
+    fi
+}
+
 mkdir -p "$FASTP_DIR" "$KNEAD_DIR" "$HUMANN_SAMPLE_DIR" "$QC_DIR" \
     "$CLEAN_DIR" "$LOG_DIR" "$DONE_DIR" "$FAILED_DIR" "$(dirname "$LOCK_DIR")" \
     "$(dirname "$METAPHLAN_OUT")" "$HUMANN_DIR"
@@ -80,6 +96,7 @@ if [[ -s "$DONE_DIR/${SAMPLE_ID}.done" ]]; then
         && -s "$HUMANN_DIR/${SAMPLE_ID}_pathabundance_relab.tsv" \
         && -s "$HUMANN_DIR/${SAMPLE_ID}_genefamilies_relab.tsv" \
         && -s "$CLEAN_DIR/${SAMPLE_ID}.dehosted.fastq.gz" ]]; then
+        prepare_healthy_comparison
         printf 'SKIP complete: %s\n' "$SAMPLE_ID"
         exit 0
     fi
@@ -292,6 +309,10 @@ if [[ ! -s "$clean_output" ]]; then
     mv "$clean_output.tmp" "$clean_output"
 fi
 require_file "$clean_output"
+
+# Reuse the completed dehosted input; preserve the main analysis if this
+# independent reference branch fails. Reports already consume its profile.
+prepare_healthy_comparison
 
 printf '%s\t%s\t%s\n' "$(date -Is)" "$SAMPLE_ID" "$GROUP_JSON" \
     > "$DONE_DIR/${SAMPLE_ID}.done"

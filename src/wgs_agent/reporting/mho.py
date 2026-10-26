@@ -192,6 +192,14 @@ def compare(sample_id: str, metadata: dict) -> dict:
                 or any(PIPELINE.get(key) != value for key, value in header_pipeline.items())
                 or "database_version" not in header_pipeline):
             return fail("incompatible_pipeline")
+        prepared_metadata = provenance.get("comparison_metadata", {})
+        if not isinstance(prepared_metadata, dict):
+            return fail("invalid_target")
+        metadata = {**{key: prepared_metadata[key] for key in (
+            "subject_id", "study_id", "source_runs", "run_ids", "NCBI_accession",
+            "age", "sex", "country", "qc_status") if key in prepared_metadata}, **metadata}
+        if str(metadata.get("qc_status", "")).lower() in {"failed", "fail", "不通过", "未通过"}:
+            return fail("target_qc_failed")
         target, raw_total = normalize(target)
         audit.update(target_profile=str(folder / "profile.tsv"),
                      target_profile_sha256=digest(profile_raw),
