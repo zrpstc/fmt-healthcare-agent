@@ -208,6 +208,12 @@ def bind_table(document, block, data=None):
     chapter, sub = map(int, block["id"].split(".")[:2])
     data = data or Data(document).load(chapter, sub)
     headers = block["rows"][0]
+    mho = data.inputs.get("healthy_comparison") or {}
+    if mho and block["id"] == "1.4.t1":
+        rows = data.group("healthy_species")[:8]
+        return [[r["label"], r["result_text"], r["reference_text"], _pick(r, "percentile"),
+                 {"above": "高于 MHNO 参考", "below": "低于 MHNO 参考", "within": "MHNO 区间内"}.get(r["comparison"], "暂不判定高低")]
+                for r in rows] or [["MHNO 独立对照", "未比较", (mho.get("audit") or {}).get("reason_cn", "对照不可用"), "未提供", "暂不判定"]]
     direct = _rows(data, headers)
     if direct and ident_not_special(block["id"]):
         return [[clean(v) for v in row] for row in direct]
@@ -303,7 +309,7 @@ def bind_table(document, block, data=None):
         even = data.group("div_evenness")
         shannon = data.group("div_shannon")
         parent = data.inputs.get("diversity") or {}
-        refs = data.group("div_reference")
+        refs = [] if mho else data.group("div_reference")
         result = []
         for label, key, items in (
             ("观测物种数", "richness", observed),
@@ -323,6 +329,10 @@ def bind_table(document, block, data=None):
             result.append(
                 [label, value, ref.get("reference_text", "未提供"), _pick(ref, "percentile")]
             )
+        if mho:
+            for row in data.group("healthy_diversity"):
+                result.append(["MHNO 独立谱 · " + row["label"], row["result_text"],
+                               row["reference_text"], _pick(row, "percentile")])
         return result
     if ident == "2.3.t1":
         rows = []
@@ -774,6 +784,18 @@ def _narrative(document, chapter, sub):
 def paragraph(document, block, chapter):
     s = block["text"].replace("图中位置仅用于版式展示。", "")
     sub = block["sub"]
+    mho = document.get("template_inputs", {}).get("healthy_comparison") or {}
+    if mho and (chapter, sub) in {(1, 4), (2, 1)}:
+        audit = mho.get("audit") or {}
+        if s.startswith("分析流程与参考版本") or s.startswith("指标介绍与解读"):
+            return ("MHOmicrobiome MHNO 独立对照：MetaPhlAn 4.2.2 / mpa_vJan25_CHOCOPhlAnSGB_202503；"
+                    "参考与待测谱均按已分类物种总和归一化至 100%。主分析数值与独立谱分别展示。"
+                    + " ".join(audit.get("limitations", [])))
+        if s.startswith("参考人群"):
+            return (f"参考人群：MHOmicrobiome MHNO；独立人数：{audit.get('n_subjects', '未建立')}；"
+                    f"匹配条件：{'、'.join(audit.get('stratify_by', [])) or '总体（未匹配人口学）'}；"
+                    "本表按待测谱丰度展示前 8 项，完整物种清单见结构化报告。"
+                    + ("" if audit.get("status") == "available" else str(audit.get("reason_cn", "对照不可用"))))
     if "【" not in s and not s.startswith(("意义解读：", "指标介绍与解读")):
         return s
     if any(s.startswith(p) for p in ("结果解读", "综合解读", "综合指标解读", "所选模块的主要线索")):

@@ -4,6 +4,8 @@
 
 请按照下面说明部署。
 
+健康人群参考采用 MHOmicrobiome 时，请按 [MHOmicrobiome 准备与接入指南](docs/MHOMICROBIOME_REFERENCE.md) 下载约 9.1 MB 预计算数据、构建 MHNO 参考，并为待测样本准备独立 MetaPhlAn 4.2.2 对照谱。
+
 ## 1. 准备服务器
 
 需要安装：

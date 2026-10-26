@@ -264,4 +264,5 @@ TEMPLATE_INPUT_KEYS = (
     "composite_models",
     "symptoms",
     "resistance",
+    "healthy_comparison",
 )

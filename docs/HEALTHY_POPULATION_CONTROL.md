@@ -1,5 +1,7 @@
 # 健康人群对照：实现、数据缺口与下载
 
+> 2026-10-25 更新：已增加 MHOmicrobiome 预计算参考接入。小体积参考优先按 [MHOmicrobiome 指南](MHOMICROBIOME_REFERENCE.md) 操作；设置 `WGS_HEALTHY_REFERENCE_PROVIDER=mho` 启用独立 4.2.2 支线。下文保留原有通用健康队列/ENA 重跑路径，供自行统一原始测序流程时使用。
+
 检查日期：2026-10-24。项目位置：gpu02 `/home/zhanghaiyang/fmt-healthcare-agent`。
 
 ## 当前结论

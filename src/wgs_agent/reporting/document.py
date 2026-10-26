@@ -224,7 +224,10 @@ def build_document(
                 reference += f"；参考样本 n={int(n_reference)}"
             percentile = finite(item.get("percentile"))
             if percentile is not None:
-                population = "健康人群" if item.get("generated_by") == "healthy-reference-v1" else "供体子集"
+                population = (
+                    "MHNO 参考队列" if item.get("generated_by") == "mhomic-reference-v1" else
+                    "健康人群" if item.get("generated_by") == "healthy-reference-v1" else "供体子集"
+                )
                 reference += f"；{population}经验百分位 {number(percentile)}"
             if item.get("generated_by") == "reference-comparison-v1":
                 reference += "（探索性）"
@@ -244,15 +247,32 @@ def build_document(
         evidence[key] = item
         groups.setdefault(group, []).append(key)
 
+    healthy_comparison = inputs.get("healthy_comparison") or {}
+    for row in records(healthy_comparison, "species"):
+        add("healthy_species", "HS", row, "taxonomic_estimate")
+    for row in records(healthy_comparison, "diversity"):
+        add("healthy_diversity", "HV", row, "calculated")
+
     sp = (
         records(species, "species_list")
         or records(compare, "comparison", "species_list")
         or records(species, "abnormal_species")
     )
-    for row in sp:
-        add("species", "S", row, "taxonomic_estimate", species)
     taxonomy = inputs.get("taxonomy") or species.get("taxonomy") or {}
     ranks = taxonomy.get("ranks", {})
+    if healthy_comparison and taxonomy.get("complete") is True and records(ranks.get("species")):
+        from .reference import species_key
+
+        prior = {species_key(row.get("species", row.get("name"))): row for row in sp}
+        sp = [{**prior.get(species_key(row.get("name")), {}), **row, "species": row["name"]}
+              for row in records(ranks.get("species")) if row.get("name")]
+    for row in sp:
+        if healthy_comparison:
+            # Primary abundance is retained; its old reference intervals do not
+            # describe the separately profiled MHNO comparison.
+            row = {**row, "p5": None, "p95": None, "percentile": None,
+                   "status": "unknown", "comparison_reason_cn": "主分析谱；MHNO 对照见独立比较区"}
+        add("species", "S", row, "taxonomic_estimate", species)
     for rank in ("phylum", "genus", "class", "order", "family"):
         for row in records(ranks.get(rank)):
             add(f"tax_{rank}", "T", row, "taxonomic_estimate", taxonomy)
@@ -303,6 +323,8 @@ def build_document(
                 "calculated",
             )
     for row in records(diversity.get("reference_comparisons")) + records(diversity.get("longitudinal")):
+        if healthy_comparison and row.get("generated_by") in {"healthy-reference-v1", "reference-comparison-v1"}:
+            continue
         add("div_reference", "V", row, "calculated")
     if complete_sp:
         values = [finite(row.get("abundance")) for row in complete_sp]
@@ -655,7 +677,7 @@ def render_markdown(document: dict) -> str:
     healthy = reference.get("healthy_population") or {}
     if healthy.get("status") == "available":
         output.append(
-            f"健康人群对照：{text(healthy.get('cohort_id'))}，参考独立个体 n={healthy['n_subjects']}；"
+            f"{'MHOmicrobiome 对照' if healthy.get('provider') == 'mho' else '健康人群对照'}：{text(healthy.get('cohort_id'))}，参考独立个体 n={healthy['n_subjects']}；"
             f"队列版本：{text(healthy.get('cohort_version'))}。"
             + " ".join(healthy.get("limitations", []))
         )

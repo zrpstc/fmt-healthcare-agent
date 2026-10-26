@@ -303,6 +303,20 @@ def _diversity_reference(sample_id: str, observed: dict) -> tuple[list[dict], di
 def refresh_reference_comparisons(data: dict, inputs: dict) -> dict:
     """Return enriched input; never mutate data or write files during preparation."""
     result = copy.deepcopy(data)
+    if os.environ.get("WGS_HEALTHY_REFERENCE_PROVIDER", "").strip().lower() == "mho":
+        from .mho import compare as compare_mho
+
+        metadata = result.setdefault("metadata", {})
+        if not isinstance(metadata, dict):
+            raise ValueError("分析元数据必须是 JSON 对象")
+        comparison = compare_mho(str(result.get("sample_id", "")), metadata)
+        result["healthy_comparison"] = comparison
+        metadata["reference_comparison"] = {
+            "version": VERSION, "healthy_population": comparison["audit"],
+        }
+        metadata["reference_version"] = comparison["audit"].get("version")
+        return result
+    result.pop("healthy_comparison", None)
     species = result.get("species") if isinstance(result.get("species"), dict) else {}
     taxonomy = inputs.get("taxonomy") or {}
     full = taxonomy.get("ranks", {}).get("species", []) if taxonomy.get("complete") is True else []

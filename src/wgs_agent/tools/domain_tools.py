@@ -877,6 +877,10 @@ class ReportGeneratorTool(BaseTool):
                 if refreshed != data else original_analysis
             )
             data = refreshed
+            if isinstance(data.get("healthy_comparison"), dict):
+                inputs["healthy_comparison"] = data["healthy_comparison"]
+            else:
+                inputs.pop("healthy_comparison", None)
             if isinstance(data.get("diversity"), dict):
                 inputs["diversity"] = data["diversity"]
             context = dict(module("metadata"))

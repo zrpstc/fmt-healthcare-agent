@@ -190,10 +190,11 @@ def chart_data(document, spec):
             reason="未提供可核对的样本与参考人群降维坐标",
         )
     if ident == "1.4.1":
+        mho = bool(data.inputs.get("healthy_comparison"))
         rows = sorted(
             [
                 r
-                for r in data.group("species")
+                for r in data.group("healthy_species" if mho else "species")
                 if r.get("comparison") in {"above", "below", "within"} and r.get("unit") == "%"
             ],
             key=lambda r: (r.get("comparison") == "within", -(r.get("value") or 0)),
@@ -201,12 +202,17 @@ def chart_data(document, spec):
         return _dataset(
             [r["label"] for r in rows],
             [
-                _series("本次样本", [finite(r.get("value")) for r in rows]),
+                _series("MHNO 独立谱" if mho else "本次样本", [finite(r.get("value")) for r in rows]),
                 _series("参考人群中位数", [finite(r.get("reference_median")) for r in rows]),
             ],
             "%",
         )
     if ident == "2.1.1":
+        if data.inputs.get("healthy_comparison"):
+            rows = data.group("healthy_diversity")
+            return _dataset(["MHNO · " + r["label"] for r in rows],
+                            [_series("MHNO 独立谱经验百分位", [_percentile(r) for r in rows])],
+                            "MHNO 经验百分位（0–100）")
         rows = data.group("div_richness", "div_shannon", "div_evenness")
         refs = data.group("div_reference")
         vals = []

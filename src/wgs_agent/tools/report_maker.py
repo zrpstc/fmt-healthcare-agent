@@ -434,6 +434,83 @@ def build_full_report(
 #         with open(alt_path, "w", encoding="utf-8") as f:
 #             f.write(report_md)
 #         return alt_path
+def _paginate_pdf_table_rows(
+    pdf, table_rows, col_widths=None, *, body_style=None, line_height=5.0, padding=1.4,
+):
+    """Yield (source row index, cells), splitting only rows too tall for a page.
+
+    fpdf2 can move whole table rows across pages, but cannot split a single row.
+    Measure with the same font, wrapping and padding as the renderer, reserving
+    space for the repeated heading. Keep every character in each source cell;
+    continuation rows repeat short category labels for context.
+    """
+    from fpdf.fonts import FontFace
+
+    if not table_rows:
+        return
+    ncols = len(table_rows[0])
+    proportions = col_widths or [1] * ncols
+    widths = [pdf.epw * value / sum(proportions) for value in proportions]
+
+    def height(text, column, face=None):
+        with pdf.use_font_face(face or FontFace()):
+            return pdf.multi_cell(
+                widths[column], line_height, text, padding=padding,
+                max_line_height=line_height, align="JUSTIFY", wrapmode="WORD",
+                dry_run=True, output="HEIGHT", new_x="RIGHT", new_y="TOP",
+            )
+
+    headers = list(table_rows[0])
+    header_height = max(
+        height(cell, column, FontFace(emphasis="BOLD"))
+        for column, cell in enumerate(headers)
+    )
+    available_height = pdf.eph - header_height - 1.0
+    if available_height < line_height + 2 * padding:
+        raise ValueError("PDF table heading leaves no room for a data row")
+    yield 0, headers
+
+    # Shorter continuation blocks also make useful progress near a page bottom.
+    continuation_height = min(80.0, available_height)
+
+    def take_prefix(text, column):
+        if not text or height(text, column, body_style) <= continuation_height:
+            return text, ""
+        low, high = 0, len(text)
+        while low < high:
+            middle = (low + high + 1) // 2
+            if height(text[:middle], column, body_style) <= continuation_height:
+                low = middle
+            else:
+                high = middle - 1
+        if not low:
+            raise ValueError("PDF table column is too narrow for one character")
+        # Prefer a clause/word boundary without discarding its separator.
+        boundary = max(text.rfind(sep, 0, low) for sep in ("；", "\n", " "))
+        if boundary >= low // 2:
+            low = boundary + 1
+        return text[:low], text[low:]
+
+    for row_index, cells in enumerate(table_rows[1:], 1):
+        cells = (list(cells) + [""] * ncols)[:ncols]
+        if max(height(cell, column, body_style) for column, cell in enumerate(cells)) <= available_height:
+            yield row_index, cells
+            continue
+        remaining = cells[:]
+        continuation_label = cells[0] + "（续）"
+        repeat_label = bool(cells[0]) and height(continuation_label, 0, body_style) <= continuation_height
+        first = True
+        while any(remaining):
+            fragments = []
+            for column, text in enumerate(remaining):
+                fragment, remaining[column] = take_prefix(text, column)
+                fragments.append(fragment)
+            if not first and not fragments[0] and repeat_label:
+                fragments[0] = continuation_label
+            yield row_index, fragments
+            first = False
+
+
 def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> str:
     """Render a real Unicode PDF when a TeX distribution is unavailable.
 
@@ -658,14 +735,19 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
                     for block in chapter_spec["blocks"]:
                         if block["type"]=="table" and block["rows"][0]==table_rows[0] and len(block["widths"])==ncols:
                             widths=tuple(block["widths"])
+                score_style = (
+                    FontFace(color=(52,101,164), size_pt=18)
+                    if table_rows[0] == ["综合健康分", "失衡分", "模型肠龄"] else None
+                )
                 with pdf.table(col_widths=widths, line_height=5.0, padding=1.4,
                                headings_style=FontFace(emphasis="BOLD", color=(0,0,0), fill_color=(226,237,240)),
                                cell_fill_color=(246,248,249), cell_fill_mode="ROWS",
-                               borders_layout="ALL") as report_table:
-                    for row_index, cells in enumerate(table_rows):
-                        score_style=FontFace(color=(52,101,164),size_pt=18) if row_index and table_rows[0]==["综合健康分","失衡分","模型肠龄"] else None
-                        row = report_table.row(style=score_style)
-                        for cell in (cells + [""] * ncols)[:ncols]:
+                               borders_layout="ALL", v_align="TOP") as report_table:
+                    for row_index, cells in _paginate_pdf_table_rows(
+                        pdf, table_rows, widths, body_style=score_style,
+                    ):
+                        row = report_table.row(style=score_style if row_index else None)
+                        for cell in cells:
                             row.cell(cell)
             continue
         in_table = False

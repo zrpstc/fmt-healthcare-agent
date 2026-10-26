@@ -175,6 +175,18 @@ class Body:
         self.emit(headers, [[_pick(r, *fields) for fields in columns] for r in rows], missing)
 
 
+    def mho_table(self, group):
+        comparison = self.inputs.get("healthy_comparison") or {}
+        audit = comparison.get("audit") or {}
+        self.out.append("**MHOmicrobiome MHNO 独立对照（MetaPhlAn 4.2.2 / Jan25）**")
+        self.out.append("本区使用独立待测谱；参考与待测谱均按已分类物种总和归一化至 100%。")
+        self.emit(
+            ["物种" if group == "healthy_species" else "多样性指标", "独立对照谱结果", "MHNO P5–P95", "MHNO 经验百分位"],
+            [[r["label"], r["result_text"], r["reference_text"], _pick(r, "percentile")]
+             for r in self.group(group)],
+            "本次 MHNO 对照不可用：" + str(audit.get("reason_cn", "缺少有效参考或待测谱")) + "。",
+        )
+
     def composition(self, block):
         species = self.group("species")
         if block == 1:
@@ -264,6 +276,10 @@ class Body:
             self.emit(["判读项目", "填写内容"], values, "本次未提供肠型判定结果，无法归类。")
             self.out.append("肠型用于描述群落组成特征。")
         else:
+            if self.inputs.get("healthy_comparison"):
+                self.mho_table("healthy_species")
+                self.absolute_quantities()
+                return
             rows = [r for r in species if r.get("comparison") in {"above", "below", "within"}]
             rows.sort(key=lambda r: (r["comparison"] == "within", -(r.get("value") or 0)))
             self.emit(
@@ -307,33 +323,24 @@ class Body:
                 )
             elif healthy:
                 self.out.append("健康人群对照未建立：" + str(healthy.get("reason_cn", "参考数据不足")) + "。")
-            # Optional absolute quantities require an actual validated quantitative basis.
-            absolute = [
-                r
-                for r in self.raw("absolute_abundance", "measurements")
-                if r.get("unit")
-                and r.get("method")
-                and (r.get("data_type") == "measured" or r.get("validated_quantification") is True)
-                and finite(r.get("value")) is not None
-            ]
-            if absolute:
-                self.out.append("**绝对丰度补充结果**")
-                self.emit(
-                    ["定量项目", "本次结果", "测量或估算依据"],
-                    [
-                        [
-                            _pick(r, "name", "species"),
-                            f"{self.number(r['value'])} {r['unit']}",
-                            r["method"],
-                        ]
-                        for r in absolute
-                    ],
-                )
+            self.absolute_quantities()
+
+    def absolute_quantities(self):
+        # Optional absolute quantities require an actual validated quantitative basis.
+        absolute = [r for r in self.raw("absolute_abundance", "measurements")
+                    if r.get("unit") and r.get("method")
+                    and (r.get("data_type") == "measured" or r.get("validated_quantification") is True)
+                    and finite(r.get("value")) is not None]
+        if absolute:
+            self.out.append("**绝对丰度补充结果**")
+            self.emit(["定量项目", "本次结果", "测量或估算依据"],
+                      [[_pick(r, "name", "species"), f"{self.number(r['value'])} {r['unit']}", r["method"]]
+                       for r in absolute])
 
     def diversity(self, block):
         if block == 1:
             rows = self.group("div_richness", "div_shannon", "div_simpson", "div_evenness")
-            refs = self.group("div_reference")
+            refs = [] if self.inputs.get("healthy_comparison") else self.group("div_reference")
 
             def match(r):
                 metric = r["kind"].removeprefix("div_")
@@ -362,8 +369,14 @@ class Body:
             self.out.append(
                 "Shannon 指数同时反映丰富度与均匀度；仅在相同分析口径和适用参考人群下比较，不设置通用健康分界值。"
             )
+            if self.inputs.get("healthy_comparison"):
+                self.mho_table("healthy_diversity")
         elif block == 2:
-            self.standard(self.group("div_reference"))
+            if self.inputs.get("healthy_comparison"):
+                audit = self.inputs["healthy_comparison"].get("audit") or {}
+                self.out.append(" ".join(audit.get("limitations", [])) or str(audit.get("reason_cn", "MHNO 对照不可用")))
+            else:
+                self.standard(self.group("div_reference"))
             self.out.append(
                 "人群内的多样性位置与群落组成距离分别解释；未提供群落差异指标或匹配参考时，不补算群落距离。"
             )
