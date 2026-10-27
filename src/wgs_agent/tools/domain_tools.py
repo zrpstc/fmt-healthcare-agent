@@ -892,7 +892,7 @@ class ReportGeneratorTool(BaseTool):
             })
             context["health_inputs"] = inputs
             pathways = module("pathways")
-            if inputs.get("pathways") and pathways.get("is_complete") is not True:
+            if inputs.get("pathways") and (pathways.get("is_complete") is not True or inputs["pathways"].get("stratification_source") == "canonical_humann_output_v1"):
                 pathways = inputs["pathways"]
             proteins = module("proteins") or module("protein") or module("gene_families")
             if not proteins:
@@ -909,6 +909,10 @@ class ReportGeneratorTool(BaseTool):
             attach_subgraphs(document)
             translate_graph_labels(document, resolve_graph_model())
             translate_overview_taxa(document, resolve_report_model() or resolve_graph_model())
+            from wgs_agent.reporting.chapter_one import prepare_chapter_one
+            prepare_chapter_one(document, resolve_report_model() or resolve_graph_model())
+            from wgs_agent.reporting.chapter_two import prepare_chapter_two
+            prepare_chapter_two(document, resolve_report_model() or resolve_graph_model())
             document["audit"]["generation_id"] = uuid.uuid4().hex
             context["report_document"] = document
             evidence_manifest = {
@@ -937,6 +941,10 @@ class ReportGeneratorTool(BaseTool):
                 evidence_manifest["word_figures"] = document.get("word_figures", {})
                 evidence_manifest["overview_chart"] = document.get("overview_chart", {})
                 evidence_manifest["overview_taxon_labels"] = document.get("overview_taxon_labels", {})
+                evidence_manifest["chapter_one_taxon_labels"] = document.get("chapter_one_taxon_labels", {})
+                evidence_manifest["chapter_one_presentation"] = document.get("chapter_one_presentation", {})
+                evidence_manifest["chapter_two_results"] = document.get("chapter_two_results", {})
+                evidence_manifest["chapter_two_taxon_labels"] = document.get("chapter_two_taxon_labels", {})
                 evidence_manifest["word_sections"] = document.get("word_sections", [])
                 (staging / filenames["markdown"]).write_text(markdown, encoding="utf-8")
                 (staging / filenames["structured"]).write_text(json.dumps(document, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")

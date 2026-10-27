@@ -19,9 +19,26 @@ id是不可修改的标识，必须逐字保留；不能改大小写、替换为
 Mediterraneibacter gnavus 的 gnavus 表示活泼，不是贪食；现属地中海杆菌属，曾名 Ruminococcus gnavus。
 Mediterraneibacter gnavus 应完整译为活泼地中海杆菌，不能只写属名地中海杆菌。科名必须保留科的分类层级。
 Bifidobacterium bifidum 应完整译为两歧双歧杆菌，不能仅写属名双歧杆菌。
+Ruminococcus bromii 应译为布氏瘤胃球菌，不得误译为溴化瘤胃球菌。
+Ruminococcus torques 应译为扭曲瘤胃球菌，不得误译为扭矩瘤胃球菌。
 不要添加数字、健康解释或分类学推断。label只含中文及中文标点，不超过32字。
 只返回JSON：{"items":[{"id":"原id","label":"中文分类名"}]}。"""
 FALLBACK = {
+    'bacteroidota': '拟杆菌门',
+    'pseudomonadota': '变形菌门',
+    'actinomycetota': '放线菌门',
+    'verrucomicrobiota': '疣微菌门',
+    'bacteroides': '拟杆菌属',
+    'blautia': '布劳特菌属',
+    'ruminococcus': '瘤胃球菌属',
+    'escherichia': '埃希菌属',
+    'agathobacter': '阿加托杆菌属',
+    'bacteroides eggerthii': '埃格特拟杆菌',
+    'agathobacter rectalis': '直肠阿加托杆菌',
+    'blautia wexlerae': '韦氏布劳特菌',
+    'ruminococcus bicirculans': '双环瘤胃球菌',
+    'ruminococcus bromii': '布氏瘤胃球菌',
+
     "escherichia coli": "大肠埃希菌",
     "bifidobacterium bifidum": "两歧双歧杆菌",
     "bifidobacterium longum": "长双歧杆菌",
@@ -29,6 +46,7 @@ FALLBACK = {
     "faecalibacterium prausnitzii": "普拉梭菌",
     "mediterraneibacter gnavus": "活泼地中海杆菌",
     "ruminococcus gnavus": "活泼瘤胃球菌",
+    "ruminococcus torques": "扭曲瘤胃球菌",
     "firmicutes": "厚壁菌门", "bacillota": "厚壁菌门",
     "bacteria": "细菌", "clostridia": "梭菌纲",
     "eubacteriales": "真杆菌目",
@@ -49,6 +67,8 @@ def _valid_for_name(key, label):
         "escherichia coli": {"大肠埃希菌", "大肠杆菌"},
         "bifidobacterium bifidum": {"两歧双歧杆菌", "两岐双歧杆菌", "双歧双歧杆菌"},
         "bifidobacterium longum": {"长双歧杆菌", "长双歧菌"},
+        "ruminococcus bromii": {"布氏瘤胃球菌", "布罗姆瘤胃球菌"},
+        "ruminococcus torques": {"扭曲瘤胃球菌", "扭链瘤胃球菌"},
         "mediterraneibacter gnavus": {"活泼地中海杆菌", "活泼瘤胃球菌", "格纳武斯地中海杆菌"},
     }
     return key not in aliases or label in aliases[key]
@@ -99,7 +119,7 @@ def _lineages(document):
 def _descriptor(raw, lineage=""):
     ids = re.findall(r"(?:GGB|SGB)\d+", raw, re.I)
     unnamed = bool(ids or re.search(r"unclassified|uncultured|unidentified", raw, re.I))
-    name, rank = raw, "species"
+    name, rank = re.sub(r"\s+ex\s+.*$", "", raw, flags=re.I), "species"
     if unnamed:
         name, rank = "", "unresolved"
         ranks = {"g": "genus", "f": "family", "o": "order", "c": "class", "p": "phylum", "k": "kingdom"}
@@ -122,9 +142,9 @@ def _assemble(description, label, source):
             "resolution": "named_rank_only" if description["unnamed"] else "named_species"}
 
 
-def display_taxon(document, row):
+def display_taxon(document, row, *, label_field="overview_taxon_labels"):
     raw = _taxon(row)
-    existing = document.get("overview_taxon_labels", {}).get(species_key(raw))
+    existing = document.get(label_field, {}).get(species_key(raw))
     if existing:
         return existing
     description = _descriptor(raw, _lineages(document).get(species_key(raw), ""))
@@ -133,15 +153,15 @@ def display_taxon(document, row):
     return _assemble(description, label or ("菌种" if not description["unnamed"] else ""), "fallback")
 
 
-def translate_overview_taxa(document, config, *, post=None, fallback_config=None):
+def translate_overview_taxa(document, config, *, post=None, fallback_config=None, rows=None, label_field="overview_taxon_labels", audit_field="overview_taxon_translation"):
     from .graph_labels import _parse_labels, _save_cache
     from .narrative import _request
 
     lineages = _lineages(document)
     taxa = {}
-    for finding in select_findings(document):
-        row = document["evidence"][finding["evidence_id"]]
-        if row.get("kind") in {"species", "healthy_species", "pathogen"}:
+    selected_rows = rows if rows is not None else [document["evidence"][f["evidence_id"]] for f in select_findings(document)]
+    for row in selected_rows:
+        if row.get("kind") in {"species", "healthy_species", "pathogen", "tax_phylum", "tax_genus", "tax_family", "tax_order", "tax_class"}:
             raw = _taxon(row)
             taxa[species_key(raw)] = _descriptor(raw, lineages.get(species_key(raw), ""))
     names = {d["name_key"]: d["name"] for d in taxa.values() if d["name"]}
@@ -223,8 +243,8 @@ def translate_overview_taxa(document, config, *, post=None, fallback_config=None
                 unresolved.append(key)
                 translated = {"label": "菌种", "source": "untranslated"}
         labels[key] = _assemble(description, translated["label"], translated["source"])
-    document["overview_taxon_labels"] = labels
-    document["audit"]["overview_taxon_translation"] = {
+    document[label_field] = labels
+    document["audit"][audit_field] = {
         "version": VERSION, "configured": bool(config), "attempts": attempts,
         "model_translated": sum(value["source"].startswith("llm") for value in labels.values()),
         "errors": errors, "rejected": rejected, "untranslated": len(unresolved),

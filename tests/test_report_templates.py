@@ -223,7 +223,9 @@ def test_core_members_use_defined_reference_and_actual_detection_without_zero_fi
     )
     body = block(render_markdown(doc), "1.2")
     assert "Core A" in body and "5 %" in body
-    assert "Core B" in body and "无法判断" in body
+    from wgs_agent.reporting.word_figures import chart_data
+    assert doc["template_inputs"]["core_microbiome"]["members"][1]["species"] == "Core B"
+    assert chart_data(doc, {"id": "1.2.2", "kind": "doughnutChart"})["status"] == "missing"
     assert "1 / 2" not in body
 
 

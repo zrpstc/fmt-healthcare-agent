@@ -16,6 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from .fonts import resolve_cjk_fonts
 from .inputs import finite
+from .reference import species_key
 from .template_catalog import CHAPTERS
 from .word_template import (
     Data,
@@ -100,9 +101,15 @@ def _stack(rows, labeler, member="name"):
 def chart_data(document, spec):
     ident = spec["id"]
     chapter, sub = map(int, ident.split(".")[:2])
+    if ident in {"2.1.1", "2.3.1"}:
+        from .chapter_two import chart_payload
+        return chart_payload(document, spec)
     data = Data(document)
     if data.qc_failed:
         return _dataset(reason="质控未通过，暂不展示结果")
+    from .chapter_one import TARGETS, chart_payload
+    if ident in TARGETS:
+        return chart_payload(document, spec)
     if ident in {"1.1.1", "1.1.2", "1.1.3", "1.2.1"}:
         kind = {
             "1.1.1": "tax_phylum",
@@ -134,20 +141,20 @@ def chart_data(document, spec):
     if ident == "1.2.2":
         core = data.raw("core_microbiome", "members")
         module = data.inputs.get("core_microbiome") or {}
-        species = {r["label"].casefold(): r for r in data.group("species")}
+        species = {species_key(r.get("species") or r["label"]): r for r in data.group("species")}
         vals = [
             finite(
                 r.get(
                     "value",
                     r.get(
                         "abundance",
-                        species.get(str(_pick(r, "species", "name")).casefold(), {}).get("value"),
+                        species.get(species_key(_pick(r, "species", "name")), {}).get("value"),
                     ),
                 )
             )
             for r in core
         ]
-        unique = len({str(_pick(r, "species", "name")).casefold() for r in core}) == len(core)
+        unique = len({species_key(_pick(r, "species", "name")) for r in core}) == len(core)
         if (
             core
             and unique
@@ -406,6 +413,12 @@ def _text(draw, xy, text, font, fill="#30343A", width=None, anchor="la", max_lin
 
 
 def draw_chart(spec, payload, width):
+    if payload.get("chapter_two_mode"):
+        from .chapter_two import draw_chart as draw_chapter_two
+        return draw_chapter_two(spec, payload, width)
+    if payload.get("chapter_one_mode"):
+        from .chapter_one import draw_chart as draw_chapter_chart
+        return draw_chapter_chart(spec, payload, width)
     height = max(170, int(width * spec["extent"][1] / max(1, spec["extent"][0])))
     image = Image.new("RGB", (width, height), "white")
     draw = ImageDraw.Draw(image)
@@ -631,6 +644,9 @@ def draw_chart(spec, payload, width):
 
 
 def flow_labels(document, spec):
+    if spec["id"] == "2.4.flow":
+        from .chapter_two import cooperation_payload
+        return cooperation_payload(document)["labels"]
     chapter, sub = map(int, spec["id"].split(".")[:2])
     data = Data(document).load(chapter, sub)
     tables = tables_for(document, chapter, sub)
@@ -802,13 +818,22 @@ def render_word_figures(document, output_dir):
                 continue
             key = "+".join(v["id"] for v in block["items"])
             width = 1800
-            partwidth = width // (3 if block.get("age_panel") else len(block["items"]))
+            active_items = block["items"]
+            if chapter["number"] == 1 and any(v["id"] == "1.2.2" for v in active_items):
+                core = next(v for v in active_items if v["id"] == "1.2.2")
+                if chart_data(document, core)["status"] != "available":
+                    active_items = [v for v in active_items if v["id"] != "1.2.2"]
+            partwidth = width // (3 if block.get("age_panel") else len(active_items))
             payloads = []
             images = []
-            for spec in block["items"]:
+            for spec in active_items:
                 if spec["type"] == "chart":
                     payload = chart_data(document, spec)
                     im = draw_chart(spec, payload, partwidth)
+                elif spec["id"] == "2.4.flow":
+                    from .chapter_two import cooperation_payload, draw_cooperation
+                    payload = cooperation_payload(document)
+                    im = draw_cooperation(payload, partwidth)
                 else:
                     payload = {"labels": flow_labels(document, spec)}
                     im = draw_flow(spec, payload["labels"], partwidth)

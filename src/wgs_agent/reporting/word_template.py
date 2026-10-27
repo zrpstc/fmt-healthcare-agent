@@ -13,6 +13,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from .inputs import finite
+from .reference import species_key
 from .template_body import Body, _contributors, _linked, _pick, _sequence
 from .template_catalog import CHAPTERS, TOPIC_PLACEMENT
 
@@ -183,24 +184,8 @@ def matching(rows, label):
 
 
 def redundancy_category(name):
-    text = str(name).lower()
-    if "butyrate" in text or "丁酸" in text:
-        return "丁酸合成"
-    if "lactate utilization" in text or "乳酸利用" in text:
-        return "乳酸利用"
-    # Cell-envelope polysaccharide synthesis is not dietary polysaccharide degradation.
-    if any(
-        w in text for w in ("lipopolysaccharide", "lipid a", "peptidoglycan", "脂多糖", "肽聚糖")
-    ):
-        return None
-    substrate = any(
-        w in text
-        for w in ("starch", "pectin", "xylan", "polysaccharide", "多糖", "淀粉", "木聚糖", "果胶")
-    )
-    degradation = any(
-        w in text for w in ("degradation", "utilization", "hydrolysis", "降解", "利用")
-    )
-    return "复杂多糖降解" if substrate and degradation else None
+    from .functional_metrics import category
+    return category(name)
 
 
 def bind_table(document, block, data=None):
@@ -208,6 +193,12 @@ def bind_table(document, block, data=None):
     chapter, sub = map(int, block["id"].split(".")[:2])
     data = data or Data(document).load(chapter, sub)
     headers = block["rows"][0]
+    if block["id"] == "2.3.t1":
+        from .chapter_two import redundancy_table
+        return redundancy_table(document)
+    if block["id"] == "2.4.t1":
+        from .chapter_two import cooperation_table
+        return cooperation_table(document)
     mho = data.inputs.get("healthy_comparison") or {}
     if mho and block["id"] == "1.4.t1":
         rows = data.group("healthy_species")[:8]
@@ -271,14 +262,14 @@ def bind_table(document, block, data=None):
             values["前五位物种合计占比"] = f"{sum(r['value'] for r in top[:5]):.5g}%"
         core = data.raw("core_microbiome", "members")
         parent = data.inputs.get("core_microbiome") or {}
-        names = {r["label"].casefold(): r for r in top}
+        names = {species_key(r.get("species") or r["label"]): r for r in data.group("species")}
         corevals = [
             finite(
                 r.get(
                     "value",
                     r.get(
                         "abundance",
-                        names.get(str(_pick(r, "species", "name")).casefold(), {}).get("value"),
+                        names.get(species_key(_pick(r, "species", "name")), {}).get("value"),
                     ),
                 )
             )
@@ -288,7 +279,7 @@ def bind_table(document, block, data=None):
             parent.get("definition")
             and core
             and all(v is not None for v in corevals)
-            and len({str(_pick(r, "species", "name")).casefold() for r in core}) == len(core)
+            and len({species_key(_pick(r, "species", "name")) for r in core}) == len(core)
         ):
             values["核心成员检出数 / 参考成员数"] = f"{sum(v > 0 for v in corevals)} / {len(core)}"
             if all(
@@ -296,7 +287,7 @@ def bind_table(document, block, data=None):
                     "unit",
                     parent.get(
                         "unit",
-                        names.get(str(_pick(r, "species", "name")).casefold(), {}).get("unit"),
+                        names.get(species_key(_pick(r, "species", "name")), {}).get("unit"),
                     ),
                 )
                 == "%"
@@ -964,7 +955,7 @@ def render_body(document):
                 ),
                 {},
             )
-            if topic.get("interpretation") and not has_slot:
+            if topic.get("interpretation") and not has_slot and (n, index) != (2, 3):
                 output.append("结果解读  " + topic["interpretation"])
             empty_graphs = set()
             for tid in CHAPTERS[n - 1][3][index - 1][1]:
@@ -998,9 +989,36 @@ def render_body(document):
                         Data(document).load(1, 4), ["定量项目", "本次结果", "测量或估算依据"]
                     ):
                         continue
-                output.append(paragraph(document, block, n))
+                if n == 2 and sub == 1 and block["text"].startswith(("指标介绍与解读", "意义解读")):
+                    continue
+                if n == 1 and sub == 2 and block["text"].startswith("表 1-1"):
+                    continue
+                content = paragraph(document, block, n)
+                if n == 2 and sub in {3, 4}:
+                    from .chapter_two import paragraph_override
+                    override = paragraph_override(document, block["text"])
+                    if override is not None:
+                        content = override
+                if n == 1 and sub in {1, 2, 4}:
+                    from .chapter_one import translate_text
+                    content = translate_text(document, content)
+                    if sub == 4:
+                        content = content.replace("本表按", "本图按")
+                    if sub == 2 and block["text"].startswith("图 1-3") and not document.get("chapter_one_presentation", {}).get("core_chart_visible", False):
+                        content = "图 1-3  优势物种相对丰度（未提供核心参考清单，未绘制核心检出圆环）"
+                output.append(content)
             elif kind == "table":
+                if n == 1 and block["id"] in {"1.1.t1", "1.2.t2", "1.4.t1"}:
+                    continue
                 rows = bind_table(document, block)
+                if block["id"] == "2.1.t1":
+                    from .chapter_two import filter_diversity_table
+                    rows = filter_diversity_table(document, rows)
+                    if not rows:
+                        continue
+                if n == 1 and sub in {1, 2, 4}:
+                    from .chapter_one import translate_text
+                    rows = [[translate_text(document, cell) for cell in row] for row in rows]
                 if block["id"] == "1.4.t2" and not _rows(
                     Data(document).load(1, 4), block["rows"][0]
                 ):

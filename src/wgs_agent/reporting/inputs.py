@@ -96,51 +96,6 @@ def load_existing_report_inputs(sample_id: str, root: Path | None = None) -> dic
         result["diversity"] = diversity_metrics(taxonomy["species"], complete=complete)
     pathway_file = root / "profiles/humann" / f"{sample_id}_pathabundance_relab.tsv"
     if pathway_file.is_file() and pathway_file.resolve().is_relative_to(root):
-        pathways, special, contributions = [], {}, {}
-        with pathway_file.open(encoding="utf-8") as handle:
-            for line in handle:
-                if not line.strip() or line.startswith("#"):
-                    continue
-                fields = line.rstrip("\n").split("\t")
-                value = finite(fields[1]) if len(fields) > 1 else None
-                if value is None or value < 0:
-                    continue
-                name = fields[0]
-                base, _, contributor = name.partition("|")
-                if base in {"UNMAPPED", "UNINTEGRATED"}:
-                    if not contributor:
-                        special[base] = value
-                    continue
-                if contributor:
-                    contributions.setdefault(base, []).append(
-                        {
-                            "taxon": contributor,
-                            "abundance": value,
-                            "unit": "relative_abundance",
-                        }
-                    )
-                    continue
-                pathway_id, separator, label = base.partition(":")
-                pathways.append(
-                    {
-                        "id": pathway_id,
-                        "name": label.strip() if separator else base,
-                        "abundance": value,
-                        "unit": "relative_abundance",
-                        "data_type": "functional_potential",
-                        "source_file": str(pathway_file),
-                        "_raw_id": base,
-                    }
-                )
-        for row in pathways:
-            row["contributors"] = contributions.get(row.pop("_raw_id"), [])
-        result["pathways"] = {
-            "pathways": sorted(pathways, key=lambda row: -row["abundance"]),
-            "special_rows": special,
-            "unit": "relative_abundance",
-            "is_complete": True,
-            "method": "HUMAnN pathway profiling",
-            "source_file": str(pathway_file),
-            "n_total_pathways": len(pathways),
-        }
+        from .functional_metrics import read_humann_pathways
+        result["pathways"] = read_humann_pathways(pathway_file)
     return result
