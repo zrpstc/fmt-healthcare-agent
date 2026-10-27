@@ -190,6 +190,9 @@ def redundancy_category(name):
 
 def bind_table(document, block, data=None):
     """Return exact Word columns, binding assays by meaning rather than column order."""
+    if str(block.get("id", "")).startswith(("3.1.", "3.2.", "3.3.")):
+        from .chapter_three import table_payload
+        return table_payload(document, int(block["id"].split(".")[1]))["rows"]
     chapter, sub = map(int, block["id"].split(".")[:2])
     data = data or Data(document).load(chapter, sub)
     headers = block["rows"][0]
@@ -621,11 +624,7 @@ def valid_composites(data):
 
 def tables_for(document, chapter, sub):
     data = Data(document).load(chapter, sub)
-    return [
-        (b, bind_table(document, b, data))
-        for b in contract()["chapters"][chapter - 1]["blocks"]
-        if b["type"] == "table" and b["sub"] == sub
-    ]
+    return [({**b, "rows": [_bound_headers(document, b), *b["rows"][1:]]}, bind_table(document, b, data)) for b in contract()["chapters"][chapter - 1]["blocks"] if b["type"] == "table" and b["sub"] == sub]
 
 
 def narrative_sections(document):
@@ -638,6 +637,8 @@ def narrative_sections(document):
     for chapter, title, _, blocks in CHAPTERS:
         topics = []
         for sub, (heading, ids) in enumerate(blocks, 1):
+            if chapter == 3 and sub == 4:
+                continue
             data = Data(document).load(chapter, sub)
             scopes = {
                 (2, 2): (1, 2),
@@ -702,7 +703,7 @@ def narrative_sections(document):
                             any(actual(v, index) for index, v in enumerate(row) if index)
                             for row in rows
                         ):
-                            observed.append({"headers": b["rows"][0], "rows": rows})
+                            observed.append({"headers": _bound_headers(document, b), "rows": rows})
                 else:
                     observed.extend(t for t in Data(document).load(chapter, i).tables if t["rows"])
             if chapter == 14 and sub in {1, 2, 3}:
@@ -932,6 +933,9 @@ def render_body(document):
     for chapter in contract()["chapters"]:
         n = chapter["number"]
         output.append(f"## {n} {chapter['title']}")
+        if n == 3:
+            from .chapter_three import intro
+            output.append(intro(document))
         sub = 0
 
         def finish(index):
@@ -955,7 +959,7 @@ def render_body(document):
                 ),
                 {},
             )
-            if topic.get("interpretation") and not has_slot and (n, index) != (2, 3):
+            if n != 3 and topic.get("interpretation") and not has_slot and (n, index) != (2, 3):
                 output.append("结果解读  " + topic["interpretation"])
             empty_graphs = set()
             for tid in CHAPTERS[n - 1][3][index - 1][1]:
@@ -969,11 +973,16 @@ def render_body(document):
                         output.append(part)
 
         for block in chapter["blocks"]:
+            if n == 3 and block["sub"] in {0, 4}:
+                continue
             kind = block["type"]
             if kind == "heading":
                 finish(sub)
                 sub = block["sub"]
                 output.append("### " + block["text"])
+                if n == 3 and sub == 3:
+                    from .chapter_three import support_note
+                    output.append(support_note(document))
             elif kind == "paragraph":
                 # Optional quantitative panel is removed exactly as instructed in the Word.
                 if (
@@ -993,6 +1002,22 @@ def render_body(document):
                     continue
                 if n == 1 and sub == 2 and block["text"].startswith("表 1-1"):
                     continue
+                if n == 2 and sub == 3 and block["text"].startswith(("功能冗余", "贡献集中度")):
+                    continue
+                if n == 3:
+                    from .chapter_three import table_payload, support_note, chart_payload
+                    text = block["text"]
+                    if sub == 1 and text.startswith("图"):
+                        output.append("图 3-1  重点菌群的主分析相对丰度（柱末标注实际数值）")
+                        continue
+                    if sub in {1, 2} and text.startswith(("结果解读", "综合解读")):
+                        continue
+                    if sub in {1, 2} and text.startswith("检出状态") and table_payload(document, sub).get("detection_column_removed"):
+                        continue
+                    if sub == 3:
+                        if text.startswith("图") and chart_payload(document, "3.3.1")["rows"]:
+                            output.append("图 3-2  已提供的物种支持读段数")
+                        continue
                 content = paragraph(document, block, n)
                 if n == 2 and sub in {3, 4}:
                     from .chapter_two import paragraph_override
@@ -1008,9 +1033,14 @@ def render_body(document):
                         content = "图 1-3  优势物种相对丰度（未提供核心参考清单，未绘制核心检出圆环）"
                 output.append(content)
             elif kind == "table":
+                if n == 2 and sub in {1, 4}:
+                    continue
                 if n == 1 and block["id"] in {"1.1.t1", "1.2.t2", "1.4.t1"}:
                     continue
                 rows = bind_table(document, block)
+                if n == 3 and not rows:
+                    output.append("本次未提供可展示的对应物种记录。")
+                    continue
                 if block["id"] == "2.1.t1":
                     from .chapter_two import filter_diversity_table
                     rows = filter_diversity_table(document, rows)
@@ -1023,7 +1053,12 @@ def render_body(document):
                     Data(document).load(1, 4), block["rows"][0]
                 ):
                     continue
-                output.append(table(block["rows"][0], rows))
+                output.append(table(_bound_headers(document, block), rows))
+                if n == 3:
+                    from .chapter_three import table_payload
+                    note = table_payload(document, sub).get("note")
+                    if note:
+                        output.append(note)
                 if n == 8:
                     data = Data(document).load(n, sub)
                     measured = [
@@ -1036,6 +1071,10 @@ def render_body(document):
                             ["**已有代谢物检测或模型记录**", table(t["headers"], t["rows"])]
                         )
             elif kind == "visuals":
+                if n == 3 and sub == 3:
+                    from .chapter_three import chart_payload
+                    if not chart_payload(document, "3.3.1")["rows"]:
+                        continue
                 key = "+".join(v["id"] for v in block["items"])
                 image = word_figures.get(key)
                 if image:
@@ -1044,3 +1083,10 @@ def render_body(document):
                     output.append("图示数据状态：本次尚未渲染，图表布局见PDF报告。")
         finish(sub)
     return output
+
+
+def _bound_headers(document, block):
+    if str(block.get("id", "")).startswith(("3.1.", "3.2.", "3.3.")):
+        from .chapter_three import table_payload
+        return table_payload(document, int(block["id"].split(".")[1]))["headers"]
+    return block["rows"][0]

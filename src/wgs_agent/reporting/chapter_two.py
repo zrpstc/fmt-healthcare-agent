@@ -185,9 +185,16 @@ def cooperation_payload(document):
     return {**data,"labels":[[r["stage"],r["contributors"],r["function"]] for r in data["stages"]]+[[],[]]}
 
 
-def _text(draw,xy,text,size=27,**kwargs):
-    from .chapter_one import _label
-    _label(draw,xy,text,size,**kwargs)
+def _text(draw, xy, text, size=28, *, bold=False, **kwargs):
+    if bold:
+        from PIL import ImageFont
+        from .fonts import resolve_cjk_fonts
+        from .word_figures import _text as draw_text
+        font = ImageFont.truetype(resolve_cjk_fonts()[1], max(10, int(size)))
+        draw_text(draw, xy, str(text), font, **kwargs)
+    else:
+        from .chapter_one import _label
+        _label(draw, xy, text, size, **kwargs)
 
 
 def draw_chart(spec,payload,width):
@@ -260,34 +267,47 @@ def draw_redundancy(document,payload,width):
     return image
 
 
-def draw_cooperation(payload,width):
-    height=625;image=Image.new("RGB",(width,height),"white");draw=ImageDraw.Draw(image)
-    stages=payload["stages"]
-    if not stages:_text(draw,(40,70),"未提供可用阶段记录");return image
-    part=(width-130)/3
-    for i,stage in enumerate(stages[:3]):
-        x=25+i*(part+40)
-        draw.rounded_rectangle((x,35,x+part,530),radius=14,fill="#EAF1F5",outline="#B8CDD2",width=2)
-        _text(draw,(x+22,60),stage["stage"],32,width=part-44,max_lines=2)
-        _text(draw,(x+22,143),"贡献菌：",26)
-        _text(draw,(x+22,190),stage["contributors"],27,width=part-44,max_lines=3)
-        path=stage.get("pathway")
+def draw_cooperation(payload, width):
+    height = 745
+    image = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(image)
+    stages = payload["stages"]
+    if not stages:
+        _text(draw, (40, 70), "未提供可用阶段记录", 34, bold=True)
+        return image
+    part = (width - 130) / 3
+    for i, stage in enumerate(stages[:3]):
+        x = 25 + i * (part + 40)
+        draw.rounded_rectangle((x, 35, x + part, 650), radius=14, fill="#EFF5F8", outline="#9BBBCB", width=2)
+        _text(draw, (x + 24, 60), stage["stage"], 40, bold=True, fill="#123C50", width=part - 48, max_lines=2)
+        _text(draw, (x + 24, 145), "贡献菌", 29, bold=True, fill="#426478")
+        _text(draw, (x + 24, 195), stage["contributors"], 34, bold=True, fill="#172D3E", width=part - 48, max_lines=3)
+        path = stage.get("pathway")
         if path:
-            _text(draw,(x+22,330),str(path.get("id","")),24)
-            _text(draw,(x+22,378),stage["function"].split("（",1)[0],27,width=part-44,max_lines=2)
-            value=finite(path.get("value",path.get("abundance")))
-            _text(draw,(x+22,457),f"通路丰度 {value:.5g}",25)
-        else:_text(draw,(x+22,330),stage["function"],25,width=part-44,max_lines=3)
-    links=payload.get("connections",[])
+            _text(draw, (x + 24, 365), str(path.get("id", "")), 29, bold=True, fill="#255D77", width=part - 48, max_lines=1)
+            _text(draw, (x + 24, 420), stage["function"].split("（", 1)[0], 34, bold=True, fill="#172D3E", width=part - 48, max_lines=2)
+            value = finite(path.get("value", path.get("abundance")))
+            _text(draw, (x + 24, 552), "通路丰度", 29, fill="#426478")
+            _text(draw, (x + 24, 595), f"{value:.5g}" if value is not None else "未提供", 36, bold=True, fill="#172D3E")
+        else:
+            _text(draw, (x + 24, 365), stage["function"], 34, bold=True, fill="#172D3E", width=part - 48, max_lines=3)
+    links = payload.get("connections", [])
     if links:
-        stage_names=[r["stage"] for r in stages[:3]]
+        stage_names = [r["stage"] for r in stages[:3]]
         for link in links:
-            if link.get("source") not in stage_names or link.get("target") not in stage_names:continue
-            source=stage_names.index(link["source"]);target=stage_names.index(link["target"])
-            if target!=source+1:continue
-            start=25+source*(part+40)+part+3;end=25+target*(part+40)-3;y=280
-            draw.line((start,y,end,y),fill="#246A73",width=3)
-            draw.polygon([(end,y),(end-9,y-6),(end-9,y+6)],fill="#246A73")
-        _text(draw,(35,565),"按已提供的阶段与连接证据展示；详细连接记录见下表。",25)
-    else:_text(draw,(35,565),"以上为独立功能阶段的注释记录；未提供菌间交换连接证据，未绘制传递箭头。",25,width=width-70,max_lines=2)
+            if link.get("source") not in stage_names or link.get("target") not in stage_names:
+                continue
+            source = stage_names.index(link["source"])
+            target = stage_names.index(link["target"])
+            if target != source + 1:
+                continue
+            start = 25 + source * (part + 40) + part + 3
+            end = 25 + target * (part + 40) - 3
+            y = 320
+            draw.line((start, y, end, y), fill="#255D77", width=3)
+            draw.polygon([(end, y), (end - 9, y - 6), (end - 9, y + 6)], fill="#255D77")
+        note = "按已提供的阶段与连接证据展示；连接详情保留在结构化报告。"
+    else:
+        note = "以上为独立功能阶段的注释记录；未提供菌间交换连接证据，未绘制传递箭头。"
+    _text(draw, (35, 685), note, 27, fill="#426478", width=width - 70, max_lines=2)
     return image

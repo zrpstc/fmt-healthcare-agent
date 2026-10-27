@@ -5,6 +5,7 @@ DrawingML; each numeric panel has an explicit assay/unit/denominator binding.
 """
 
 from __future__ import annotations
+from .presentation_units import display_text
 
 import hashlib
 import io
@@ -99,6 +100,9 @@ def _stack(rows, labeler, member="name"):
 
 
 def chart_data(document, spec):
+    if spec.get("id") in {"3.1.1", "3.3.1"}:
+        from .chapter_three import chart_payload
+        return chart_payload(document, spec["id"])
     ident = spec["id"]
     chapter, sub = map(int, ident.split(".")[:2])
     if ident in {"2.1.1", "2.3.1"}:
@@ -406,6 +410,7 @@ def _font(size):
 
 
 def _text(draw, xy, text, font, fill="#30343A", width=None, anchor="la", max_lines=3):
+    text = display_text(text)
     lines = _wrap(draw, text, font, width, max_lines) if width else str(text).splitlines()
     step = font.size * 1.32
     for i, line in enumerate(lines):
@@ -413,6 +418,9 @@ def _text(draw, xy, text, font, fill="#30343A", width=None, anchor="la", max_lin
 
 
 def draw_chart(spec, payload, width):
+    if payload.get("chapter_three_mode"):
+        from .chapter_three import draw_chart as draw_chapter_three
+        return draw_chapter_three(payload, width)
     if payload.get("chapter_two_mode"):
         from .chapter_two import draw_chart as draw_chapter_two
         return draw_chapter_two(spec, payload, width)

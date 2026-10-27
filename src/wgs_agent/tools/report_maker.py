@@ -735,6 +735,9 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
                     for block in chapter_spec["blocks"]:
                         if block["type"]=="table" and block["rows"][0]==table_rows[0] and len(block["widths"])==ncols:
                             widths=tuple(block["widths"])
+                if table_rows[0][:2] in (["菌群范围", "具体物种"], ["关注类别", "微生物名称"]):
+                    weights = {"菌群范围": 12, "关注类别": 12, "具体物种": 22, "微生物名称": 22, "功能背景": 30, "关注说明": 30, "检出状态": 10, "主分析丰度": 12, "对照谱丰度": 12, "人群分位数": 11}
+                    widths = tuple(weights.get(header, 15) for header in table_rows[0])
                 score_style = (
                     FontFace(color=(52,101,164), size_pt=18)
                     if table_rows[0] == ["综合健康分", "失衡分", "模型肠龄"] else None

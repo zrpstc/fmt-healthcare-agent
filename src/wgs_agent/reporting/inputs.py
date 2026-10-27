@@ -58,7 +58,11 @@ def load_existing_report_inputs(sample_id: str, root: Path | None = None) -> dic
         pipeline = {"profiler": "MetaPhlAn"}
         invalid = False
         with profile.open(encoding="utf-8") as handle:
+            profile_headers = []
             for line in handle:
+                if line.lstrip("#").startswith("clade_name\t"):
+                    profile_headers = line.lstrip("#").strip().split("\t")
+                    continue
                 if line.startswith("#mpa_"):
                     pipeline["database_version"] = line[1:].strip()
                 version = re.match(r"#\s*MetaPhlAn(?: version)?\s+([0-9]+\.[0-9]+(?:\.[0-9]+)?)", line, re.I)
@@ -84,6 +88,13 @@ def load_existing_report_inputs(sample_id: str, root: Path | None = None) -> dic
                         "source_file": str(profile),
                     }
                 )
+                if profile_headers:
+                    supplied = dict(zip(profile_headers, fields))
+                    supported_fields = {"read_count": ("read_count", "reads", "supporting_reads"), "clade_reads": ("clade_reads",), "direct_reads": ("direct_reads",), "coverage": ("coverage",), "coverage_breadth": ("coverage_breadth",), "marker_coverage": ("marker_coverage",)}
+                    for key, aliases in supported_fields.items():
+                        number = next((finite(supplied.get(alias)) for alias in aliases if finite(supplied.get(alias)) is not None), None)
+                        if number is not None and number >= 0:
+                            taxonomy[ranks[leaf[0]]][-1][key] = number
         complete = bool(taxonomy["species"]) and not invalid
         result["taxonomy"] = {
             "ranks": taxonomy,

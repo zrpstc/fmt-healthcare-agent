@@ -1146,6 +1146,8 @@ class Body:
 
 
 def prepare_presentation(document):
+    from .chapter_three import prepare_chapter_three
+    prepare_chapter_three(document)
     document["audit"]["body_template_version"] = TEMPLATE_VERSION
     document["audit"]["overview_rule_version"] = RULE_VERSION
     document["presentation"] = {
@@ -1163,6 +1165,8 @@ def prepare_presentation(document):
         "topic_placement": TOPIC_PLACEMENT,
     }
     document["overview_findings"] = select_findings(document)
+    if len(document["presentation"].get("chapters", [])) > 2:
+        document["presentation"]["chapters"][2]["subsections"] = document["presentation"]["chapters"][2]["subsections"][:3]
 
 
 def render_body(document):

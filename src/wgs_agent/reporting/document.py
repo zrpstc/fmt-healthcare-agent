@@ -5,6 +5,7 @@ metabolite concentrations, host function scores, or disease probabilities.
 """
 
 from __future__ import annotations
+from .presentation_units import display_text, display_unit
 
 import html
 import math
@@ -48,7 +49,7 @@ def records(data: Any, *keys: str) -> list[dict]:
 def text(value: Any, missing: str = "未提供") -> str:
     if value is None or value == "":
         return missing
-    return html.unescape(str(value)).replace("|", "／").replace("\n", " ").strip()
+    return display_text(html.unescape(str(value)).replace("|", "／").replace("\n", " ").strip())
 
 
 def number(value: Any) -> str:
@@ -74,9 +75,7 @@ def _label(row: dict) -> str:
 
 
 def _unit(value: Any) -> str:
-    return {"percent": "%", "percentage": "%", "relative_abundance": "相对丰度"}.get(
-        str(value), text(value)
-    )
+    return {"percent": "%", "percentage": "%", "relative_abundance": "相对丰度"}.get(str(value), display_unit(text(value, missing="")))
 
 
 def _matches(row: dict, keywords: tuple[str, ...]) -> bool:
@@ -728,7 +727,7 @@ def render_markdown(document: dict) -> str:
     matching = document.get("fmt_matching") or {}
     if matching.get("top_k_matches"):
         output.extend(_fmt_appendix(matching))
-    return "\n\n".join(output) + "\n"
+    return display_text("\n\n".join(output) + "\n")
 
 
 def _fmt_appendix(matching: dict) -> list[str]:

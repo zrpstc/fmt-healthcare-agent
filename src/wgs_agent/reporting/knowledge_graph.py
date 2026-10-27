@@ -164,6 +164,8 @@ async def enrich_document(document: dict, *, transport=None) -> None:
                     audit["added_claims"] += 1
                 if key not in topic["allowed_narrative_ids"]:
                     topic["allowed_narrative_ids"].append(key)
+        from .chapter_three import integrate_knowledge
+        integrate_knowledge(document, references)
         audit.update(
             status="complete",
             scanned_claims=len(raw),
@@ -335,9 +337,9 @@ def graph_markdown(topic: dict) -> list[str]:
 
     graph = topic.get("knowledge_subgraph", {})
     if not graph.get("edges"):
-        return ["**相关知识子图**：未匹配到可展示的知识图谱关系。"]
+        return []
     if graph.get("display_status") != "ready":
-        return ["**相关知识子图**：中文图谱暂不可用。"]
+        return []
     output = ["**相关知识子图**"]
     if graph.get("figure"):
         output.append(f"![{text(topic['title'])}相关知识子图]({graph['figure']})")

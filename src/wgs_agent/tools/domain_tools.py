@@ -944,6 +944,8 @@ class ReportGeneratorTool(BaseTool):
                 evidence_manifest["chapter_one_taxon_labels"] = document.get("chapter_one_taxon_labels", {})
                 evidence_manifest["chapter_one_presentation"] = document.get("chapter_one_presentation", {})
                 evidence_manifest["chapter_two_results"] = document.get("chapter_two_results", {})
+                evidence_manifest["chapter_three_results"] = document.get("chapter_three_results", {})
+                evidence_manifest["chapter_three_backgrounds"] = document.get("chapter_three_backgrounds", {})
                 evidence_manifest["chapter_two_taxon_labels"] = document.get("chapter_two_taxon_labels", {})
                 evidence_manifest["word_sections"] = document.get("word_sections", [])
                 (staging / filenames["markdown"]).write_text(markdown, encoding="utf-8")
