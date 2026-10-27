@@ -99,46 +99,48 @@ async def enrich_document(document: dict, *, transport=None) -> None:
         async with httpx.AsyncClient(
             base_url=base, headers=headers, timeout=timeout, transport=transport
         ) as client:
-            while len(raw) < limit:
-                size = min(500, limit - len(raw))
-                response = await client.get(
-                    f"/knowledge-bases/{kb}/claims", params={"limit": size, "offset": len(raw)}
-                )
-                response.raise_for_status()
-                payload = response.json()
-                page = payload.get("claims") if isinstance(payload, dict) else None
-                if not isinstance(page, list) or any(not isinstance(r, dict) for r in page):
-                    raise ValueError("invalid Claim response")
-                total = payload.get("total")
-                raw.extend(page[:size])
-                if len(page) < size or (isinstance(total, int) and len(raw) >= total):
-                    break
+            from .litkg_claims import load_claims
+            if transport is None:
+                from .litkg_targeted import retrieve_report_references
+                try:
+                    raw, fetch_meta = await retrieve_report_references(client, kb, document, limit)
+                except httpx.HTTPStatusError as error:
+                    if error.response.status_code not in {404, 405}:
+                        raise
+                    raw, fetch_meta = await load_claims(client, kb, limit)
+            else:
+                raw, fetch_meta = await load_claims(client, kb, limit, cache_dir=False)
+            total = fetch_meta.get("total_claims")
+            audit.update(fetch_meta)
         from wgs_agent.tools.knowledge_tools import claim_record_to_reference
 
-        references = []
-        for row in raw:
-            if row.get("id") is None:
-                continue
-            item = claim_record_to_reference(row, base_url=base, knowledge_base_id=kb)
-            # Keep endpoint identities and qualifiers that are absent in the legacy contract.
-            for field in (
-                "subject_entity_id",
-                "object_entity_id",
-                "subject_normalized_id",
-                "object_normalized_id",
-                "qualifiers",
-                "process",
-                "result_status",
-                "review_status",
-                "display_negated",
-                "page",
-                "page_end",
-                "section_title",
-                "title",
-            ):
-                if field in row:
-                    item[field] = row[field]
-            references.append(item)
+        if fetch_meta.get("reference_rows"):
+            references = raw
+        else:
+            references = []
+            for row in raw:
+                if row.get("id") is None:
+                    continue
+                item = claim_record_to_reference(row, base_url=base, knowledge_base_id=kb)
+                # Keep endpoint identities and qualifiers that are absent in the legacy contract.
+                for field in (
+                    "subject_entity_id",
+                    "object_entity_id",
+                    "subject_normalized_id",
+                    "object_normalized_id",
+                    "qualifiers",
+                    "process",
+                    "result_status",
+                    "review_status",
+                    "display_negated",
+                    "page",
+                    "page_end",
+                    "section_title",
+                    "title",
+                ):
+                    if field in row:
+                        item[field] = row[field]
+                references.append(item)
         evidence = document["evidence"]
         document["references"] = copy.deepcopy(document.get("references") or {})
         supplied = document["references"].get("matched_docs", [])
@@ -167,10 +169,10 @@ async def enrich_document(document: dict, *, transport=None) -> None:
         from .chapter_three import integrate_knowledge
         integrate_knowledge(document, references)
         audit.update(
-            status="complete",
+            status=fetch_meta.get("status", "complete"),
             scanned_claims=len(raw),
             total_claims=total,
-            scan_truncated=isinstance(total, int) and total > len(raw),
+            scan_truncated=fetch_meta.get("scan_truncated", isinstance(total, int) and total > len(raw)),
             knowledge_base_id=kb,
         )
         audit["selected_sha256"] = hashlib.sha256(

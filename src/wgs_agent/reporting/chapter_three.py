@@ -123,7 +123,21 @@ def background(document, row):
     name = _name(row)
     claims = [r for r in document.get("evidence", {}).values() if _functional(r) and _claim_scope(r, name)]
     if not claims:
-        return {"sentence": "LitKG暂缺可用于介绍该物种功能的直接证据。", "scope": "missing", "claim_ids": [], "evidence_count": 0}
+        retrieval = document.get("audit", {}).get("knowledge_graph_retrieval", {})
+        status = retrieval.get("status")
+        if status == "unavailable":
+            sentence = "本次LitKG检索超时，功能介绍暂不可用。" if retrieval.get("error_type") in {"ReadTimeout", "ConnectTimeout", "TimeoutException"} else "本次LitKG连接或检索失败，功能介绍暂不可用。"
+        elif status == "partial" or retrieval.get("scan_truncated"):
+            sentence = "本次LitKG检索覆盖不完整，尚未取得该物种的功能介绍。"
+        elif status == "cached" and retrieval.get("refresh_error_type"):
+            sentence = "最近一次LitKG知识快照中未匹配到该物种的直接功能证据。"
+        elif status in {"disabled", "not_configured"}:
+            sentence = "本次未启用LitKG检索，功能介绍暂不可用。"
+        elif retrieval.get("source") == "targeted":
+            sentence = "本次定向检索未匹配到该物种可直接使用的功能证据。"
+        else:
+            sentence = "LitKG暂缺可用于介绍该物种功能的直接证据。"
+        return {"sentence": sentence, "scope": "missing", "claim_ids": [], "evidence_count": 0, "retrieval_status": status}
     claims.sort(key=lambda r: _claim_rank(r, name), reverse=True)
     claim = claims[0]
     scope = _claim_scope(claim, name)
@@ -146,7 +160,7 @@ def integrate_knowledge(document, references):
             key = by_claim.get(ident)
             if key is None:
                 key = "C3KG_" + re.sub(r"[^A-Za-z0-9_]", "_", ident)
-                evidence[key] = {**claim, "kind": "knowledge"}
+                evidence[key] = {**claim, "kind": "literature"}
                 matched.append(claim)
                 by_claim[ident] = key
                 added.append(ident)

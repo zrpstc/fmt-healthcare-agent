@@ -194,6 +194,9 @@ def bind_table(document, block, data=None):
         from .chapter_three import table_payload
         return table_payload(document, int(block["id"].split(".")[1]))["rows"]
     chapter, sub = map(int, block["id"].split(".")[:2])
+    if chapter == 8:
+        from .chapter_eight import table_rows
+        return table_rows(document, sub, data, labels=[row[0] for row in block["rows"][1:]])
     data = data or Data(document).load(chapter, sub)
     headers = block["rows"][0]
     if block["id"] == "2.3.t1":
@@ -973,6 +976,12 @@ def render_body(document):
                         output.append(part)
 
         for block in chapter["blocks"]:
+            if n == 7 and block["type"] == "heading" and block["sub"] == 2:
+                finish(sub)
+                from .chapter_seven import render_sections
+                output.extend(render_sections(document))
+                sub = 0
+                break
             if n == 3 and block["sub"] in {0, 4}:
                 continue
             kind = block["type"]

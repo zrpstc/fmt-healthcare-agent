@@ -714,6 +714,15 @@ def render_markdown(document: dict) -> str:
     output.append(
         "> 阅读提示：本报告分别标识菌群估计、功能潜能、检测结果和模型推算。未评估项目不表示正常，报告用于健康管理与研究参考，不能替代临床诊断。"
     )
+    kg_retrieval = document.get("audit", {}).get("knowledge_graph_retrieval", {})
+    if kg_retrieval.get("status") == "unavailable":
+        output.append("知识证据：本次LitKG连接或检索未完成，相关介绍和知识子图暂不可用；这不表示知识库没有相关证据。")
+    elif kg_retrieval.get("status") == "partial":
+        output.append("知识证据：本次仅取得部分LitKG记录，未匹配项目暂不能据此判定缺少相关知识。")
+    elif kg_retrieval.get("status") == "cached" and kg_retrieval.get("refresh_error_type"):
+        output.append("知识证据：LitKG实时读取未完成，本次使用最近一次成功同步的知识快照，来源时间见结构化报告。")
+    if document.get("audit", {}).get("graph_translation", {}).get("raw_source_labels", 0):
+        output.append("知识图中部分术语沿用知识库原文；关系与文献依据保持不变。")
     output.extend(render_body(document))
     output.extend(
         [

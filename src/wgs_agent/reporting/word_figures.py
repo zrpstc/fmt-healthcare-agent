@@ -105,6 +105,9 @@ def chart_data(document, spec):
         return chart_payload(document, spec["id"])
     ident = spec["id"]
     chapter, sub = map(int, ident.split(".")[:2])
+    if chapter == 8:
+        from .chapter_eight import chart_payload
+        return chart_payload(document, spec)
     if ident in {"2.1.1", "2.3.1"}:
         from .chapter_two import chart_payload
         return chart_payload(document, spec)
@@ -418,6 +421,9 @@ def _text(draw, xy, text, font, fill="#30343A", width=None, anchor="la", max_lin
 
 
 def draw_chart(spec, payload, width):
+    if payload.get("chapter_eight_mode"):
+        from .chapter_eight import draw_chart as draw_chapter_eight
+        return draw_chapter_eight(payload, width)
     if payload.get("chapter_three_mode"):
         from .chapter_three import draw_chart as draw_chapter_three
         return draw_chapter_three(payload, width)
@@ -892,6 +898,8 @@ def render_word_figures(document, output_dir):
             (output / name).write_bytes(encoded)
             manifest[key] = {"filename": name, "items": payloads, "width": width, "height": height}
             figures[key] = name
+    from .chapter_seven import render_figures as render_chapter_seven_figures
+    figures.update(render_chapter_seven_figures(document, output, manifest))
     document["word_figures"] = manifest
     document["presentation"]["word_source_hashes"] = contract()["sources"]
     document["presentation"]["word_chart_count"] = 21

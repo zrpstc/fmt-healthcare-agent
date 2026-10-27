@@ -776,24 +776,9 @@ class Body:
                 )
             ]
         potential = [r for r in rows if r.get("measurement_type") == "functional_potential"]
-        self.emit(
-            ["产物或功能分支", "反应方向", "本次功能结果", "主要贡献菌与证据"],
-            [
-                [
-                    r["label"],
-                    _pick(
-                        r,
-                        "reaction_direction",
-                        "direction",
-                        default="以所列路径注释为准；方向未单独验证",
-                    ),
-                    r["result_text"],
-                    f"{_contributors(r)}；{_sequence(r)}",
-                ]
-                for r in potential
-            ],
-            "本次未提供该方向的测序功能结果，无法判断。",
-        )
+        from .chapter_eight import HEADERS, SCORE_NOTE, table_rows
+        self.emit(HEADERS, table_rows({}, block, self), "未提供对应代谢通路证据")
+        self.out.append(SCORE_NOTE)
         other = [r for r in rows if r.get("measurement_type") != "functional_potential"]
         if other:
             from .document import TYPE_LABELS

@@ -313,6 +313,15 @@ def translate_graph_labels(document: dict, config: dict | None, *, post=None) ->
                 "detail": fallback or value,
                 "source": "dictionary",
             }
+    raw_source_labels = 0
+    for key, item in items.items():
+        if key in accepted:
+            continue
+        # Missing translation must not discard a retrieved, cited relationship.
+        original_text = re.sub(r"[\x00-\x1f\x7f]", " ", str(item["text"])).strip()
+        if original_text:
+            accepted[key] = {"label": original_text[:120], "detail": original_text[:240], "source": "source_text_fallback"}
+            raw_source_labels += 1
     for section in document["sections"]:
         for topic in section["topics"]:
             graph = topic.get("knowledge_subgraph", {})
@@ -355,3 +364,4 @@ def translate_graph_labels(document: dict, config: dict | None, *, post=None) ->
         "available_labels": len(accepted),
         "errors": errors,
     }
+    document["audit"]["graph_translation"]["raw_source_labels"] = raw_source_labels
