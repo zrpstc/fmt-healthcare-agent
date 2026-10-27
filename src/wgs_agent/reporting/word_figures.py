@@ -105,6 +105,9 @@ def chart_data(document, spec):
         return chart_payload(document, spec["id"])
     ident = spec["id"]
     chapter, sub = map(int, ident.split(".")[:2])
+    if chapter == 10:
+        from .chapter_ten import chart_payload
+        return chart_payload(document, spec)
     if chapter == 8:
         from .chapter_eight import chart_payload
         return chart_payload(document, spec)
@@ -902,6 +905,6 @@ def render_word_figures(document, output_dir):
     figures.update(render_chapter_seven_figures(document, output, manifest))
     document["word_figures"] = manifest
     document["presentation"]["word_source_hashes"] = contract()["sources"]
-    document["presentation"]["word_chart_count"] = 21
+    document['presentation']['word_chart_count'] = sum(item.get('type') == 'chart' for chapter in contract()['chapters'] for block in chapter['blocks'] for item in block.get('items', []))
     document["presentation"]["word_flow_count"] = 12
     return figures

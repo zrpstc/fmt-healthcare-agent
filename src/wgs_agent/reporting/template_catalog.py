@@ -160,7 +160,7 @@ CHAPTERS = (
             ("神经活性分子的生成与降解相关功能", ("gut_brain.gaba", "gut_brain.catecholamine")),
             ("芳香族氨基酸代谢的关联解读", ("gut_brain.tryptophan",)),
             ("雌激素等相关微生物转化功能", ("gut_brain.estrogen", "gut_brain.metabolic_signals")),
-            ("量表背景与综合解读", ()),
+            ('睡眠、压力与情绪相关代谢评分及解读', ()),
         ),
     ),
     (

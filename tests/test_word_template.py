@@ -213,7 +213,10 @@ def test_identical_word_placeholder_paragraphs_use_their_own_chapter():
     assert "UNIQUE_VF" in block(md, "4.4")
     assert "UNIQUE_VF" not in block(md, "7.4")
     assert "UNIQUE_VF" not in block(md, "10.4")
-    assert "UNIQUE_SLEEP" in block(md, "10.4")
+    assert 'UNIQUE_SLEEP' not in block(md, '10.4')
+    assert "代谢关联评分" in block(md, "10.4")
+    assert "证据不足" in block(md, "10.4")
+    assert "不是睡眠、压力或情绪问卷的实测分数" in block(md, "10.4")
 
 
 def test_cell_component_synthesis_is_not_dietary_polysaccharide_degradation():

@@ -102,6 +102,9 @@ def _function_rows(data, chapter, sub):
         (8, 8): ("lipopolysaccharide", "lipid a", "peptidoglycan", "脂多糖", "肽聚糖"),
         (10, 1): ("gaba", "gabap", "glutamate decarboxylase", "catecholamine", "多巴胺"),
     }.get((chapter, sub), ())
+    if chapter == 10 and sub in {1, 2, 3}:
+        from .chapter_ten import search_terms
+        words = tuple(dict.fromkeys((*words, *search_terms(sub))))
     rows = list({id(r): r for r in rows + data.functions(words)}.values())
     if chapter == 8 and sub in {1, 2}:
         rows = [
@@ -122,6 +125,7 @@ def _direction(row):
     generation = any(
         w in value for w in ("generation", "biosynthesis", "production", "生成", "合成")
     )
+    generation = generation or any(word in value for word in ("synthesis", "biosynth", "synthetic", "合成"))
     use = any(
         w in value for w in ("utilization", "consumption", "degradation", "利用", "消耗", "降解")
     )
@@ -194,6 +198,9 @@ def bind_table(document, block, data=None):
         from .chapter_three import table_payload
         return table_payload(document, int(block["id"].split(".")[1]))["rows"]
     chapter, sub = map(int, block["id"].split(".")[:2])
+    if chapter == 10:
+        from .chapter_ten import table_rows
+        return table_rows(document, sub, data)
     if chapter == 8:
         from .chapter_eight import table_rows
         return table_rows(document, sub, data, labels=[row[0] for row in block["rows"][1:]])
@@ -752,6 +759,9 @@ def narrative_sections(document):
 
 
 def _narrative(document, chapter, sub):
+    if chapter == 10:
+        from .chapter_ten import interpretation
+        return interpretation(document, sub)
     key = f"word.{chapter}.{sub}"
     topic = next(
         (t for s in document.get("word_sections", []) for t in s["topics"] if t["id"] == key), None
@@ -777,6 +787,9 @@ def _narrative(document, chapter, sub):
 
 
 def paragraph(document, block, chapter):
+    if chapter == 10 and block.get("chapter_ten_role") == "interpretation":
+        from .chapter_ten import interpretation
+        return "结果解读：" + interpretation(document, block["sub"])
     if (chapter, block["sub"]) == (1, 3):
         from .ordination import composition_summary
         return composition_summary(document)
@@ -942,6 +955,8 @@ def render_body(document):
         sub = 0
 
         def finish(index):
+            if n == 10:
+                return
             if not index:
                 return
             # A generated subsection interpretation has one visible placement.
@@ -1095,6 +1110,9 @@ def render_body(document):
 
 
 def _bound_headers(document, block):
+    if str(block.get("id", "")).startswith("10."):
+        from .chapter_ten import HEADERS, TRAIT_HEADERS
+        return TRAIT_HEADERS if block["sub"] == 4 else HEADERS
     if str(block.get("id", "")).startswith(("3.1.", "3.2.", "3.3.")):
         from .chapter_three import table_payload
         return table_payload(document, int(block["id"].split(".")[1]))["headers"]
