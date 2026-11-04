@@ -109,4 +109,16 @@ def load_existing_report_inputs(sample_id: str, root: Path | None = None) -> dic
     if pathway_file.is_file() and pathway_file.resolve().is_relative_to(root):
         from .functional_metrics import read_humann_pathways
         result["pathways"] = read_humann_pathways(pathway_file)
+    from wgs_agent.pipeline.strain_virulence import load_chapter4_inputs
+    result.update(load_chapter4_inputs(sample_id, root))
+    from wgs_agent.pipeline.resistome_mge import load_chapter5_inputs
+    result.update(load_chapter5_inputs(sample_id, root))
+    from .chapter_six import load_chapter6_inputs
+    result.update(load_chapter6_inputs(sample_id, root))
+    from wgs_agent.pipeline.functional_annotations import load_functional_inputs
+    result.update(load_functional_inputs(sample_id, root))
+    from wgs_agent.pipeline.specialized_metabolism import load_specialized_inputs
+    result.update(load_specialized_inputs(sample_id, root))
+    from wgs_agent.pipeline.disease_features import analyze_disease_features
+    result["diseases"] = analyze_disease_features(result.get("taxonomy"))
     return result

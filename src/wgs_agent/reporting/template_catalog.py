@@ -4,7 +4,7 @@ The evidence/narrative topic IDs remain stable so knowledge graphs and module
 bibliographies retain their existing contracts. Only their body placement changes.
 """
 
-TEMPLATE_VERSION = 'word-native-1-14-v2-community-v1'
+TEMPLATE_VERSION = "word-native-1-13-specialized-v4"
 
 # number, title, introduction, [(subheading, legacy evidence/narrative topic IDs)]
 CHAPTERS = (
@@ -237,9 +237,12 @@ CHAPTERS = (
 
 CHAPTERS = tuple((n - 2, title, intro, blocks) for n, title, intro, blocks in CHAPTERS)
 
+from .report_outline import display_number, visible_chapters
+REPORT_CHAPTERS = visible_chapters(CHAPTERS)
+
 TOPIC_PLACEMENT = {
     topic_id: f"{number}.{index}"
-    for number, _, _, blocks in CHAPTERS
+    for number, _, _, blocks in REPORT_CHAPTERS
     for index, (_, topic_ids) in enumerate(blocks, 1)
     for topic_id in topic_ids
 }
@@ -247,6 +250,7 @@ TOPIC_PLACEMENT = {
 # Explicit optional inputs. They do not trigger new bioinformatics analyses.
 TEMPLATE_INPUT_KEYS = (
     "taxonomy",
+    "diseases",
     "diversity",
     "core_microbiome",
     "absolute_abundance",

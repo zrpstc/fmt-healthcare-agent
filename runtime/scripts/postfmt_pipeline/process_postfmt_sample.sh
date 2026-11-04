@@ -87,17 +87,117 @@ prepare_healthy_comparison() {
     fi
 }
 
+
+# Chapter-four steps have separate durable states and never invalidate completed base profiles.
+run_chapter_four() {
+  [[ "${WGS_CHAPTER4_ENABLED:-1}" == "1" ]] || return 0
+  local chapter4_python="${WGS_CHAPTER4_PYTHON:-$APP_ROOT/.venv/bin/python}"
+  local chapter4_reads="$CLEAN_DIR/${SAMPLE_ID}.dehosted.fastq.gz"
+  if [[ -s "${MERGED_FASTQ:-}" ]]; then chapter4_reads="$MERGED_FASTQ"; fi
+  if [[ ! -x "$chapter4_python" ]]; then
+    printf 'Chapter 4: application Python unavailable.\n' >&2
+    return 0
+  fi
+  if ! PYTHONPATH="$APP_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" "$chapter4_python" -B \
+      -m wgs_agent.pipeline.strain_virulence --sample-id "$SAMPLE_ID" \
+      --output-root "$OUTPUT_ROOT" --reads "$chapter4_reads" \
+      --db-root "$DB_ROOT" --tax-bin "$TAX_ENV/bin" --threads "$METAPHLAN_THREADS"; then
+    printf 'Chapter 4: incomplete; inspect normalized module status.\n' >&2
+  fi
+  return 0
+}
+
+run_chapter_five() {
+    [[ "${WGS_CHAPTER5_ENABLED:-1}" == "1" ]] || return 0
+    local chapter5_python="${WGS_CHAPTER5_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    local chapter5_reads="$CLEAN_DIR/${SAMPLE_ID}.dehosted.fastq.gz"
+    if [[ -s "${MERGED_FASTQ:-}" ]]; then chapter5_reads="$MERGED_FASTQ"; fi
+    if [[ ! -x "$chapter5_python" ]]; then
+        printf '%s\n' '[chapter5] Python unavailable; analysis not run' >&2
+        return 0
+    fi
+    if ! PYTHONPATH="$APP_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" "$chapter5_python" \
+      -m wgs_agent.pipeline.resistome_mge --sample-id "$SAMPLE_ID" \
+      --output-root "$OUTPUT_ROOT" --reads "$chapter5_reads" \
+      --database-root "${WGS_CHAPTER5_DATABASE_ROOT:-$APP_ROOT/fmt-databases/resistome_mge}" \
+      --tax-bin "$TAX_ENV/bin" --threads "$METAPHLAN_THREADS" \
+      >> "$LOG_DIR/${SAMPLE_ID}.chapter5.log" 2>&1; then
+        printf '%s\n' '[chapter5] See module status; primary pipeline retained' >&2
+    fi
+    return 0
+}
+
+
+run_chapter_six() {
+    [[ "${WGS_CHAPTER6_ENABLED:-1}" == "1" ]] || return 0
+    local app_python="${WGS_CHAPTER6_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    if [[ ! -x "$app_python" ]]; then
+        printf '%s\n' '[chapter6] Python unavailable; analysis not run' >&2
+        return 0
+    fi
+    if ! PYTHONPATH="$APP_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" "$app_python" -B \
+      -m wgs_agent.pipeline.non_bacterial --sample-id "$SAMPLE_ID" --output-root "$OUTPUT_ROOT" \
+      "${1:---ensure-viral}" --metaphlan "$METAPHLAN" --db-dir "$METAPHLAN_DB" \
+      --index "$METAPHLAN_INDEX" --threads "$METAPHLAN_THREADS"; then
+        printf '%s\n' '[chapter6] Screening incomplete; inspect module status' >&2
+    fi
+    return 0
+}
+
+run_specialized_metabolism() {
+    [[ "${WGS_SPECIALIZED_METABOLISM_ENABLED:-1}" == "1" ]] || return 0
+    local app_python="${WGS_FUNCTIONAL_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    if [[ ! -x "$app_python" ]]; then
+        printf '%s\n' '[specialized] Python unavailable; annotation not run' >&2
+        return 0
+    fi
+    if ! PYTHONPATH="$APP_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" "$app_python" -B \
+      -m wgs_agent.pipeline.specialized_metabolism --sample-id "$SAMPLE_ID" \
+      --output-root "$OUTPUT_ROOT" --mapping-dir "$DB_ROOT/humann3/utility_mapping"; then
+        printf '%s\n' '[specialized] Annotation incomplete; inspect module status' >&2
+    fi
+    return 0
+}
+
+run_functional_annotations() {
+    [[ "${WGS_FUNCTIONAL_ANNOTATIONS_ENABLED:-1}" == "1" ]] || return 0
+    local app_python="${WGS_FUNCTIONAL_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    if [[ ! -x "$app_python" ]]; then
+        printf '%s\n' '[functional] Python unavailable; annotation not run' >&2
+        return 0
+    fi
+    if ! PYTHONPATH="$APP_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" "$app_python" -B \
+      -m wgs_agent.pipeline.functional_annotations --sample-id "$SAMPLE_ID" \
+      --output-root "$OUTPUT_ROOT" --mapping-dir "$DB_ROOT/humann3/utility_mapping"; then
+        printf '%s\n' '[functional] Annotation incomplete; inspect module status' >&2
+    fi
+    return 0
+}
+
+record_base_completion() {
+    local marker="$DONE_DIR/${SAMPLE_ID}.done"
+    local temporary="${marker}.tmp.$$"
+    printf '%s\t%s\t%s\n' "$(date -Is)" "$SAMPLE_ID" "$GROUP_JSON" > "$temporary"
+    mv -- "$temporary" "$marker"
+}
+
 mkdir -p "$FASTP_DIR" "$KNEAD_DIR" "$HUMANN_SAMPLE_DIR" "$QC_DIR" \
     "$CLEAN_DIR" "$LOG_DIR" "$DONE_DIR" "$FAILED_DIR" "$(dirname "$LOCK_DIR")" \
     "$(dirname "$METAPHLAN_OUT")" "$HUMANN_DIR"
 
-if [[ -s "$DONE_DIR/${SAMPLE_ID}.done" ]]; then
+if [[ -f "$DONE_DIR/${SAMPLE_ID}.done" ]]; then
     if [[ -s "$METAPHLAN_OUT" \
         && -s "$HUMANN_DIR/${SAMPLE_ID}_pathabundance_relab.tsv" \
         && -s "$HUMANN_DIR/${SAMPLE_ID}_genefamilies_relab.tsv" \
         && -s "$CLEAN_DIR/${SAMPLE_ID}.dehosted.fastq.gz" ]]; then
         prepare_healthy_comparison
         printf 'SKIP complete: %s\n' "$SAMPLE_ID"
+        run_chapter_four
+        run_chapter_five
+        run_chapter_six
+        run_functional_annotations
+        run_specialized_metabolism
+        record_base_completion
         exit 0
     fi
     rm -f "$DONE_DIR/${SAMPLE_ID}.done"
@@ -237,17 +337,24 @@ if [[ ! -s "$METAPHLAN_OUT" ]]; then
     log "METAPHLAN $METAPHLAN_INDEX"
     jan25_mapout="$WORK_DIR/${SAMPLE_ID}.jan25.mapout.bz2"
     rm -f "$jan25_mapout"
+    mkdir -p "$OUTPUT_ROOT/profiles/viruses"
     "$METAPHLAN" "$MERGED_FASTQ" \
+      --profile_vsc --vsc_breadth 0.75 \
+      --vsc_out "$OUTPUT_ROOT/profiles/viruses/${SAMPLE_ID}_vsc.tsv" \
+      --samout "$WORK_DIR/${SAMPLE_ID}.vsc.sam" \
         --input_type fastq -o "$METAPHLAN_OUT" \
         --mapout "$jan25_mapout" \
         --db_dir "$METAPHLAN_DB" -x "$METAPHLAN_INDEX" \
         --nproc "$METAPHLAN_THREADS"
+    run_chapter_six --complete-vsc
     rm -f "$jan25_mapout"
 fi
 require_file "$METAPHLAN_OUT"
 
 # HUMAnN 3.9 officially supports MetaPhlAn vJun23, while the latest Jan25
 # profile above is retained as the primary species-abundance result.
+# Viral supplementation runs after the canonical dehosted reads are published.
+
 HUMANN_TAX_DIR="$OUTPUT_ROOT/profiles/metaphlan_humann_vJun23"
 HUMANN_TAX_OUT="$HUMANN_TAX_DIR/${SAMPLE_ID}_profile.tsv"
 mkdir -p "$HUMANN_TAX_DIR"
@@ -314,7 +421,11 @@ require_file "$clean_output"
 # independent reference branch fails. Reports already consume its profile.
 prepare_healthy_comparison
 
-printf '%s\t%s\t%s\n' "$(date -Is)" "$SAMPLE_ID" "$GROUP_JSON" \
-    > "$DONE_DIR/${SAMPLE_ID}.done"
+run_chapter_four
+run_chapter_five
+run_chapter_six
+run_functional_annotations
+run_specialized_metabolism
+record_base_completion
 log "COMPLETE"
 rm -rf "$WORK_DIR" || true

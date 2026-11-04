@@ -144,6 +144,7 @@ def build_document(
 ) -> dict:
     context = context or {}
     inputs = context.get("health_inputs") or {}
+    diseases = diseases or inputs.get("diseases") or {}
     evidence: dict[str, dict] = {}
     groups: dict[str, list[str]] = {}
     counts: dict[str, int] = {}
@@ -576,6 +577,8 @@ def build_document(
         }
     )
 
+    from .chapter_nine import prepare_document as prepare_chapter_nine
+    prepare_chapter_nine(document)
     from .knowledge_graph import attach_subgraphs
 
     attach_subgraphs(document)

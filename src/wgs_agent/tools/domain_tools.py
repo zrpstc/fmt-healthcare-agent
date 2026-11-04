@@ -805,7 +805,6 @@ class ReportGeneratorTool(BaseTool):
     params_model = ReportGenerateParams
 
     async def invoke(self, params: dict[str, object]) -> ToolResult:
-        import fcntl
         import hashlib
         import os
         import re
@@ -838,10 +837,9 @@ class ReportGeneratorTool(BaseTool):
             reserved = {output_dir / name for name in filenames.values()}
             if analysis_path in reserved:
                 raise ValueError("分析输入不能使用报告输出文件名")
-            lock_path = output_dir / f".{sid}.report.lock"
-            lock = os.fdopen(os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o600), "a+")
+            from wgs_agent.reporting.report_lock import acquire_report_lock
             try:
-                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                lock = acquire_report_lock(output_dir, sid)
             except BlockingIOError:
                 return ToolResult(content="该样本的报告正在生成，请稍后查看。", is_error=True)
 
@@ -868,15 +866,34 @@ class ReportGeneratorTool(BaseTool):
             # Read existing canonical artifacts to recover complete taxonomy and
             # pathways from historical analysis JSONs that only retained Top N.
             inputs = load_existing_report_inputs(sid)
+            functional_fresh = {k: inputs[k] for k in ("functional_modules",) if k in inputs}
+            specialized_fresh = {k: inputs[k] for k in ("specialized_metabolism",) if k in inputs}
+            chapter6_fresh = {k: inputs[k] for k in ("archaea", "fungi", "dna_viruses") if k in inputs}
+            chapter4_fresh = {k: inputs[k] for k in ("strains", "virulence") if k in inputs}
+            chapter5_fresh = {k: inputs[k] for k in ('resistance', 'mobile_elements') if k in inputs}
             from wgs_agent.reporting.template_catalog import TEMPLATE_INPUT_KEYS
             for key in dict.fromkeys(("taxonomy", "diversity", "functional_modules", "nutrition", "diet", "symptoms", "gut_brain", "resistance", "pathogens", "disease_models", *TEMPLATE_INPUT_KEYS)):
                 if isinstance(data.get(key), (dict, list)):
                     inputs[key] = data[key]
+            from wgs_agent.pipeline.strain_virulence import merge_chapter4_inputs
+            inputs.update(merge_chapter4_inputs(chapter4_fresh, data))
+            from wgs_agent.pipeline.non_bacterial import merge_chapter6_inputs
+            inputs.update(merge_chapter6_inputs(chapter6_fresh, inputs))
+            from wgs_agent.pipeline.resistome_mge import merge_chapter5_inputs
+            inputs.update(merge_chapter5_inputs(chapter5_fresh, data))
+            from wgs_agent.pipeline.functional_annotations import merge_functional_inputs
+            inputs.update(merge_functional_inputs(functional_fresh, data))
+            from wgs_agent.pipeline.specialized_metabolism import merge_specialized_inputs
+            inputs.update(merge_specialized_inputs(specialized_fresh, data))
+            from wgs_agent.pipeline.disease_features import analyze_disease_features, merge_disease_features
+            inputs.update(merge_disease_features(analyze_disease_features(inputs.get("taxonomy")), data))
+            module_keys = ("specialized_metabolism", "diseases", "strains", "virulence", "resistance", "mobile_elements",
+                           "archaea", "fungi", "dna_viruses", "functional_modules")
+            data = {**data, **{k: inputs[k] for k in module_keys
+                              if isinstance(inputs.get(k), dict) and inputs[k].get("status") != "not_run"}}
             refreshed = refresh_reference_comparisons(data, inputs)
-            analysis_payload = (
-                json.dumps(refreshed, ensure_ascii=False, indent=2, allow_nan=False).encode("utf-8")
-                if refreshed != data else original_analysis
-            )
+            from wgs_agent.reporting.module_refresh import serialize_analysis
+            analysis_payload = serialize_analysis(original_analysis, refreshed)
             data = refreshed
             if isinstance(data.get("healthy_comparison"), dict):
                 inputs["healthy_comparison"] = data["healthy_comparison"]

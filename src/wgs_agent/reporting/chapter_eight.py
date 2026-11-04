@@ -67,6 +67,8 @@ def _paths(rows):
         for path in paths:
             if isinstance(path, dict):
                 label = path.get("pathway_name") or path.get("label") or path.get("name") or path.get("pathway_id") or path.get("id")
+                if path.get("annotation_level", "").startswith("EC enzyme family"):
+                    label = str(path.get("id", "")) + " " + str(label) + "（酶家族注释，非完整通路）"
                 direction = _direction(path)
                 if direction == "综合/方向未注明":
                     direction = _direction(row)

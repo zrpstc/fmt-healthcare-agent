@@ -103,7 +103,9 @@ def test_first_report_bootstraps_real_artifacts_from_uploaded_profiles(runtime):
     assert [row["abundance"] for row in analysis["species"]["species_list"]] == [60, 40]
     assert analysis["species"]["n_total"] == 2
     assert analysis["species"]["n_unknown"] == 2
-    assert "diseases" not in analysis and "metabolites" not in analysis
+    assert analysis["diseases"]["status"] == "completed"
+    assert all("risk_score" not in r for r in analysis["diseases"]["diseases"])
+    assert "metabolites" not in analysis
     assert analysis["diversity"]["richness"] == 2
     assert analysis["pathways"]["n_total_pathways"] == 1
     assert analysis_path.stat().st_mode & 0o777 == 0o600

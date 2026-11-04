@@ -29,21 +29,27 @@
       "kind": "reference-database",
       "path": "databases/kneaddata",
       "estimated_size_gib": 4.1,
-      "required": ["databases/kneaddata/hg_39/hg_39.1.bt2"]
+      "required": [
+        "databases/kneaddata/hg_39/hg_39.1.bt2"
+      ]
     },
     {
       "name": "metaphlan4",
       "kind": "reference-database",
       "path": "databases/metaphlan4",
       "estimated_size_gib": 34,
-      "required": ["databases/metaphlan4/mpa_vJan25_CHOCOPhlAnSGB_202503.pkl"]
+      "required": [
+        "databases/metaphlan4/mpa_vJan25_CHOCOPhlAnSGB_202503.pkl"
+      ]
     },
     {
       "name": "metaphlan4-vjun23",
       "kind": "reference-database",
       "path": "databases/metaphlan4_vJun23",
       "estimated_size_gib": 23,
-      "required": ["databases/metaphlan4_vJun23/mpa_vJun23_CHOCOPhlAnSGB_202307.pkl"]
+      "required": [
+        "databases/metaphlan4_vJun23/mpa_vJun23_CHOCOPhlAnSGB_202307.pkl"
+      ]
     },
     {
       "name": "humann3",
@@ -76,6 +82,12 @@
         "data/fmt-matching/species_abundance_train.csv",
         "data/fmt-matching/match.xlsx"
       ]
+    },
+    {
+      "name": "vfdb-core-nucleotide",
+      "kind": "database",
+      "path": "databases/vfdb/VFDB_setA_nt.fas.gz",
+      "required": false
     }
   ]
 }

@@ -16,6 +16,7 @@ from .inputs import finite
 from .reference import species_key
 from .template_body import Body, _contributors, _linked, _pick, _sequence
 from .template_catalog import CHAPTERS, TOPIC_PLACEMENT
+from .report_outline import display_number, display_references, REMOVED_CHAPTER
 
 
 @lru_cache(maxsize=1)
@@ -198,6 +199,14 @@ def bind_table(document, block, data=None):
         from .chapter_three import table_payload
         return table_payload(document, int(block["id"].split(".")[1]))["rows"]
     chapter, sub = map(int, block["id"].split(".")[:2])
+    if chapter == 4:
+        from .chapter_four import table_rows as chapter4_table_rows
+        result = chapter4_table_rows(document, sub)
+        if result is not None:
+            return result
+    if chapter == 9:
+        from .chapter_nine import table_rows
+        return table_rows(document, sub, data)
     if chapter == 10:
         from .chapter_ten import table_rows
         return table_rows(document, sub, data)
@@ -205,6 +214,11 @@ def bind_table(document, block, data=None):
         from .chapter_eight import table_rows
         return table_rows(document, sub, data, labels=[row[0] for row in block["rows"][1:]])
     data = data or Data(document).load(chapter, sub)
+    if chapter == 6:
+        from .chapter_six import table_payload as chapter6_table_payload
+        result = chapter6_table_payload(document, sub, data)
+        if result is not None:
+            return result["rows"]
     headers = block["rows"][0]
     if block["id"] == "2.3.t1":
         from .chapter_two import redundancy_table
@@ -537,6 +551,10 @@ def bind_table(document, block, data=None):
             ]
         ]
     if ident == "12.2.t1":
+        from .chapter_eleven import feature_rows
+        rows = feature_rows(document, data)
+        if rows is not None:
+            return rows or _missing_rows(block, data)
         return [
             [
                 r["label"],
@@ -562,7 +580,14 @@ def bind_table(document, block, data=None):
                 seed[0],
                 _join(models, lambda r: _pick(r, *f, default="未提供"))
                 if models
-                else "未启用：缺少适用验证",
+                else {
+                    "目标用途与预测终点": "未配置疾病预测模型及预测终点",
+                    "适用人群与排除条件": "未提供模型适用人群及排除条件",
+                    "输入与本次数据匹配": "现有物种谱可用于关联注释；缺少预测特征及预处理定义",
+                    "外部验证": "未提供独立病例/对照验证队列及验证版本",
+                    "主要性能": "未提供区分度、校准及阈值表现",
+                    "本次可报告范围": "仅文献物种关联；模型未启用",
+                }.get(seed[0], "模型未启用：缺少适用验证"),
             ]
             for seed, f in zip(block["rows"][1:], fields)
         ]
@@ -645,6 +670,8 @@ def narrative_sections(document):
     prepare_presentation(document)
     sections = []
     for chapter, title, _, blocks in CHAPTERS:
+        if chapter == REMOVED_CHAPTER:
+            continue
         topics = []
         for sub, (heading, ids) in enumerate(blocks, 1):
             if chapter == 3 and sub == 4:
@@ -751,14 +778,19 @@ def narrative_sections(document):
                     "interpretation": "",
                     "advice": "",
                     "narrative_source": "rule",
-                    "source_subsections": [f"{chapter}.{i}" for i in scope],
+                    "source_subsections": [f"{display_number(chapter)}.{i}" for i in scope],
                 }
             )
-        sections.append({"id": f"word.{chapter}", "title": f"{chapter} {title}", "topics": topics})
+        sections.append({"id": f"word.{chapter}", "title": f"{display_number(chapter)} {title}", "topics": topics})
     return sections
 
 
 def _narrative(document, chapter, sub):
+    if chapter == 4:
+        from .chapter_four import interpretation as chapter4_interpretation
+        message = chapter4_interpretation(document, sub)
+        if message is not None:
+            return message
     if chapter == 10:
         from .chapter_ten import interpretation
         return interpretation(document, sub)
@@ -787,6 +819,24 @@ def _narrative(document, chapter, sub):
 
 
 def paragraph(document, block, chapter):
+    if chapter == 13:
+        from .chapter_twelve import paragraph_text
+        override = paragraph_text(document, block, Data(document))
+        if override is not None:
+            return override
+    if chapter == 12:
+        from .chapter_eleven import paragraph_text
+        override = paragraph_text(document, block, Data(document))
+        if override is not None:
+            return override
+    if chapter == 4:
+        from .chapter_four import paragraph_override as chapter4_paragraph_override
+        message = chapter4_paragraph_override(document, block)
+        if message is not None:
+            return message
+    if chapter == 9:
+        from .chapter_nine import paragraph as chapter_nine_paragraph
+        return chapter_nine_paragraph(document, block)
     if chapter == 10 and block.get("chapter_ten_role") == "interpretation":
         from .chapter_ten import interpretation
         return "结果解读：" + interpretation(document, block["sub"])
@@ -948,10 +998,27 @@ def render_body(document):
     word_figures = document.get("word_figures", {})
     for chapter in contract()["chapters"]:
         n = chapter["number"]
+        if n == REMOVED_CHAPTER:
+            continue
+        if n == 5:
+            from .chapter_five import has_results_schema, render_chapter
+            if has_results_schema(document):
+                output.extend(render_chapter(document))
+                continue
         output.append(f"## {n} {chapter['title']}")
+        if n == 12:
+            from .chapter_eleven import status_note
+            note = status_note(document)
+            if note:
+                output.append(note)
         if n == 3:
             from .chapter_three import intro
             output.append(intro(document))
+        if n == 13:
+            from .chapter_twelve import status_note
+            note = status_note(document)
+            if note:
+                output.append(note)
         sub = 0
 
         def finish(index):
@@ -1099,6 +1166,12 @@ def render_body(document):
                     from .chapter_three import chart_payload
                     if not chart_payload(document, "3.3.1")["rows"]:
                         continue
+                if n == 4 and sub == 3:
+                    from .chapter_four import figure_note as chapter4_figure_note
+                    note = chapter4_figure_note(document)
+                    if note is not None:
+                        output.append(note)
+                        continue
                 key = "+".join(v["id"] for v in block["items"])
                 image = word_figures.get(key)
                 if image:
@@ -1106,10 +1179,25 @@ def render_body(document):
                 else:
                     output.append("图示数据状态：本次尚未渲染，图表布局见PDF报告。")
         finish(sub)
-    return output
+        if n == 13 and not Data(document).qc_failed:
+            from .chapter_twelve import source_notes
+            notes = source_notes(document, "validation")
+            if notes:
+                output.append("专项注释参考：")
+                output.extend("- " + note for note in notes)
+    return [display_references(part) for part in output]
 
 
 def _bound_headers(document, block):
+    from .chapter_eleven import table_headers as disease_headers
+    headers = disease_headers(document, block)
+    if headers is not None:
+        return headers
+    if str(block.get("id", "")).startswith("6."):
+        from .chapter_six import bound_headers as chapter6_bound_headers
+        result = chapter6_bound_headers(document, block)
+        if result is not None:
+            return result
     if str(block.get("id", "")).startswith("10."):
         from .chapter_ten import HEADERS, TRAIT_HEADERS
         return TRAIT_HEADERS if block["sub"] == 4 else HEADERS

@@ -1,0 +1,50 @@
+{
+  "version": "literature-species-associations-2026-11-04-v1",
+  "scope": "Species associations from primary human faecal shotgun metagenomic studies; no diagnostic thresholds or predictive weights.",
+  "modules": [
+    {
+      "id": "colorectal_cancer",
+      "disease": "结直肠癌（研究关联）",
+      "category": "gastrointestinal",
+      "target_population": "原研究的成人结直肠癌与非肿瘤对照队列；本次仅核对物种特征",
+      "evidence_level": "多队列宏基因组荟萃分析",
+      "reference": {
+        "doi": "10.1038/s41591-019-0405-7",
+        "url": "https://www.nature.com/articles/s41591-019-0405-7",
+        "title": "Metagenomic analysis of colorectal cancer datasets identifies cross-cohort microbial diagnostic signatures and a link with choline degradation",
+        "authors": "Thomas AM et al.",
+        "year": 2019,
+        "locator": "Fig. 1a; species biomarkers identified independently in the majority of datasets"
+      },
+      "limitations": "原研究使用不同队列和分类流程；物种检出不能证明患病，也不能复现原论文分类器。",
+      "features": [
+        {"species": "Fusobacterium nucleatum", "direction": "病例组富集"},
+        {"species": "Solobacterium moorei", "direction": "病例组富集"},
+        {"species": "Porphyromonas asaccharolytica", "direction": "病例组富集"},
+        {"species": "Parvimonas micra", "direction": "病例组富集"},
+        {"species": "Peptostreptococcus stomatis", "direction": "病例组富集"}
+      ]
+    },
+    {
+      "id": "crohns_disease",
+      "disease": "克罗恩病（研究关联）",
+      "category": "gastrointestinal",
+      "target_population": "HMP2/iHMP 克罗恩病菌群失衡期与非 IBD 对照；本次仅核对物种特征",
+      "evidence_level": "纵向多组学人群研究",
+      "reference": {
+        "doi": "10.1038/s41586-019-1237-9",
+        "url": "https://www.nature.com/articles/s41586-019-1237-9",
+        "title": "Multi-omics of the gut microbial ecosystem in inflammatory bowel diseases",
+        "authors": "Lloyd-Price J et al.",
+        "year": 2019,
+        "locator": "Multi-omic gut microbiome changes in IBD; Fig. 2f and Extended Data Fig. 4b"
+      },
+      "limitations": "关联依赖疾病活动、个体及治疗背景；本文的代谢物实测结果不作为本样本的功能或浓度测量。",
+      "features": [
+        {"species": "Faecalibacterium prausnitzii", "direction": "病例菌群失衡期减少"},
+        {"species": "Roseburia hominis", "direction": "病例菌群失衡期减少"},
+        {"species": "Escherichia coli", "direction": "病例菌群失衡期富集"}
+      ]
+    }
+  ]
+}

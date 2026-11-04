@@ -72,8 +72,8 @@ def test_fixed_outline_is_complete_even_without_inputs():
     assert [s["title"] for s in doc["sections"]] == [s.title for s in SECTIONS]
     assert all(s["status"] == "missing" for s in doc["sections"])
     markdown = render_markdown(doc)
-    from wgs_agent.reporting.template_catalog import CHAPTERS
-    assert all(f"## {n} {title}" in markdown for n, title, _, _ in CHAPTERS)
+    from wgs_agent.reporting.template_catalog import REPORT_CHAPTERS
+    assert all(f"## {n} {title}" in markdown for n, title, _, _ in REPORT_CHAPTERS)
     assert "结果覆盖" not in markdown
     assert "综合健康评分" not in markdown
     assert "模型解释状态" not in markdown

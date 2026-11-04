@@ -11,7 +11,8 @@ import re
 
 from .inputs import finite
 from .overview import RULE_VERSION, select_findings
-from .template_catalog import CHAPTERS, TEMPLATE_VERSION, TOPIC_PLACEMENT
+from .template_catalog import CHAPTERS, REPORT_CHAPTERS, TEMPLATE_VERSION, TOPIC_PLACEMENT
+from .report_outline import OUTLINE_VERSION
 
 
 def _pick(row: dict, *keys, default="未提供"):
@@ -526,6 +527,12 @@ class Body:
             )
 
     def strains(self, block):
+        from .chapter_four import status_message
+        module_name = "strains" if block == 1 else "virulence"
+        message = status_message(self.inputs.get(module_name), module_name)
+        if message and not self.qc_failed:
+            self.out.append(message)
+            return
         if block == 1:
             self.extra(
                 "strains",
@@ -576,6 +583,9 @@ class Body:
             )
 
     def resistance(self, block):
+        from .chapter_five import render_resistance
+        if render_resistance(self, block):
+            return
         rows = self.group("amr")
         if block == 1:
             self.emit(
@@ -639,6 +649,9 @@ class Body:
 
     def other_microbes(self, block):
         module = {1: "archaea", 2: "fungi", 3: "dna_viruses"}.get(block)
+        from .chapter_six import render_other_microbes
+        if render_other_microbes(self, block, module):
+            return
         if module:
             rows = self.raw(module, "members", "species", "viruses")
             if block == 3:
@@ -809,58 +822,8 @@ class Body:
         self.out.append(notes[block])
 
     def ecology(self, block, topic_ids):
-        rows = self.topic_rows(*topic_ids)
-        if block == 1:
-            self.emit(
-                ["相关维度", "代表证据", "本次结果", "证据等级"],
-                [
-                    [
-                        _pick(r, "dimension", "label"),
-                        _pick(r, "gene", "id", "name"),
-                        r["result_text"],
-                        _pick(r, "evidence_level"),
-                    ]
-                    for r in rows
-                ],
-            )
-        elif block == 2:
-            self.emit(
-                ["相关特征", "关联方向", "适用背景", "证据等级"],
-                [
-                    [
-                        r["label"],
-                        _pick(r, "association_direction", default="未提供"),
-                        _pick(r, "study_population", "applicable_context"),
-                        _pick(r, "association_evidence_level", "evidence_level"),
-                    ]
-                    for r in rows
-                ],
-            )
-            if rows:
-                self.standard(rows)
-        elif block == 3:
-            self.standard(rows)
-        else:
-            self.emit(
-                ["引用结果", "与本章的联系", "本次可解释范围"],
-                [
-                    [
-                        "第7章底物利用",
-                        "与宿主底物和微生物资源利用相关",
-                        "仅解释已提供的底物及通路注释",
-                    ],
-                    ["第8章代谢功能", "与微生物代谢环境相关", "功能潜力不等同于屏障或免疫实测"],
-                ],
-            )
-            if rows:
-                self.standard(rows)
-        notes = {
-            1: "底物竞争、代谢环境和抑菌功能是定植抗力的关联线索，未据此计算定植抗力分。",
-            2: "关联方向、适用人群及研究背景需有对应文献；未提供时不补写炎症或免疫结论。",
-            3: "结合黏蛋白相关酶、通路完整性与生态背景解读，不将相关酶检出直接等同于屏障损伤。",
-            4: "综合引用第7章底物利用和第8章代谢功能，不重复计分，也不直接给出屏障、免疫或抗炎能力分。",
-        }
-        self.out.append(notes[block])
+        from .chapter_nine import render_section
+        return render_section(self, block)
 
     def brain(self, block, topic_ids):
         if block == 4:
@@ -990,6 +953,9 @@ class Body:
             )
 
     def specialized(self, block):
+        from .chapter_twelve import render_section
+        if render_section(self, block):
+            return
         module = self.inputs.get("specialized_metabolism") or {}
         key = {1: "dietary", 2: "drugs", 3: "validation"}[block]
         rows = (
@@ -1144,9 +1110,10 @@ def prepare_presentation(document):
                 "title": title,
                 "subsections": [f"{n}.{i} {h}" for i, (h, _) in enumerate(blocks, 1)],
             }
-            for n, title, _, blocks in CHAPTERS
+            for n, title, _, blocks in REPORT_CHAPTERS
         ],
         "overview_rule_version": RULE_VERSION,
+        "outline_version": OUTLINE_VERSION,
         "topic_placement": TOPIC_PLACEMENT,
     }
     document["overview_findings"] = select_findings(document)
@@ -1168,7 +1135,7 @@ def render_toc():
     return [
         "## 目录",
         "- [检测结果总览](#检测结果总览)",
-        *[f"- [{n} {title}](#{anchor(f'{n} {title}')})" for n, title, _, _ in CHAPTERS],
+        *[f"- [{n} {title}](#{anchor(f'{n} {title}')})" for n, title, _, _ in REPORT_CHAPTERS],
         "- [附录与参考资料](#附录与参考资料)",
     ]
 

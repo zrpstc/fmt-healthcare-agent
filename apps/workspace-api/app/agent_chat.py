@@ -441,13 +441,12 @@ def execute_confirmed_action(action: dict[str, Any]) -> dict[str, Any]:
             results = _results_dir()
             analysis = results / f"{sid}_analysis.json"
             knowledge = results / f"{sid}_knowledge.json"
+            from wgs_agent.reporting.analysis import ensure_analysis_input
             if not analysis.is_file():
-                from wgs_agent.reporting.analysis import ensure_analysis_input
-
                 workflow = get_workflow_status(sid, include_log=False)
                 if workflow["state"] != "complete":
                     raise ValueError("尚无分析 JSON，且生信任务尚未完成，暂不能生成报告。")
-                analysis = ensure_analysis_input(sid, results)
+            analysis = ensure_analysis_input(sid, results)
             result = _run_async(ReportGeneratorTool().invoke({"sample_id": sid, "analysis_json_path": str(analysis), "knowledge_json_path": str(knowledge) if knowledge.is_file() else ""}))
     else:
         raise ValueError("待确认动作类型无效或已过期。")

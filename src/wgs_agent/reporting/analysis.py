@@ -22,7 +22,8 @@ def ensure_analysis_input(sample_id: str, results_dir: Path) -> Path:
         raise ValueError("样本编号格式无效")
     target = results_dir / f"{sample_id}_analysis.json"
     if target.is_file():
-        return target
+        from .module_refresh import refresh_analysis_inputs
+        return refresh_analysis_inputs(target, sample_id)
 
     inputs = load_existing_report_inputs(sample_id)
     taxonomy = inputs.get("taxonomy", {})

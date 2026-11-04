@@ -13,7 +13,7 @@ from wgs_agent.reporting.document import build_document, render_markdown
 from wgs_agent.reporting.knowledge_graph import graph_markdown
 from wgs_agent.reporting.overview import select_findings
 from wgs_agent.reporting.template_body import _linked
-from wgs_agent.reporting.template_catalog import CHAPTERS, TOPIC_PLACEMENT
+from wgs_agent.reporting.template_catalog import CHAPTERS, REPORT_CHAPTERS, TOPIC_PLACEMENT
 
 
 def build(**kwargs):
@@ -44,7 +44,7 @@ def test_template_chapters_replace_the_old_body_and_keep_a_complete_toc():
     doc = build()
     md = render_markdown(doc)
     headings = re.findall(r"^## (\d+) (.+)$", md, re.M)
-    assert [int(n) for n, _ in headings] == list(range(1, 15))
+    assert [int(n) for n, _ in headings] == list(range(1, 14))
     assert headings[0][1] == "菌群组成与群落结构"
     assert headings[1][1] == "菌群多样性与生态功能结构"
     assert headings[-1][1] == "综合解读与行动建议"
@@ -53,12 +53,13 @@ def test_template_chapters_replace_the_old_body_and_keep_a_complete_toc():
     assert "[5 耐药组与可移动遗传元件](#5-耐药组与可移动遗传元件)" in md
     assert "【" not in md and "图中位置仅用于版式展示" not in md
     assert "其余固定分析方向" not in md
-    assert "未启用" in block(md, "14.4")
+    assert "未启用" in block(md, "13.4")
 
 
 def test_each_existing_graph_topic_has_exactly_one_body_placement():
-    occurrences = Counter(tid for _, _, _, blocks in CHAPTERS for _, ids in blocks for tid in ids)
-    assert set(occurrences) == set(TOPICS) == set(TOPIC_PLACEMENT)
+    occurrences = Counter(tid for _, _, _, blocks in REPORT_CHAPTERS for _, ids in blocks for tid in ids)
+    removed = {tid for n, _, _, blocks in CHAPTERS if n == 11 for _, ids in blocks for tid in ids}
+    assert set(occurrences) == set(TOPICS) - removed == set(TOPIC_PLACEMENT)
     assert all(count == 1 for count in occurrences.values())
 
 
@@ -202,8 +203,8 @@ def test_absolute_quantities_and_composite_scores_need_validated_inputs():
     )
     md = render_markdown(doc)
     assert "UNSUPPORTED_QUANTITY" not in md
-    assert "99" not in block(md, "14.4")
-    assert "未启用" in block(md, "14.4")
+    assert "99" not in block(md, "13.4")
+    assert "未启用" in block(md, "13.4")
 
 
 def test_core_members_use_defined_reference_and_actual_detection_without_zero_filling():
@@ -327,10 +328,10 @@ def test_symptom_records_do_not_become_fabricated_functional_comparisons():
             "health_inputs": {"symptoms": {"observations": [{"name": "腹胀", "answer": "偶发"}]}}
         }
     )
-    content = block(render_markdown(doc), "11.2")
-    assert "未提供" in content
+    content = render_markdown(doc)
+    assert "症状相关特征与问卷对照" not in content
     assert "偶发" not in content
-    assert "测序结果摘要" in content
+    assert "### 11.1 疾病关联模块与适用范围" in content
 
 
 def test_aromatic_derivatives_are_not_relabelled_as_plain_metabolite_targets():

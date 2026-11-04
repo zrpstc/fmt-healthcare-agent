@@ -12,8 +12,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
-import signal
 import subprocess
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
@@ -302,7 +300,11 @@ def get_workflow_status(
         "taxonomy": (output / "profiles/metaphlan" / f"{sample_id}_profile.tsv").is_file(),
         "functions": (output / "profiles/humann" / f"{sample_id}_pathabundance_relab.tsv").is_file(),
     }
-    if done.is_file():
+    try:
+        completed_marker = done.is_file() and done.stat().st_size > 0
+    except OSError:
+        completed_marker = False
+    if completed_marker:
         state = "complete"
     elif failed.is_file():
         state = "failed"
@@ -312,6 +314,8 @@ def get_workflow_status(
         state = "failed"
     else:
         state = job.get("state", "not_submitted")
+        if state == "complete":
+            state = "failed"  # A job record cannot replace a valid completion marker.
     progress = 0
     for key, value in (("uploaded", 5), ("quality_control", 25), ("taxonomy", 55), ("functions", 90)):
         if artifacts[key]:
@@ -329,5 +333,9 @@ def get_workflow_status(
 
     healthy_reference = get_mho_status(sample_id)
     artifacts["healthy_reference"] = healthy_reference["ready"]
+    from .strain_virulence import load_chapter4_inputs
+    chapter_four = {key: {"status": value.get("status", "not_run"),
+                          "reason_code": value.get("reason_code", "NOT_RUN")}
+                    for key, value in load_chapter4_inputs(sample_id, output).items()}
     return {**job, "state": state, "progress": progress, "artifacts": artifacts,
-            "healthy_reference": healthy_reference, "log_tail": log_tail}
+            "healthy_reference": healthy_reference, "log_tail": log_tail, "chapter_four": chapter_four}

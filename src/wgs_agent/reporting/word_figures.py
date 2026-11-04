@@ -19,6 +19,7 @@ from .fonts import resolve_cjk_fonts
 from .inputs import finite
 from .reference import species_key
 from .template_catalog import CHAPTERS
+from .report_outline import REMOVED_CHAPTER, display_references
 from .word_template import (
     Data,
     _direction,
@@ -416,7 +417,7 @@ def _font(size):
 
 
 def _text(draw, xy, text, font, fill="#30343A", width=None, anchor="la", max_lines=3):
-    text = display_text(text)
+    text = display_references(display_text(text))
     lines = _wrap(draw, text, font, width, max_lines) if width else str(text).splitlines()
     step = font.size * 1.32
     for i, line in enumerate(lines):
@@ -661,6 +662,9 @@ def draw_chart(spec, payload, width):
 
 
 def flow_labels(document, spec):
+    if str(spec.get('id', '')).startswith('9.'):
+        from .chapter_nine import flow_labels as chapter_nine_flow_labels
+        return chapter_nine_flow_labels(document, spec)
     if spec["id"] == "2.4.flow":
         from .chapter_two import cooperation_payload
         return cooperation_payload(document)["labels"]
@@ -750,7 +754,7 @@ def flow_labels(document, spec):
     elif (chapter, sub) == (13, 1):
         raw = data.raw("specialized_metabolism", "dietary")
         if raw:
-            r = raw[0]
+            r = next((row for row in raw if row.get("status") == "annotation_detected"), raw[0])
             vals = [
                 _pick(r, "substrate", "name"),
                 _pick(r, "pathway", "enzyme"),
@@ -802,7 +806,7 @@ def draw_flow(spec, labels, width):
                 outline="#" + shape["line"],
                 width=2,
             )
-            lines = [line for t in text for line in _wrap(draw, t, font, w * 0.88, 2)]
+            lines = [line for t in text for line in _wrap(draw, display_references(t), font, w * 0.88, 2)]
             # Preserve shape geometry, with readable ellipsis for long observations.
             allowed = max(2, int((h - 14) / (font.size * 1.3)))
             if len(lines) > allowed:
@@ -830,6 +834,8 @@ def render_word_figures(document, output_dir):
     figures = {}
     manifest = {}
     for chapter in contract()["chapters"]:
+        if chapter["number"] == REMOVED_CHAPTER:
+            continue
         for block in chapter["blocks"]:
             if block["type"] != "visuals":
                 continue
@@ -905,6 +911,6 @@ def render_word_figures(document, output_dir):
     figures.update(render_chapter_seven_figures(document, output, manifest))
     document["word_figures"] = manifest
     document["presentation"]["word_source_hashes"] = contract()["sources"]
-    document['presentation']['word_chart_count'] = sum(item.get('type') == 'chart' for chapter in contract()['chapters'] for block in chapter['blocks'] for item in block.get('items', []))
-    document["presentation"]["word_flow_count"] = 12
+    document['presentation']['word_chart_count'] = sum(item.get('type') == 'chart' for chapter in contract()['chapters'] if chapter["number"] != REMOVED_CHAPTER for block in chapter['blocks'] for item in block.get('items', []))
+    document["presentation"]["word_flow_count"] = sum(item.get("type") != "chart" for chapter in contract()["chapters"] if chapter["number"] != REMOVED_CHAPTER for block in chapter["blocks"] for item in block.get("items", []))
     return figures

@@ -1,6 +1,10 @@
 # Word报告正文模板 v4
 
-报告版本health-report-v4，正文模板word-native-1-14-v2。
+报告版本health-report-v4，正文模板word-native-1-13-disease-v3。
+
+当前运行时正文为13章，版本word-native-1-13-disease-v3：原第11章症状/问卷已删除，原12–14章前移为11–13；原Word源合同仍保留历史索引。疾病空数据排查和新增流程见CHAPTER_ELEVEN_DISEASE_FEATURES.md。
+
+
 四份只读Word原稿保存在docs/report_templates；SHA-256记录于reporting/word_contract.json。
 DOCX的填写说明仅作为模板数据，不作为执行指令，也不进入受检者报告。
 

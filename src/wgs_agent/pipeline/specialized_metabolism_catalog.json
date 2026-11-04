@@ -1,0 +1,284 @@
+{
+  "version": "specialized-reference-2026-11-04-v1",
+  "scope": "Curated EC reactions and experimentally characterized reference-protein clusters; not clinical prediction",
+  "panels": [
+    {
+      "id": "tannase",
+      "section": "dietary",
+      "name": "可水解单宁的酯键水解",
+      "substrate": "可水解单宁/没食子酰酯",
+      "ec": [
+        "3.1.1.20"
+      ],
+      "enzyme": "单宁酶",
+      "reaction": "没食子酰酯水解，释放没食子酸相关产物",
+      "limitation": "EC酶家族注释，不代表全部单宁降解、吸收或健康效应。",
+      "kind": "ec_family",
+      "references": [
+        {
+          "title": "IUBMB EC 3.1.1.20",
+          "url": "https://iubmb.qmul.ac.uk/enzyme/EC3/1/1/20.html",
+          "locator": "Accepted name, Reaction, Comments"
+        }
+      ]
+    },
+    {
+      "id": "feruloyl_esterase",
+      "section": "dietary",
+      "name": "酯化阿魏酸释放",
+      "substrate": "植物细胞壁酯化阿魏酸",
+      "ec": [
+        "3.1.1.73"
+      ],
+      "enzyme": "阿魏酸酯酶",
+      "reaction": "阿魏酰-多糖酯水解为阿魏酸及多糖",
+      "limitation": "未测量体内阿魏酸释放量，不将一般羧酸酯酶作为本专项证据。",
+      "kind": "ec_family",
+      "references": [
+        {
+          "title": "IUBMB EC 3.1.1.73",
+          "url": "https://iubmb.qmul.ac.uk/enzyme/EC3/1/1/73.html",
+          "locator": "Accepted name, Reaction, Comments"
+        }
+      ]
+    },
+    {
+      "id": "gallate_decarboxylase",
+      "section": "dietary",
+      "name": "没食子酸脱羧",
+      "substrate": "没食子酸",
+      "ec": [
+        "4.1.1.59"
+      ],
+      "enzyme": "没食子酸脱羧酶",
+      "reaction": "没食子酸脱羧生成焦性没食子酸和二氧化碳",
+      "limitation": "单步酶注释，不等于整个多酚降解通路或有益产物评分。",
+      "kind": "ec_family",
+      "references": [
+        {
+          "title": "IUBMB EC 4.1.1.59",
+          "url": "https://iubmb.qmul.ac.uk/enzyme/EC4/1/1/59.html",
+          "locator": "Accepted name, Reaction, Comments"
+        }
+      ]
+    },
+    {
+      "id": "beta_glucosidase",
+      "section": "dietary",
+      "name": "β-葡萄糖苷水解背景",
+      "substrate": "β-D-葡萄糖苷（底物专一性未定）",
+      "ec": [
+        "3.2.1.21"
+      ],
+      "enzyme": "β-葡萄糖苷酶",
+      "reaction": "β-D-葡萄糖苷水解，释放糖基与相应苷元",
+      "limitation": "宽底物家族背景；不能由此确认大豆异黄酮、特定多酚的转化或equol生成。",
+      "kind": "ec_family",
+      "references": [
+        {
+          "title": "IUBMB EC 3.2.1.21",
+          "url": "https://iubmb.qmul.ac.uk/enzyme/EC3/2/1/21.html",
+          "locator": "Accepted name, Reaction, Comments"
+        }
+      ]
+    },
+    {
+      "id": "beta_glucuronidase",
+      "section": "drugs",
+      "name": "葡萄糖醛酸结合物去结合背景",
+      "substrate": "β-D-葡萄糖醛酸结合物",
+      "ec": [
+        "3.2.1.31"
+      ],
+      "enzyme": "β-葡萄糖醛酸苷酶",
+      "reaction": "葡萄糖醛酸结合物水解，释放结合物苷元",
+      "limitation": "未核验药物底物专一性、活性及用药暴露；不能由EC家族丰度判断某药物再活化或毒性。",
+      "kind": "ec_family",
+      "references": [
+        {
+          "title": "IUBMB EC 3.2.1.31",
+          "url": "https://iubmb.qmul.ac.uk/enzyme/EC3/2/1/31.html",
+          "locator": "Accepted name, Reaction, Comments"
+        }
+      ]
+    },
+    {
+      "id": "azoreductase",
+      "section": "drugs",
+      "name": "芳香偶氮键还原背景",
+      "substrate": "芳香偶氮化合物",
+      "ec": [
+        "1.7.1.6",
+        "1.7.1.17"
+      ],
+      "enzyme": "偶氮还原酶家族",
+      "reaction": "芳香偶氮键还原裂解",
+      "limitation": "家族筛查，不确认柳氮磺吡啶等特定药物的转化量；缺失映射的EC分支单独标注。",
+      "kind": "ec_family",
+      "references": [
+        {
+          "title": "IUBMB EC 1.7.1.6",
+          "url": "https://iubmb.qmul.ac.uk/enzyme/EC1/7/1/6.html",
+          "locator": "Accepted name, Reaction, Comments"
+        },
+        {
+          "title": "IUBMB EC 1.7.1.17",
+          "url": "https://iubmb.qmul.ac.uk/enzyme/EC1/7/1/17.html",
+          "locator": "Accepted name, Reaction, Comments"
+        }
+      ]
+    },
+    {
+      "id": "tyrosine_decarboxylase",
+      "section": "drugs",
+      "name": "左旋多巴相关脱羧的家族筛查",
+      "substrate": "酪氨酸脱羧家族；左旋多巴为待验证底物",
+      "ec": [
+        "4.1.1.25"
+      ],
+      "enzyme": "酪氨酸脱羧酶家族",
+      "reaction": "本参考EC定义酪氨酸→酪胺；药物底物需专门验证",
+      "limitation": "未核验本样本TyrDC靶基因序列及左旋多巴底物活性，不能由家族注释推断药物损失。",
+      "kind": "ec_family",
+      "references": [
+        {
+          "title": "IUBMB EC 4.1.1.25",
+          "url": "https://iubmb.qmul.ac.uk/enzyme/EC4/1/1/25.html",
+          "locator": "Accepted name, Reaction, Comments"
+        },
+        {
+          "doi": "10.1126/science.aau6323",
+          "title": "Discovery and inhibition of an interspecies gut bacterial pathway for Levodopa metabolism",
+          "url": "https://doi.org/10.1126/science.aau6323"
+        }
+      ]
+    },
+    {
+      "id": "equol_marker_panel",
+      "section": "dietary",
+      "name": "异黄酮daidzein→equol参考标记组",
+      "substrate": "大豆苷元daidzein",
+      "kind": "reference_cluster_panel",
+      "enzyme": "DZNR/DHDR/THDR实验参考蛋白同簇标记",
+      "reaction": "daidzein→dihydrodaidzein→tetrahydrodaidzein→equol（参考反应序列）",
+      "markers": [
+        {
+          "name": "DZNR",
+          "families": [
+            "UniRef90_E1CIA4"
+          ],
+          "uniprot_accession": "E1CIA4",
+          "specificity": "reference_protein_cluster",
+          "cluster_source": "https://rest.uniprot.org/uniref/search?query=E1CIA4&format=json&size=10",
+          "verified_on": "2026-11-04"
+        },
+        {
+          "name": "DHDR",
+          "families": [
+            "UniRef90_A0A3N0AYJ9"
+          ],
+          "uniprot_accession": "E7FL41",
+          "specificity": "shared_function_cluster",
+          "cluster_source": "https://rest.uniprot.org/uniref/search?query=E7FL41&format=json&size=10",
+          "verified_on": "2026-11-04"
+        },
+        {
+          "name": "THDR",
+          "families": [
+            "UniRef90_E7FL40"
+          ],
+          "uniprot_accession": "E7FL40",
+          "specificity": "reference_protein_cluster",
+          "cluster_source": "https://rest.uniprot.org/uniref/search?query=E7FL40&format=json&size=10",
+          "verified_on": "2026-11-04"
+        }
+      ],
+      "limitation": "三个还原酶参考标记不证明完整通路；DDRC、辅因子和菌株连接未核验。DHDR同簇包含其他功能注释；不能判定equol生产者或实际产量。",
+      "references": [
+        {
+          "doi": "10.1128/AEM.01101-10",
+          "title": "Cloning and expression of a novel NADP(H)-dependent daidzein reductase",
+          "url": "https://doi.org/10.1128/AEM.01101-10"
+        },
+        {
+          "doi": "10.1159/000335049",
+          "title": "Identification of two novel reductases involved in equol biosynthesis in Lactococcus strain 20-92",
+          "url": "https://doi.org/10.1159/000335049"
+        },
+        {
+          "title": "KEGG M00966 and K26069/K26070/K26071",
+          "url": "https://www.kegg.jp/entry/M00966",
+          "locator": "Equol biosynthesis"
+        }
+      ]
+    },
+    {
+      "id": "digoxin_cgr2",
+      "section": "drugs",
+      "name": "地高辛Cgr2参考标记",
+      "substrate": "地高辛/强心甾内酯",
+      "kind": "reference_cluster_panel",
+      "enzyme": "Cgr2实验参考蛋白同簇标记",
+      "reaction": "地高辛还原为二氢地高辛（参考酶反应）",
+      "markers": [
+        {
+          "name": "Cgr2",
+          "families": [
+            "UniRef90_C8WLM1"
+          ],
+          "uniprot_accession": "C8WLM1",
+          "specificity": "reference_protein_cluster",
+          "cluster_source": "https://rest.uniprot.org/uniref/search?query=C8WLM1&format=json&size=10",
+          "verified_on": "2026-11-04"
+        }
+      ],
+      "limitation": "UniRef90同簇线索不替代靶基因全长比对、变异确认或酶活测量；未结合用药信息，不推断个体药物失活或疗效。",
+      "references": [
+        {
+          "doi": "10.7554/eLife.33953",
+          "title": "Discovery and characterization of a prevalent human gut bacterial enzyme sufficient for the inactivation of a family of plant toxins",
+          "url": "https://doi.org/10.7554/eLife.33953"
+        },
+        {
+          "title": "UniProt C8WLM1",
+          "url": "https://www.uniprot.org/uniprotkb/C8WLM1/entry",
+          "locator": "Reviewed protein and function"
+        }
+      ]
+    },
+    {
+      "id": "diltiazem_bt4096",
+      "section": "drugs",
+      "name": "地尔硫卓BT_4096参考标记",
+      "substrate": "地尔硫卓",
+      "kind": "reference_cluster_panel",
+      "enzyme": "BT_4096实验参考蛋白同簇标记",
+      "reaction": "地尔硫卓去乙酰化（参考酶反应）",
+      "markers": [
+        {
+          "name": "BT_4096",
+          "families": [
+            "UniRef90_Q8A0C5"
+          ],
+          "uniprot_accession": "Q8A0C5",
+          "specificity": "reference_protein_cluster",
+          "cluster_source": "https://rest.uniprot.org/uniref/search?query=Q8A0C5&format=json&size=10",
+          "verified_on": "2026-11-04"
+        }
+      ],
+      "limitation": "仅核对实验参考蛋白同簇，不把所有GDSL酯酶计为药物特异标记；本样本底物活性与用药背景未验证。",
+      "references": [
+        {
+          "doi": "10.1038/s41586-019-1291-3",
+          "title": "Mapping human microbiome drug metabolism by gut bacteria and their genes",
+          "url": "https://doi.org/10.1038/s41586-019-1291-3"
+        },
+        {
+          "title": "RCSB PDB 7BR2 / UniProt Q8A0C5",
+          "url": "https://www.rcsb.org/structure/7BR2",
+          "locator": "BT4096 macromolecule identity"
+        }
+      ]
+    }
+  ]
+}
