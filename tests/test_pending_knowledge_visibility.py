@@ -31,5 +31,25 @@ class PendingKnowledgeVisibilityTests(unittest.TestCase):
         self.assertIn('待审核', property_caption(graph['edges'][0]))
 
 
+    def test_graph_reserves_edge_budget_for_high_confidence_nonpending_claims(self):
+        topic_id = 'composition.genera'
+        evidence = {
+            f'K{i}': {
+                'kind': 'literature', 'claim_id': f'claim-{i}', 'knowledge_base_id': 30,
+                'subject': 'Bacteroides', 'predicate': 'PRODUCES', 'object': 'acetate',
+                'evidence_text': 'Bacteroides produces acetate.', 'topic_ids': [topic_id],
+                'semantic_status': 'accepted', 'confidence': i / 10,
+            }
+            for i in range(1, 8)
+        }
+        evidence['K8'] = {**evidence['K7'], 'claim_id': 'claim-8', 'confidence': 0.99,
+                          'review_status': 'pending'}
+        topic = {'id': topic_id, 'status': 'ready', 'evidence_ids': [],
+                 'allowed_narrative_ids': list(evidence), 'narrative_evidence_ids': ['K8', 'K1']}
+        graph = build_topic_graph({'evidence': evidence}, topic)
+        self.assertEqual([edge['claim_id'] for edge in graph['edges']],
+                         [f'claim-{i}' for i in range(7, 1, -1)])
+
+
 if __name__ == '__main__':
     unittest.main()

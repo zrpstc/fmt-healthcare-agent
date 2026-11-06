@@ -28,6 +28,15 @@ def eligible_for_use(row):
     """A consumption policy; acquisition always retains pending data and all predicates."""
     if os.environ.get('WGS_KNOWLEDGE_USAGE_INCLUDE_PENDING', 'true').lower() in {'1', 'true'}:
         return True
-    claim = row.get('claim_json') or {}
-    return not (row.get('audit_pending') or row.get('semantic_status') == 'pending'
-                or claim.get('semantic_status') == 'pending' or row.get('review_status') == 'pending')
+    return not is_pending_review(row)
+
+
+def is_pending_review(row):
+    """Use the same review signals for filtering and ranking claims."""
+    claim = row.get('claim_json')
+    return bool(
+        row.get('audit_pending')
+        or row.get('semantic_status') == 'pending'
+        or row.get('review_status') == 'pending'
+        or (isinstance(claim, dict) and claim.get('semantic_status') == 'pending')
+    )

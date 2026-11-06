@@ -202,6 +202,24 @@ async def test_retrieval_paginates_once_per_report_and_keeps_only_matching_claim
 
 
 @pytest.mark.asyncio
+async def test_claim_quality_applies_before_report_candidate_limit(retrieval):
+    doc = document()
+    pending = [claim(i, confidence=0.99, audit_pending=True) for i in range(1, 10)]
+    accepted = claim(10, confidence=0.75, semantic_status='accepted')
+    claims = [*pending, accepted]
+    transport = httpx.MockTransport(
+        lambda _: httpx.Response(200, json={'claims': claims, 'total': len(claims)})
+    )
+    await enrich_document(doc, transport=transport)
+    evidence = doc['evidence']
+    linked = [evidence[key] for key in topic(doc)['allowed_narrative_ids']
+              if evidence[key].get('kind') == 'literature']
+    assert len(linked) == 8
+    assert linked[0]['claim_id'] == reference(accepted)['claim_id']
+    assert all(row.get('audit_pending') for row in linked[1:])
+
+
+@pytest.mark.asyncio
 async def test_outage_preserves_bound_evidence(retrieval):
     doc = document([claim()])
 

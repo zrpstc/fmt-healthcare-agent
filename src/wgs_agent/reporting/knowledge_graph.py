@@ -13,6 +13,8 @@ from pathlib import Path
 
 import httpx
 
+from wgs_fmt_platform.knowledge.knowledge_settings import is_pending_review
+
 from .catalog import SECTIONS
 
 MAX_EDGES = 6
@@ -73,6 +75,10 @@ def _confidence(row: dict) -> float:
         return value if math.isfinite(value) else 0
     except (TypeError, ValueError):
         return 0
+
+
+def _claim_quality(row: dict) -> tuple[bool, float]:
+    return is_pending_review(row), -_confidence(row)
 
 
 def _topics(document: dict):
@@ -165,12 +171,13 @@ async def enrich_document(document: dict, *, transport=None) -> None:
         document["references"]["matched_docs"] = matched
         by_claim = {str(r.get("claim_id")): key for key, r in evidence.items() if r.get("claim_id")}
         for topic in _topics(document):
-            ranked = sorted(
-                (r for r in references if _score(r, topic, evidence)),
-                key=lambda r: (_score(r, topic, evidence), _confidence(r), str(r.get("claim_id"))),
-                reverse=True,
-            )
-            for row in ranked[:8]:
+            ranked = [
+                (row, score)
+                for row in references
+                if (score := _score(row, topic, evidence))
+            ]
+            ranked.sort(key=lambda item: (*_claim_quality(item[0]), -item[1], str(item[0].get("claim_id"))))
+            for row, _ in ranked[:8]:
                 claim_id = str(row["claim_id"])
                 key = by_claim.get(claim_id)
                 if key is None:
@@ -230,7 +237,9 @@ def build_topic_graph(document: dict, topic: dict) -> dict:
             and (row.get("claim_id") or row.get("raw_claim_id"))
         ):
             candidates.append((key, row, score))
-    candidates.sort(key=lambda r: (r[0] not in cited, -r[2], -_confidence(r[1]), r[0]))
+    candidates.sort(
+        key=lambda item: (*_claim_quality(item[1]), item[0] not in cited, -item[2], item[0])
+    )
     graph["candidate_count"] = len(candidates)
     nodes, seen = {}, set()
     for key, row, _ in candidates:
