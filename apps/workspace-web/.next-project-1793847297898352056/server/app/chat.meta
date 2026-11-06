@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/chat/layout,_N_T_/chat/page,_N_T_/chat"
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/7140583d8682f3e107517ecbc1dd811545b16f6149c723d4d2802674e5919827/$/chat",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/chat/page"
+    },
+    "isFallback": false
+  }
+}

@@ -453,3 +453,8 @@ def execute_confirmed_action(action: dict[str, Any]) -> dict[str, Any]:
     payload = {"action_id": action.get("id"), "kind": kind, "sample_id": sid, "is_error": result.is_error, "content": result.content}
     _audit("action.executed", payload)
     return payload
+
+
+from wgs_agent.tools.knowledge_acquisition import KnowledgeBaseFetchTool
+TOOLS.append(_function(KnowledgeBaseFetchTool.name, KnowledgeBaseFetchTool.description, KnowledgeBaseFetchTool.input_schema['properties']))
+_READ_TOOLS[KnowledgeBaseFetchTool.name] = KnowledgeBaseFetchTool

@@ -1349,3 +1349,32 @@ async def litkg_graph(
         "document_id": document_id,
         "source": _litkg_source(),
     }
+
+
+@app.get('/api/knowledge-base/config')
+def knowledge_base_config():
+    from wgs_fmt_platform.knowledge.litkg_retrieval import LitkgRetrievalConfig
+    from wgs_fmt_platform.knowledge.knowledge_settings import refresh_knowledge_settings
+    source = refresh_knowledge_settings()
+    config = LitkgRetrievalConfig.from_env()
+    url = httpx.URL(config.base_url)
+    return {**source, 'knowledge_base_id': config.knowledge_base_id, 'acquisition_scope': config.acquisition_scope,
+            'api_origin': str(httpx.URL(scheme=url.scheme, host=url.host, port=url.port)),
+            'usage_include_pending': os.environ.get('WGS_KNOWLEDGE_USAGE_INCLUDE_PENDING', 'false').lower() in {'1', 'true'}}
+
+@app.get('/api/knowledge-base/snapshot')
+async def knowledge_base_snapshot(force_refresh: bool = False):
+    from wgs_fmt_platform.knowledge.litkg_retrieval import LitkgRetrievalConfig
+    from wgs_fmt_platform.knowledge.litkg_acquisition import acquire_knowledge_base, snapshot_path, snapshot_summary
+    config = LitkgRetrievalConfig.from_env()
+    snapshot = await acquire_knowledge_base(config, force_refresh=force_refresh)
+    return {**snapshot_summary(snapshot), 'snapshot_path': str(snapshot_path(config))}
+
+@app.get('/api/knowledge-base/export')
+async def knowledge_base_export(force_refresh: bool = False):
+    from fastapi.responses import FileResponse
+    from wgs_fmt_platform.knowledge.litkg_retrieval import LitkgRetrievalConfig
+    from wgs_fmt_platform.knowledge.litkg_acquisition import acquire_knowledge_base, snapshot_path
+    config = LitkgRetrievalConfig.from_env()
+    await acquire_knowledge_base(config, force_refresh=force_refresh)
+    return FileResponse(snapshot_path(config), media_type='application/json', filename=f'knowledge-base-{config.knowledge_base_id}.json')

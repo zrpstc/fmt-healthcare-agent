@@ -73,7 +73,7 @@ class Fixture:
         pytest.fail(str(request.url))
 
     async def run(self, **kwargs):
-        retriever=NativeGraphRetriever(LitkgRetrievalConfig('http://litkg.test',26,token='test-secret'),
+        retriever=NativeGraphRetriever(LitkgRetrievalConfig('http://litkg.test',26,token='test-secret', acquisition_scope="targeted"),
             transport=httpx.MockTransport(self.handler),max_requests=kwargs.pop('max_requests',24))
         return await retriever.retrieve('Faecalibacterium butyrate inflammation in mice',
             [{'name':'Faecalibacterium prausnitzii'}],**kwargs)
@@ -182,7 +182,7 @@ def test_output_budget_never_cuts_quotes_or_leaves_dangling_paths():
     facts[0]['citations'][0]['sentence']='Original quote. '*2000
     before=copy.deepcopy(facts)
     result=pack_graph('question',[],[1],{i:{'id':i} for i in range(1,4)},edges,facts,8,
-        LitkgRetrievalConfig('http://litkg.test',26),2,[],[],None)
+        LitkgRetrievalConfig('http://litkg.test',26, acquisition_scope="targeted"),2,[],[],None)
     assert [row['id'] for row in result['facts']]==[202]
     assert result['omitted_fact_count']==1
     assert [edge['id'] for edge in result['subgraph']['edges']]==[102]

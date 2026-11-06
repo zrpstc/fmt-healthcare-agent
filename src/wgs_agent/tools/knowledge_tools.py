@@ -469,3 +469,9 @@ def _grep_search(kb_dir: str, query: str, max_results: int) -> list[dict[str, An
 
     results.sort(key=lambda r: -r["match_count"])
     return results[:max_results]
+
+
+# Acquisition is a separate capability from query selection and narrative limits.
+from wgs_agent.tools.knowledge_acquisition import KnowledgeBaseFetchTool
+KNOWLEDGE_TOOLS.append(KnowledgeBaseFetchTool)
+KNOWLEDGE_TOOL_POLICIES[KnowledgeBaseFetchTool.name] = {'default': 'allow', 'reason': 'Read-only complete knowledge acquisition'}

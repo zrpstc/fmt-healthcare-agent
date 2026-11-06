@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST='{"components/evidence-graph.tsx -> vis-network/standalone":{"id":4243,"files":["static/chunks/f7df2afc.539c96df0865425f.js","static/chunks/243.d97f9dc3bd74dce3.js"]}}';

@@ -95,6 +95,18 @@ def _types(row):
 
 
 async def retrieve_report_references(client, knowledge_base_id, document, limit, *, cache_dir=None):
+    from dataclasses import replace
+    config = LitkgRetrievalConfig.from_env()
+    if config.acquisition_scope == 'full':
+        from wgs_fmt_platform.knowledge.litkg_acquisition import acquire_knowledge_base, KnowledgeAcquisitionError
+        public_base = httpx.URL(scheme=client.base_url.scheme, host=client.base_url.host, port=client.base_url.port, path=client.base_url.path)
+        try:
+            snapshot = await acquire_knowledge_base(replace(config, base_url=str(public_base).rstrip('/'), knowledge_base_id=knowledge_base_id))
+        except KnowledgeAcquisitionError as exc:
+            raise httpx.ReadError('Complete knowledge base acquisition failed') from exc
+        return snapshot['claims'], {'status': 'ok', 'source': 'full_snapshot', 'retrieval_mode': 'full',
+            'knowledge_base_id': knowledge_base_id, 'total_claims': len(snapshot['claims']), 'scan_truncated': False,
+            'acquisition_complete': True, 'acquired_counts': snapshot['counts'], 'acquired_at': snapshot['acquired_at']}
     queries = report_queries(document)
     if not queries:
         return [], {"status": "complete", "source": "targeted", "search_scope": "report_entities_and_topics", "reference_rows": True, "knowledge_base_id": knowledge_base_id, "query_count": 0, "total_claims": None, "scan_truncated": False}

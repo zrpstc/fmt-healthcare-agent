@@ -22,11 +22,17 @@ class LitkgRetrievalConfig:
     hops: int = 1
     token: str = ""
     local_fallback: bool = False
+    acquisition_scope: str = "full"
 
     @classmethod
     def from_env(cls) -> "LitkgRetrievalConfig":
+        from .knowledge_settings import refresh_knowledge_settings
+        refresh_knowledge_settings()
+        scope = os.environ.get('WGS_KNOWLEDGE_ACQUISITION_SCOPE', 'full')
+        if scope not in {'full', 'targeted'}:
+            raise LitkgRetrievalError('Invalid knowledge acquisition scope')
         try:
-            kb = int(os.environ.get("WGS_CLAIM_API_KNOWLEDGE_BASE_ID", "0"))
+            kb = int(os.environ.get("WGS_CLAIM_API_KNOWLEDGE_BASE_ID", ""))
             hops = int(os.environ.get("WGS_CLAIM_API_ASK_HOPS", "1"))
             timeout = float(os.environ.get("WGS_CLAIM_API_TIMEOUT", "20"))
         except ValueError as exc:
@@ -37,7 +43,7 @@ class LitkgRetrievalConfig:
         if not base.startswith(("http://", "https://")):
             raise LitkgRetrievalError("LitKG API URL 未配置为 HTTP(S) 地址")
         return cls(base, kb, timeout, hops, os.environ.get("WGS_CLAIM_API_TOKEN", ""),
-                   os.environ.get("WGS_CLAIM_API_LOCAL_FALLBACK", "false").lower() in {"true", "1"})
+                   os.environ.get("WGS_CLAIM_API_LOCAL_FALLBACK", "false").lower() in {"true", "1"}, acquisition_scope=scope)
 
 
 async def retrieve_litkg(
@@ -49,6 +55,14 @@ async def retrieve_litkg(
     if not 1 <= len(question) <= 2000:
         raise LitkgRetrievalError("知识检索问题长度必须为 1..2000 字符")
     limit = max(1, min(int(limit), 30))
+    if config.acquisition_scope == 'full':
+        from .litkg_acquisition import acquire_knowledge_base, KnowledgeAcquisitionError
+        from .litkg_full_usage import select_evidence
+        try:
+            snapshot = await acquire_knowledge_base(config, transport=transport)
+            return select_evidence(snapshot, question, limit, config)
+        except KnowledgeAcquisitionError as exc:
+            raise LitkgRetrievalError('Complete knowledge base acquisition failed') from exc
     path = f"/knowledge-bases/{config.knowledge_base_id}/ask"
     headers = {"Accept": "application/json"}
     if config.token:
@@ -83,7 +97,7 @@ def _envelope_size(data: dict) -> int:
 
 
 def pack_evidence(data: dict, question: str, limit: int, config: LitkgRetrievalConfig,
-                  max_chars: int = 17000) -> dict:
+                  max_chars: int = 17000, extra: dict | None = None) -> dict:
     warnings = list(dict.fromkeys(str(value) for value in data["warnings"]))
     if len(warnings) > 20 or any(len(value) > 500 for value in warnings):
         warnings = [value[:500] for value in warnings[:20]] + ["部分上游告警过长，显示已限制"]
@@ -107,6 +121,10 @@ def pack_evidence(data: dict, question: str, limit: int, config: LitkgRetrievalC
         "received_fact_count": len(data["facts"]), "received_citation_count": len(data["citations"]),
         "omitted_fact_count": 0, "context_budget_remaining": data.get("context_budget_remaining"),
     }
+    if extra:
+        result.update(extra)
+        if extra.get('acquisition'):
+            result['source']['endpoint'] = f'/knowledge-bases/{config.knowledge_base_id}/facts/export'
     seen_facts = set()
     for raw in data["facts"]:
         if not isinstance(raw, dict) or raw.get("id") is None or not isinstance(raw.get("participants"), list):
@@ -123,7 +141,7 @@ def pack_evidence(data: dict, question: str, limit: int, config: LitkgRetrievalC
         if len(result["facts"]) >= limit:
             result["omitted_fact_count"] += 1
             continue
-        fact = {k: raw[k] for k in ("id", "predicate", "participants", "qualifiers", "negated", "speculative") if k in raw}
+        fact = {k: raw[k] for k in ("id", "predicate", "participants", "qualifiers", "negated", "speculative", "semantic_status", "review_status", "audit_pending") if k in raw}
         fact["citation_ids"] = [ref["id"] for ref in refs]
         result["facts"].append(fact)
         result["citations"].extend(refs)

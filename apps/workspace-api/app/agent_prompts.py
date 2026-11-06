@@ -64,3 +64,5 @@ def normalize_agents(items: list[dict]) -> list[dict]:
         if primary:
             row.update(name="FMT科研助手", enabled=True)
     return sorted(rows, key=lambda row: row["id"] != MAIN_AGENT_ID)
+
+EVIDENCE_TOOL_NAMES = set(EVIDENCE_TOOL_NAMES) | {'fetch_knowledge_base'}

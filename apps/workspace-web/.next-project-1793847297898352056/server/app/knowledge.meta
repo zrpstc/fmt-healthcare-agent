@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/knowledge/layout,_N_T_/knowledge/page,_N_T_/knowledge"
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/3adf9a70f733542b2bb126b31da23c6a85a2386c71d07612a83dba4378a7088a/$/knowledge",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/knowledge/page"
+    },
+    "isFallback": false
+  }
+}

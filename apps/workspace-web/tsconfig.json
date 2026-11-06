@@ -31,11 +31,12 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next-agent-runtime/types/**/*.ts",
     ".next-knowledge/types/**/*.ts",
     ".next-preview/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-agent-runtime/types/**/*.ts"
+    ".next-project-1793847297898352056/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -11,6 +11,8 @@ from typing import Any
 
 import httpx
 
+from .knowledge_settings import eligible_for_use as _eligible_for_use
+
 from wgs_fmt_platform.knowledge.litkg_retrieval import (
     LitkgRetrievalConfig, LitkgRetrievalError, retrieve_litkg,
 )
@@ -80,6 +82,11 @@ class NativeGraphRetriever:
         return data
 
     async def _resolve(self, seed):
+        if getattr(self, '_snapshot', None) is not None:
+            rows = self._snapshot['entities']
+            if seed.get('entity_type'):
+                rows = [r for r in rows if r.get('entity_type') == seed['entity_type']]
+            return resolve_entities(seed, rows)
         params = {'query': seed['name'], 'limit': 30, 'offset': 0}
         if seed.get('entity_type'):
             params['entity_type'] = seed['entity_type']
@@ -92,6 +99,8 @@ class NativeGraphRetriever:
         return result
 
     async def _relations(self, entity_id):
+        if getattr(self, '_snapshot', None) is not None:
+            return [r for r in self._snapshot['relations'] if entity_id in (r.get('subject', {}).get('id'), r.get('object', {}).get('id'))]
         data = await self._get('/relations', {'entity_id': entity_id, 'direction': 'both',
             'include_negated': True, 'include_speculative': True, 'evidence_limit': 3, 'limit': 40, 'offset': 0})
         if not isinstance(data.get('relations'), list):
@@ -101,6 +110,10 @@ class NativeGraphRetriever:
         return data['relations']
 
     async def _facts(self, pair):
+        if getattr(self, '_snapshot', None) is not None:
+            document_id, entity_id = pair
+            return [r for r in self._snapshot['facts'] if r.get('document_id') == document_id
+                    and entity_id in {p.get('entity_id') for p in r.get('participants') or []}]
         document_id, entity_id = pair
         rows = []
         for offset in (0, 50):
@@ -129,6 +142,12 @@ class NativeGraphRetriever:
         return result
 
     async def retrieve(self, question: str, entities: list[dict], hops=2, max_results=8) -> dict:
+        if self.config.acquisition_scope == 'full':
+            from .litkg_acquisition import acquire_knowledge_base, KnowledgeAcquisitionError
+            try:
+                self._snapshot = await acquire_knowledge_base(self.config, transport=self.transport)
+            except KnowledgeAcquisitionError as exc:
+                raise GraphRAGError('Complete knowledge base acquisition failed') from exc
         headers = {'Accept':'application/json'}
         if self.config.token:
             headers['Authorization'] = f'Bearer {self.config.token}'
@@ -215,7 +234,7 @@ class NativeGraphRetriever:
         if not roots and self.failures and not supplemental:
             raise GraphRAGError('; '.join(dict.fromkeys(self.failures)))
         result = pack_graph(question, resolutions, roots, nodes, edges, supported, max_results,
-            self.config, hops, self.requests, self.warnings + self.failures, supplemental)
+            self.config, hops, self.requests, self.warnings + self.failures, supplemental, acquisition=getattr(self, "_snapshot", None))
         if self.failures:
             result['status'] = 'partial' if result['facts'] else 'unavailable'
         return result
@@ -225,8 +244,8 @@ def valid_relation(edge):
     return (isinstance(edge, dict) and isinstance(edge.get('id'), int)
         and all(isinstance(edge.get(side), dict) and isinstance(edge[side].get('id'), int) and isinstance(edge[side].get('text'), str) for side in ('subject','object'))
         and isinstance(edge.get('predicate'), str) and bool(edge.get('evidence_samples'))
-        and edge.get('review_status') != 'pending'
-        and any(sample.get('semantic_status') != 'pending' for sample in edge.get('evidence_samples', [])))
+        and _eligible_for_use(edge)
+        and any(_eligible_for_use(sample) for sample in edge.get('evidence_samples', [])))
 
 
 def connection_priority(edges, roots, hops, words):
@@ -262,7 +281,7 @@ def fact_supports_relation(fact, edge):
     return (fact.get('relation_id') == edge['id'] and fact.get('predicate') == edge['predicate']
         and {edge['subject']['id'],edge['object']['id']} <= participants
         and fact.get('negated') == edge.get('negated') and fact.get('speculative') == edge.get('speculative')
-        and (fact.get('claim_json') or {}).get('semantic_status') != 'pending'
+        and _eligible_for_use(fact)
         and any(isinstance(e.get('sentence'), str) and e['sentence'].strip() for e in fact.get('evidence') or []))
 
 
@@ -271,7 +290,7 @@ def compact_fact(row):
         'qualifiers','negated','speculative','document_id') if key in row}
     fact['extraction_confidence'] = row.get('confidence')
     claim = row.get('claim_json') or {}
-    fact['semantic_status'] = claim.get('semantic_status', 'unknown')
+    fact['semantic_status'] = row.get('semantic_status', claim.get('semantic_status', 'unknown'))
     fact['evidence_type'] = (row.get('qualifiers') or {}).get('evidence_type', claim.get('source_kind','unknown'))
     fact['pending_review_kinds'] = sorted({r.get('kind','unknown') for r in row.get('reviews') or [] if r.get('status') == 'pending'})[:8]
     fact['citations'] = []
@@ -357,7 +376,7 @@ def render_graph(result):
     return 'LitKG 原生图谱 GraphRAG（只读证据，不是因果结论）\n---JSON---\n'+json.dumps(result,ensure_ascii=False,separators=(',',':'))
 
 
-def pack_graph(question, resolutions, roots, nodes, edges, facts, max_results, config, hops, requests, warnings, supplemental):
+def pack_graph(question, resolutions, roots, nodes, edges, facts, max_results, config, hops, requests, warnings, supplemental, acquisition=None):
     selected=[]
     result={
         'source':{'kind':'litkg-native-graphrag','knowledge_base_id':config.knowledge_base_id,'read_only':True},
@@ -370,6 +389,9 @@ def pack_graph(question, resolutions, roots, nodes, edges, facts, max_results, c
     }
     # Skip a single oversized evidence group without discarding smaller, useful
     # groups that follow it in the ranking. Quotes themselves are never sliced.
+    if acquisition is not None:
+        result['retrieval_scope']['acquisition'] = {key: acquisition[key] for key in ('acquisition_scope', 'complete', 'counts', 'acquired_at')}
+        result['retrieval_scope']['usage_scope'] = 'entity-neighborhood-with-output-budget'
     for fact in copy.deepcopy(facts):
         if len(selected) >= max_results:
             break

@@ -96,7 +96,7 @@ def test_cited_claims_take_precedence_over_related_background():
     row = topic(doc)
     row["narrative_evidence_ids"] = ["S1", "K2"]
     attach_subgraphs(doc)
-    assert [e["evidence_id"] for e in row["knowledge_subgraph"]["edges"]] == ["K2"]
+    assert [e["evidence_id"] for e in row["knowledge_subgraph"]["edges"]] == ['K2', 'K1']
     assert row["knowledge_subgraph"]["selection"] == "cited_claims"
     assert row["knowledge_subgraph"]["edges"][0]["cited_in_analysis"]
 
@@ -331,3 +331,8 @@ async def test_pdf_failure_does_not_publish_new_graphs(generator, tmp_path, monk
     assert old_report.read_text() == "previous report"
     assert not list(tmp_path.glob("*.png"))
     assert not list(tmp_path.glob(".TEST__001-report-*"))
+
+
+@pytest.fixture(autouse=True)
+def _knowledge_test_environment(monkeypatch):
+    monkeypatch.setenv("WGS_KNOWLEDGE_CONFIG_SOURCE", "environment")

@@ -38,7 +38,7 @@ async def test_agent_uses_ask_not_first_thousand_claims_and_never_generates():
             'question':'butyrate inflammation', 'limit':12, 'hops':1, 'generate':False,
         }
         return httpx.Response(200, json=payload())
-    config = LitkgRetrievalConfig('http://litkg.test', 26, token='test-token')
+    config = LitkgRetrievalConfig('http://litkg.test', 26, token='test-token', acquisition_scope="targeted")
     result = await retrieve_litkg('butyrate inflammation', config=config, transport=httpx.MockTransport(handler))
     assert result['facts'][0]['id'] == 5001
     assert result['facts'][0]['negated'] is True
@@ -62,7 +62,7 @@ async def test_invalid_contract_is_rejected(mutation):
     else:
         data['citations'][0].pop('sentence')
     with pytest.raises(LitkgRetrievalError):
-        await retrieve_litkg('butyrate', config=LitkgRetrievalConfig('http://litkg.test',26),
+        await retrieve_litkg('butyrate', config=LitkgRetrievalConfig('http://litkg.test',26, acquisition_scope="targeted"),
                              transport=httpx.MockTransport(lambda r: httpx.Response(200,json=data)))
 
 
@@ -73,7 +73,7 @@ async def test_unsupported_ask_does_not_silently_scan_claims():
         paths.append(request.url.path)
         return httpx.Response(404)
     with pytest.raises(LitkgRetrievalError, match='HTTP 404'):
-        await retrieve_litkg('butyrate', config=LitkgRetrievalConfig('http://litkg.test',26),
+        await retrieve_litkg('butyrate', config=LitkgRetrievalConfig('http://litkg.test',26, acquisition_scope="targeted"),
                              transport=httpx.MockTransport(handler))
     assert paths == ['/knowledge-bases/26/ask']
 
@@ -87,7 +87,7 @@ def test_context_budget_keeps_complete_citations_and_warns_about_omissions():
         data['facts'].extend(row['facts'])
         data['citations'].extend(row['citations'])
     before = copy.deepcopy(data)
-    result = pack_evidence(data,'butyrate',12,LitkgRetrievalConfig('http://litkg.test',26))
+    result = pack_evidence(data,'butyrate',12,LitkgRetrievalConfig('http://litkg.test',26, acquisition_scope="targeted"))
     text = render_evidence(result)
     envelope = json.dumps({'is_error':False,'content':text},ensure_ascii=False)
     assert len(envelope) <= 17000
@@ -102,7 +102,7 @@ def test_context_budget_keeps_complete_citations_and_warns_about_omissions():
 
 
 def test_legacy_references_keep_claim_fact_and_original_page():
-    refs = evidence_references(pack_evidence(payload(),'butyrate',5,LitkgRetrievalConfig('http://litkg.test',26)))
+    refs = evidence_references(pack_evidence(payload(),'butyrate',5,LitkgRetrievalConfig('http://litkg.test',26, acquisition_scope="targeted")))
     assert refs[0]['claim_id'] == 'litkg:claim:6001'
     assert refs[0]['citation_id'] == '5001:0'
     assert refs[0]['fact_id'] == 5001

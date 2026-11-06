@@ -116,6 +116,8 @@ def property_caption(edge: dict) -> str:
         "unknown": "方向未明确",
     }
     parts = []
+    if edge.get("review_status") == "pending" or edge.get("semantic_status") == "pending" or edge.get("audit_pending"):
+        parts.append("待审核")
     if metric in metrics and direction in directions:
         parts.append(metrics[metric] + directions[direction])
     association = {"positive": "正相关", "negative": "负相关"}.get(

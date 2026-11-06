@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from functools import lru_cache
 import hashlib
 import json
 import math
@@ -20,6 +21,11 @@ TOPIC_KEYWORDS = {f"{s.id}.{t.id}": t.keywords for s in SECTIONS for t in s.topi
 
 
 def _normal(value: object) -> str:
+    return _normal_text(str(value or ""))
+
+
+@lru_cache(maxsize=32768)
+def _normal_text(value: str) -> str:
     return " ".join(
         re.sub(r"[^\w\u4e00-\u9fff]+", " ", str(value or "").casefold().replace("_", " ")).split()
     )
@@ -79,6 +85,8 @@ async def enrich_document(document: dict, *, transport=None) -> None:
     Existing bound evidence survives outages. The scan is bounded and audited;
     no whole-graph endpoint or patient measurements are sent to LitKG.
     """
+    from wgs_fmt_platform.knowledge.knowledge_settings import refresh_knowledge_settings
+    refresh_knowledge_settings()
     audit = {"status": "not_configured", "scanned_claims": 0, "added_claims": 0}
     document["audit"]["knowledge_graph_retrieval"] = audit
     if not list(_topics(document)):
@@ -118,7 +126,10 @@ async def enrich_document(document: dict, *, transport=None) -> None:
             references = raw
         else:
             references = []
+            from wgs_fmt_platform.knowledge.knowledge_settings import eligible_for_use
             for row in raw:
+                if not eligible_for_use(row):
+                    continue
                 if row.get("id") is None:
                     continue
                 item = claim_record_to_reference(row, base_url=base, knowledge_base_id=kb)
@@ -132,6 +143,9 @@ async def enrich_document(document: dict, *, transport=None) -> None:
                     "process",
                     "result_status",
                     "review_status",
+                    "semantic_status",
+                    "audit_pending",
+                    "review_reasons",
                     "display_negated",
                     "page",
                     "page_end",
@@ -141,6 +155,7 @@ async def enrich_document(document: dict, *, transport=None) -> None:
                     if field in row:
                         item[field] = row[field]
                 references.append(item)
+        audit["usage_candidate_count"] = len(references)
         evidence = document["evidence"]
         document["references"] = copy.deepcopy(document.get("references") or {})
         supplied = document["references"].get("matched_docs", [])
@@ -203,7 +218,7 @@ def build_topic_graph(document: dict, topic: dict) -> dict:
         if evidence.get(key, {}).get("kind") == "literature"
     }
     # Citation-bound graphs cannot silently replace a cited claim with a nearby one.
-    keys = cited if cited else topic.get("allowed_narrative_ids", [])
+    keys = sorted(cited | set(topic.get('allowed_narrative_ids', [])))
     candidates = []
     for key in keys:
         row = evidence.get(key, {})
@@ -215,7 +230,7 @@ def build_topic_graph(document: dict, topic: dict) -> dict:
             and (row.get("claim_id") or row.get("raw_claim_id"))
         ):
             candidates.append((key, row, score))
-    candidates.sort(key=lambda r: (-r[2], -_confidence(r[1]), r[0]))
+    candidates.sort(key=lambda r: (r[0] not in cited, -r[2], -_confidence(r[1]), r[0]))
     graph["candidate_count"] = len(candidates)
     nodes, seen = {}, set()
     for key, row, _ in candidates:
@@ -284,6 +299,9 @@ def build_topic_graph(document: dict, topic: dict) -> dict:
                         "process",
                         "result_status",
                         "review_status",
+                    "semantic_status",
+                    "audit_pending",
+                    "review_reasons",
                         "page",
                         "page_end",
                     )

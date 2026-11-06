@@ -1,0 +1,10 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/backend/api/samples/upload/route": "app/backend/api/samples/upload/route.js",
+  "/chat/page": "app/chat/page.js",
+  "/knowledge/page": "app/knowledge/page.js",
+  "/page": "app/page.js",
+  "/reports/page": "app/reports/page.js",
+  "/samples/page": "app/samples/page.js",
+  "/settings/page": "app/settings/page.js"
+}

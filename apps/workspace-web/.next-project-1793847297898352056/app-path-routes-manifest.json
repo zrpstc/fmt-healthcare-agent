@@ -1,0 +1,10 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/backend/api/samples/upload/route": "/backend/api/samples/upload",
+  "/chat/page": "/chat",
+  "/knowledge/page": "/knowledge",
+  "/page": "/",
+  "/reports/page": "/reports",
+  "/samples/page": "/samples",
+  "/settings/page": "/settings"
+}
