@@ -5,6 +5,8 @@ metabolite concentrations, host function scores, or disease probabilities.
 """
 
 from __future__ import annotations
+
+from . import reference_labels
 from .presentation_units import display_text, display_unit
 
 import html
@@ -225,6 +227,7 @@ def build_document(
             percentile = finite(item.get("percentile"))
             if percentile is not None:
                 population = (
+                    "cMD 健康对照" if item.get("generated_by") == "cmd-reference-v1" else
                     "MHNO 参考队列" if item.get("generated_by") == "mhomic-reference-v1" else
                     "健康人群" if item.get("generated_by") == "healthy-reference-v1" else "供体子集"
                 )
@@ -271,7 +274,7 @@ def build_document(
             # Primary abundance is retained; its old reference intervals do not
             # describe the separately profiled MHNO comparison.
             row = {**row, "p5": None, "p95": None, "percentile": None,
-                   "status": "unknown", "comparison_reason_cn": "主分析谱；MHNO 对照见独立比较区"}
+                   "status": "unknown", "comparison_reason_cn": "主分析谱；" + reference_labels.short(inputs) + " 对照见独立比较区"}
         add("species", "S", row, "taxonomic_estimate", species)
     for rank in ("phylum", "genus", "class", "order", "family"):
         for row in records(ranks.get(rank)):

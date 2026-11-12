@@ -96,7 +96,10 @@ def read_table(raw: bytes) -> tuple[list[str], list[dict]]:
     return columns, list(reader)
 
 
-def load_bundle(base: Path) -> tuple[dict, list[dict], list[str], dict, dict]:
+def load_bundle(base: Path, *, specification=None) -> tuple[dict, list[dict], list[str], dict, dict]:
+    VERSION = getattr(specification, "VERSION", globals()["VERSION"])
+    PIPELINE = getattr(specification, "PIPELINE", globals()["PIPELINE"])
+    phenotype = getattr(specification, "PHENOTYPE", "MHNO")
     raw = {name: (base / name).read_bytes()
            for name in ("manifest.json", "metadata.tsv", "species_abundance.tsv")}
     manifest = json.loads(raw["manifest.json"])
@@ -105,7 +108,7 @@ def load_bundle(base: Path) -> tuple[dict, list[dict], list[str], dict, dict]:
     hashes = {name: digest(value) for name, value in raw.items()}
     if (manifest.get("schema_version") != VERSION or manifest.get("pipeline") != PIPELINE
             or manifest.get("normalization") != NORMALIZATION or manifest.get("unit") != "%"
-            or manifest.get("phenotype") != "MHNO" or manifest.get("body_site") != "stool"
+            or manifest.get("phenotype") != phenotype or manifest.get("body_site") != "stool"
             or manifest.get("complete_species_profiles") is not True
             or manifest.get("feature_level") != "species"
             or not all(manifest.get(key) for key in ("cohort_id", "cohort_version", "source_url"))
@@ -125,7 +128,7 @@ def load_bundle(base: Path) -> tuple[dict, list[dict], list[str], dict, dict]:
     ids = [row.get("sample_id", "") for row in labels]
     if (not required.issubset(columns) or not all(ids) or len(set(ids)) != len(ids)
             or any(not row.get("subject_id") or not row.get("study_id")
-                   or row.get("phenotype") != "MHNO" for row in labels)
+                   or row.get("phenotype") != phenotype for row in labels)
             or len({(row["study_id"], row["subject_id"]) for row in labels}) != len(labels)):
         raise MhoError("invalid_reference")
     columns, rows = read_table(raw["species_abundance.tsv"])
@@ -151,12 +154,20 @@ def _runs(value: object) -> set[str]:
     return set(re.findall(r"(?:ERR|SRR|DRR)\d+", str(value or "")))
 
 
-def compare(sample_id: str, metadata: dict) -> dict:
+def compare(sample_id: str, metadata: dict, *, specification=None) -> dict:
     """Return only a dedicated comparison payload; never alter primary results."""
-    audit = {"provider": "mho", "status": "unavailable", "configured": True,
+    VERSION = getattr(specification, "VERSION", globals()["VERSION"])
+    PIPELINE = getattr(specification, "PIPELINE", globals()["PIPELINE"])
+    POPULATION = getattr(specification, "POPULATION", globals()["POPULATION"])
+    REASONS = getattr(specification, "REASONS", globals()["REASONS"])
+    reference_dir = getattr(specification, "reference_dir", globals()["reference_dir"])
+    profiles_dir = getattr(specification, "profiles_dir", globals()["profiles_dir"])
+    load_bundle = getattr(specification, "load_bundle", globals()["load_bundle"])
+    matches = getattr(specification, "pipeline_matches", lambda value: value == PIPELINE)
+    audit = {"provider": getattr(specification, "PROVIDER", "mho"), "status": "unavailable", "configured": True,
              "generated_by": VERSION, "file": str(reference_dir()),
              "reference_population": POPULATION, "normalization": NORMALIZATION,
-             "scope": "published_MHNO_exploratory", "pipeline": PIPELINE}
+             "scope": getattr(specification, "SCOPE", "published_MHNO_exploratory"), "pipeline": PIPELINE}
     result = {"audit": audit, "species": [], "diversity": []}
 
     def fail(reason):
@@ -188,8 +199,8 @@ def compare(sample_id: str, metadata: dict) -> dict:
                 or provenance.get("profile_sha256") != digest(profile_raw)
                 or provenance.get("normalization") != NORMALIZATION):
             return fail("invalid_target")
-        if (provenance.get("pipeline") != PIPELINE
-                or any(PIPELINE.get(key) != value for key, value in header_pipeline.items())
+        if (not matches(provenance.get("pipeline"))
+                or not matches({**PIPELINE, **header_pipeline})
                 or "database_version" not in header_pipeline):
             return fail("incompatible_pipeline")
         prepared_metadata = provenance.get("comparison_metadata", {})
@@ -222,7 +233,7 @@ def compare(sample_id: str, metadata: dict) -> dict:
     for label in labels:
         same_person = (str(metadata.get("subject_id", "")) == label["subject_id"]
                        and (not metadata.get("study_id") or metadata["study_id"] == label["study_id"]))
-        if label["sample_id"] == sample_id or same_person or target_runs & _runs(label["source_runs"]):
+        if label["sample_id"] == sample_id or label.get("original_sample_id") == sample_id or same_person or target_runs & _runs(label["source_runs"]):
             exclusions["self"] += 1
             continue
         matches = True
@@ -248,7 +259,7 @@ def compare(sample_id: str, metadata: dict) -> dict:
     common = {"generated_by": VERSION, "reference_version": version,
               "reference_population": POPULATION, "n_subjects": len(selected),
               "n_reference": len(selected),
-              "method": "MetaPhlAn 4.2.2 Jan25；已分类物种内归一化", "source_file": audit["target_profile"]}
+              "method": getattr(specification, "METHOD", "MetaPhlAn 4.2.2 Jan25；已分类物种内归一化"), "source_file": audit["target_profile"]}
 
     def comparison(value, values):
         summary = distribution(values)
@@ -282,15 +293,16 @@ def compare(sample_id: str, metadata: dict) -> dict:
                 "name": title, "value": observed[key], "unit": "种" if key == "richness" else "无量纲",
                 "definition": observed["definition"]})
     from .ordination import community_ordination
-    result["ordination"] = community_ordination(
+    calculate_ordination = getattr(specification, "community_ordination", community_ordination)
+    result["ordination"] = calculate_ordination(
         target, matrix, selected, reference_version=version, stratify_by=matching,
     )
-    limitations = ["MHNO 是原研究定义的代谢健康非肥胖人群，不是通用临床正常值。",
+    limitations = list(getattr(specification, "LIMITATIONS", ["MHNO 是原研究定义的代谢健康非肥胖人群，不是通用临床正常值。",
         "丰度为已分类物种内归一化比例；未分类部分不参与分母，不能与主分析原始百分数混用。",
         "原研究的抽样深度及研究间差异未统一校正；尤其检出丰富度仅作探索性比较。",
-        "P5–P95 和经验百分位描述该参考队列，不代表疾病概率。"]
+        "P5–P95 和经验百分位描述该参考队列，不代表疾病概率。"]))
     if not matching:
-        limitations.append("使用 MHNO 总体，未按年龄、性别或地区匹配。")
+        limitations.append("使用 " + getattr(specification, "SHORT_LABEL", "MHNO") + " 总体，未按年龄、性别或地区匹配。")
     if not metadata.get("subject_id") and not target_runs:
         limitations.append("仅能排除同名样本；未提供个体或 run 标识，不能核验其他编号是否属于同一个体。")
     audit.update(status="available", version=version, limitations=limitations,

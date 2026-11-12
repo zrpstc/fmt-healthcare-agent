@@ -5,6 +5,8 @@ DrawingML; each numeric panel has an explicit assay/unit/denominator binding.
 """
 
 from __future__ import annotations
+
+from . import reference_labels
 from .presentation_units import display_text
 
 import hashlib
@@ -213,7 +215,7 @@ def chart_data(document, spec):
         return _dataset(
             [r["label"] for r in rows],
             [
-                _series("MHNO 独立谱" if mho else "本次样本", [finite(r.get("value")) for r in rows]),
+                _series(reference_labels.profile(data.inputs) if mho else "本次样本", [finite(r.get("value")) for r in rows]),
                 _series("参考人群中位数", [finite(r.get("reference_median")) for r in rows]),
             ],
             "%",
@@ -221,9 +223,9 @@ def chart_data(document, spec):
     if ident == "2.1.1":
         if data.inputs.get("healthy_comparison"):
             rows = data.group("healthy_diversity")
-            return _dataset(["MHNO · " + r["label"] for r in rows],
-                            [_series("MHNO 独立谱经验百分位", [_percentile(r) for r in rows])],
-                            "MHNO 经验百分位（0–100）")
+            return _dataset([reference_labels.short(data.inputs) + " · " + r["label"] for r in rows],
+                            [_series(reference_labels.profile(data.inputs) + "经验百分位", [_percentile(r) for r in rows])],
+                            reference_labels.short(data.inputs) + " 经验百分位（0–100）")
         rows = data.group("div_richness", "div_shannon", "div_evenness")
         refs = data.group("div_reference")
         vals = []

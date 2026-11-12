@@ -1,5 +1,7 @@
 """Data-backed diversity, observed functional contributors and unlinked stage evidence."""
 from __future__ import annotations
+
+from . import reference_labels
 import re
 from PIL import Image, ImageDraw
 from .inputs import finite
@@ -27,7 +29,7 @@ def diversity_rows(document):
         row=ref or primary
         if not row or finite(row.get("value")) is None or finite(row.get("value"))<0:continue
         rows.append({**row,"metric":key,"label":label,"primary_value":finite(primary.get("value")) if primary else None,
-                     "profile_label":"MHNO 独立谱" if ref and ref.get("kind")=="healthy_diversity" else "本次样本"})
+                     "profile_label":reference_labels.profile(document.get("template_inputs", {})) if ref and ref.get("kind")=="healthy_diversity" else "本次样本"})
     return rows
 
 
@@ -171,7 +173,7 @@ def chart_payload(document,spec):
     from .word_figures import _dataset,_series
     if spec["id"]=="2.1.1":
         rows=diversity_rows(document)
-        result=_dataset([("MHNO · " if r["profile_label"]=="MHNO 独立谱" else "")+r["label"] for r in rows],[_series("本次结果",[r["value"] for r in rows]),_series("参考中位数",[finite(r.get("reference_median")) for r in rows])],"各指标原单位")
+        result=_dataset([(reference_labels.short(document.get("template_inputs", {})) + " · " if r["profile_label"].endswith("独立谱") else "")+r["label"] for r in rows],[_series("本次结果",[r["value"] for r in rows]),_series("参考中位数",[finite(r.get("reference_median")) for r in rows])],"各指标原单位")
         return {**result,"chapter_two_mode":"diversity","rows":rows}
     rows=redundancy_rows(document)
     available=any(row["summary"]["status"]=="available" for row in rows)

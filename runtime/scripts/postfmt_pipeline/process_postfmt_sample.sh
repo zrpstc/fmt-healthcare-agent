@@ -72,7 +72,7 @@ HUMANN_NUC_DB="$DB_ROOT/humann3/chocophlan"
 HUMANN_PROT_DB="$DB_ROOT/humann3/uniref"
 
 prepare_healthy_comparison() {
-    [[ "${WGS_HEALTHY_REFERENCE_PROVIDER:-}" == "mho" ]] || return 0
+    [[ "${WGS_HEALTHY_REFERENCE_PROVIDER:-}" == "mho" || "${WGS_HEALTHY_REFERENCE_PROVIDER:-}" == "cmd" ]] || return 0
     local app_python="${WGS_MHO_PYTHON:-$APP_ROOT/.venv/bin/python}"
     if [[ ! -x "$app_python" ]]; then
         printf 'HEALTHY_REFERENCE unavailable: application Python missing\n' >&2

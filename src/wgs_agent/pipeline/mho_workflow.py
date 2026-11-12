@@ -56,6 +56,9 @@ def _state_path(sample_id: str) -> Path:
 
 
 def get_mho_status(sample_id: str) -> dict:
+    if os.environ.get("WGS_HEALTHY_REFERENCE_PROVIDER", "").strip().lower() == "cmd":
+        from .cmd_workflow import get_cmd_status
+        return get_cmd_status(sample_id)
     if not enabled():
         return {"state": "disabled", "ready": False}
     try:
@@ -194,6 +197,10 @@ def _publish(source: Path, destination: Path) -> None:
 def ensure_mho_profile(sample_id: str, *, output_root: Path | None = None,
                        group_json: Path | None = None, metadata: dict | None = None,
                        threads: int | None = None) -> dict:
+    if os.environ.get("WGS_HEALTHY_REFERENCE_PROVIDER", "").strip().lower() == "cmd":
+        from .cmd_workflow import ensure_cmd_profile
+        return ensure_cmd_profile(sample_id, output_root=output_root, group_json=group_json,
+                                  metadata=metadata, threads=threads)
     if not mho.valid_sample_id(sample_id):
         raise ValueError("invalid sample ID")
     if not enabled():

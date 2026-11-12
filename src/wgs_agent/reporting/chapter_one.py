@@ -1,5 +1,7 @@
 """Chapter-one charts with explicit percentages, translated labels and reference details."""
 from __future__ import annotations
+
+from . import reference_labels
 import re
 import math
 from PIL import Image, ImageDraw
@@ -71,7 +73,7 @@ def chart_payload(document, spec):
     if ident == "1.4.1":
         rows = reference_rows(document)
         payload = _dataset([name(document,r) for r in rows], [
-            _series("MHNO 独立谱" if any(r.get("kind")=="healthy_species" for r in rows) else "本次样本", [finite(r.get("value")) for r in rows]),
+            _series(reference_labels.profile(document.get("template_inputs", {})) if any(r.get("kind")=="healthy_species" for r in rows) else "本次样本", [finite(r.get("value")) for r in rows]),
             _series("参考人群中位数", [finite(r.get("reference_median")) for r in rows])], "%")
         payload.update(chapter_one_mode="reference", rows=[{**r,"display_label":name(document,r),"scientific_label":scientific(r)} for r in rows])
         return payload

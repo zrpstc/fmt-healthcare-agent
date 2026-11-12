@@ -7,6 +7,8 @@ the presentation authority. Evidence topics remain stable for KG/references.
 
 from __future__ import annotations
 
+from . import reference_labels
+
 import json
 import re
 from functools import lru_cache
@@ -230,8 +232,8 @@ def bind_table(document, block, data=None):
     if mho and block["id"] == "1.4.t1":
         rows = data.group("healthy_species")[:8]
         return [[r["label"], r["result_text"], r["reference_text"], _pick(r, "percentile"),
-                 {"above": "高于 MHNO 参考", "below": "低于 MHNO 参考", "within": "MHNO 区间内"}.get(r["comparison"], "暂不判定高低")]
-                for r in rows] or [["MHNO 独立对照", "未比较", (mho.get("audit") or {}).get("reason_cn", "对照不可用"), "未提供", "暂不判定"]]
+                 {"above": "高于 " + reference_labels.short(data.inputs) + " 参考", "below": "低于 " + reference_labels.short(data.inputs) + " 参考", "within": reference_labels.short(data.inputs) + " 区间内"}.get(r["comparison"], "暂不判定高低")]
+                for r in rows] or [[reference_labels.short(data.inputs) + " 独立对照", "未比较", (mho.get("audit") or {}).get("reason_cn", "对照不可用"), "未提供", "暂不判定"]]
     direct = _rows(data, headers)
     if direct and ident_not_special(block["id"]):
         return [[clean(v) for v in row] for row in direct]
@@ -349,7 +351,7 @@ def bind_table(document, block, data=None):
             )
         if mho:
             for row in data.group("healthy_diversity"):
-                result.append(["MHNO 独立谱 · " + row["label"], row["result_text"],
+                result.append([reference_labels.profile(data.inputs) + " · " + row["label"], row["result_text"],
                                row["reference_text"], _pick(row, "percentile")])
         return result
     if ident == "2.3.t1":
@@ -856,11 +858,11 @@ def paragraph(document, block, chapter):
     if mho and (chapter, sub) in {(1, 4), (2, 1)}:
         audit = mho.get("audit") or {}
         if s.startswith("分析流程与参考版本") or s.startswith("指标介绍与解读"):
-            return ("MHOmicrobiome MHNO 独立对照：MetaPhlAn 4.2.2 / mpa_vJan25_CHOCOPhlAnSGB_202503；"
+            return (f"分析流程与参考版本：{reference_labels.method(document.get('template_inputs', {}))}。"
                     "参考与待测谱均按已分类物种总和归一化至 100%。主分析数值与独立谱分别展示。"
                     + " ".join(audit.get("limitations", [])))
         if s.startswith("参考人群"):
-            return (f"参考人群：MHOmicrobiome MHNO；独立人数：{audit.get('n_subjects', '未建立')}；"
+            return (f"参考人群：{reference_labels.title(document.get('template_inputs', {}))}；独立人数：{audit.get('n_subjects', '未建立')}；"
                     f"匹配条件：{'、'.join(audit.get('stratify_by', [])) or '总体（未匹配人口学）'}；"
                     "本表按待测谱丰度展示前 8 项，完整物种清单见结构化报告。"
                     + ("" if audit.get("status") == "available" else str(audit.get("reason_cn", "对照不可用"))))

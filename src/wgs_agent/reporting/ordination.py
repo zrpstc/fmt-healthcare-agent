@@ -141,7 +141,10 @@ def community_paragraph(document, *, interpretation=False):
             text += "参考人群按" + "、".join(titles.get(k, k) for k in payload["stratify_by"]) + "筛选。"
         return text
     summary = payload.get("distance_summary") or {}
+    subset_total = payload.get("n_reference_total", payload.get("n_reference", 0))
     text = f"参考人群：{payload.get('n_reference', 0)} 个独立参考样本；方法：{payload.get('method', 'PCoA')}。"
+    if subset_total > payload.get("n_reference", 0):
+        text += f"群落图使用全部{subset_total}人中的固定绘图子集；物种和多样性分位数使用全部合格参考。"
     if summary.get("median") is not None:
         text += f"本次样本与参考样本的 Bray-Curtis 距离中位数为 {summary['median']:.3f}（范围 {summary['minimum']:.3f}–{summary['maximum']:.3f}，0 表示组成相同）。"
     return text

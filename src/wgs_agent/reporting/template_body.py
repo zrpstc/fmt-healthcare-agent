@@ -6,6 +6,8 @@ or synthetic illustrations are emitted. Legacy subgraphs are rendered unchanged.
 
 from __future__ import annotations
 
+from . import reference_labels
+
 import math
 import re
 
@@ -179,13 +181,13 @@ class Body:
     def mho_table(self, group):
         comparison = self.inputs.get("healthy_comparison") or {}
         audit = comparison.get("audit") or {}
-        self.out.append("**MHOmicrobiome MHNO 独立对照（MetaPhlAn 4.2.2 / Jan25）**")
+        self.out.append(f"**{reference_labels.title(self.inputs)} 独立对照（{reference_labels.method(self.inputs)}）**")
         self.out.append("本区使用独立待测谱；参考与待测谱均按已分类物种总和归一化至 100%。")
         self.emit(
-            ["物种" if group == "healthy_species" else "多样性指标", "独立对照谱结果", "MHNO P5–P95", "MHNO 经验百分位"],
+            ["物种" if group == "healthy_species" else "多样性指标", "独立对照谱结果", reference_labels.short(self.inputs) + " P5–P95", reference_labels.short(self.inputs) + " 经验百分位"],
             [[r["label"], r["result_text"], r["reference_text"], _pick(r, "percentile")]
              for r in self.group(group)],
-            "本次 MHNO 对照不可用：" + str(audit.get("reason_cn", "缺少有效参考或待测谱")) + "。",
+            "本次 " + reference_labels.short(self.inputs) + " 对照不可用：" + str(audit.get("reason_cn", "缺少有效参考或待测谱")) + "。",
         )
 
     def composition(self, block):
@@ -375,7 +377,7 @@ class Body:
         elif block == 2:
             if self.inputs.get("healthy_comparison"):
                 audit = self.inputs["healthy_comparison"].get("audit") or {}
-                self.out.append(" ".join(audit.get("limitations", [])) or str(audit.get("reason_cn", "MHNO 对照不可用")))
+                self.out.append(" ".join(audit.get("limitations", [])) or str(audit.get("reason_cn", "健康参考对照不可用")))
             else:
                 self.standard(self.group("div_reference"))
             self.out.append(

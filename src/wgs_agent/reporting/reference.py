@@ -303,8 +303,11 @@ def _diversity_reference(sample_id: str, observed: dict) -> tuple[list[dict], di
 def refresh_reference_comparisons(data: dict, inputs: dict) -> dict:
     """Return enriched input; never mutate data or write files during preparation."""
     result = copy.deepcopy(data)
-    if os.environ.get("WGS_HEALTHY_REFERENCE_PROVIDER", "").strip().lower() == "mho":
-        from .mho import compare as compare_mho
+    if os.environ.get("WGS_HEALTHY_REFERENCE_PROVIDER", "").strip().lower() in {"mho", "cmd"}:
+        if os.environ.get("WGS_HEALTHY_REFERENCE_PROVIDER", "").strip().lower() == "cmd":
+            from .cmd import compare as compare_mho
+        else:
+            from .mho import compare as compare_mho
 
         metadata = result.setdefault("metadata", {})
         if not isinstance(metadata, dict):

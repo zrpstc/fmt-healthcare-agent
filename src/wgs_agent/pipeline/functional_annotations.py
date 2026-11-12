@@ -3,6 +3,7 @@
 EC groups may overlap. Their sums are annotation abundance, not enzyme activity,
 complete pathways, metabolite concentrations, or clinical reference scores.
 """
+import os
 from collections import defaultdict
 import gzip
 import hashlib
@@ -210,7 +211,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sample-id", required=True)
     parser.add_argument("--output-root", type=Path, required=True)
-    parser.add_argument("--mapping-dir", type=Path, default=PROJECT_ROOT / "fmt-databases/humann3/utility_mapping")
+    parser.add_argument("--mapping-dir", type=Path, default=Path(os.environ.get("DB_ROOT") or PROJECT_ROOT / "fmt-databases") / "humann3/utility_mapping")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     try:
