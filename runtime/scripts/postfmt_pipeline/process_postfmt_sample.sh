@@ -11,18 +11,8 @@ METAPHLAN_THREADS="${METAPHLAN_THREADS:-4}"
 HUMANN_MEMORY_USE="${HUMANN_MEMORY_USE:-minimum}"
 SCRIPT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 APP_ROOT="$(cd -- "$SCRIPT_ROOT/../../.." && pwd)"
-if [[ -z "${FMT_ROOT:-}" ]]; then
-    if [[ -n "${WGS_FMT_RESOURCE_ROOT:-}" ]]; then
-        FMT_ROOT="$WGS_FMT_RESOURCE_ROOT"
-    elif [[ -n "${WGS_WORKSPACE:-}" ]]; then
-        FMT_ROOT="$(dirname -- "$WGS_WORKSPACE")"
-    else
-        FMT_ROOT="$APP_ROOT/var"
-    fi
-fi
-OUTPUT_ROOT="${OUTPUT_ROOT:-$FMT_ROOT/postfmt_processed}"
-DB_ROOT="${DB_ROOT:-$FMT_ROOT/databases}"
-ENV_ROOT="${ENV_ROOT:-$FMT_ROOT/runtime/envs}"
+source "$APP_ROOT/runtime/scripts/runtime_paths.sh"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$WGS_BIOINFORMATICS_OUTPUT_ROOT}"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -73,7 +63,7 @@ HUMANN_PROT_DB="$DB_ROOT/humann3/uniref"
 
 prepare_healthy_comparison() {
     [[ "${WGS_HEALTHY_REFERENCE_PROVIDER:-}" == "mho" || "${WGS_HEALTHY_REFERENCE_PROVIDER:-}" == "cmd" ]] || return 0
-    local app_python="${WGS_MHO_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    local app_python="${WGS_MHO_PYTHON:-$WGS_ENV_ROOT/bin/python}"
     if [[ ! -x "$app_python" ]]; then
         printf 'HEALTHY_REFERENCE unavailable: application Python missing\n' >&2
         return 0
@@ -91,7 +81,7 @@ prepare_healthy_comparison() {
 # Chapter-four steps have separate durable states and never invalidate completed base profiles.
 run_chapter_four() {
   [[ "${WGS_CHAPTER4_ENABLED:-1}" == "1" ]] || return 0
-  local chapter4_python="${WGS_CHAPTER4_PYTHON:-$APP_ROOT/.venv/bin/python}"
+  local chapter4_python="${WGS_CHAPTER4_PYTHON:-$WGS_ENV_ROOT/bin/python}"
   local chapter4_reads="$CLEAN_DIR/${SAMPLE_ID}.dehosted.fastq.gz"
   if [[ -s "${MERGED_FASTQ:-}" ]]; then chapter4_reads="$MERGED_FASTQ"; fi
   if [[ ! -x "$chapter4_python" ]]; then
@@ -109,7 +99,7 @@ run_chapter_four() {
 
 run_chapter_five() {
     [[ "${WGS_CHAPTER5_ENABLED:-1}" == "1" ]] || return 0
-    local chapter5_python="${WGS_CHAPTER5_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    local chapter5_python="${WGS_CHAPTER5_PYTHON:-$WGS_ENV_ROOT/bin/python}"
     local chapter5_reads="$CLEAN_DIR/${SAMPLE_ID}.dehosted.fastq.gz"
     if [[ -s "${MERGED_FASTQ:-}" ]]; then chapter5_reads="$MERGED_FASTQ"; fi
     if [[ ! -x "$chapter5_python" ]]; then
@@ -119,7 +109,7 @@ run_chapter_five() {
     if ! PYTHONPATH="$APP_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" "$chapter5_python" \
       -m wgs_agent.pipeline.resistome_mge --sample-id "$SAMPLE_ID" \
       --output-root "$OUTPUT_ROOT" --reads "$chapter5_reads" \
-      --database-root "${WGS_CHAPTER5_DATABASE_ROOT:-$APP_ROOT/fmt-databases/resistome_mge}" \
+      --database-root "${WGS_CHAPTER5_DATABASE_ROOT:-$DB_ROOT/resistome_mge}" \
       --tax-bin "$TAX_ENV/bin" --threads "$METAPHLAN_THREADS" \
       >> "$LOG_DIR/${SAMPLE_ID}.chapter5.log" 2>&1; then
         printf '%s\n' '[chapter5] See module status; primary pipeline retained' >&2
@@ -130,7 +120,7 @@ run_chapter_five() {
 
 run_chapter_six() {
     [[ "${WGS_CHAPTER6_ENABLED:-1}" == "1" ]] || return 0
-    local app_python="${WGS_CHAPTER6_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    local app_python="${WGS_CHAPTER6_PYTHON:-$WGS_ENV_ROOT/bin/python}"
     if [[ ! -x "$app_python" ]]; then
         printf '%s\n' '[chapter6] Python unavailable; analysis not run' >&2
         return 0
@@ -146,7 +136,7 @@ run_chapter_six() {
 
 run_specialized_metabolism() {
     [[ "${WGS_SPECIALIZED_METABOLISM_ENABLED:-1}" == "1" ]] || return 0
-    local app_python="${WGS_FUNCTIONAL_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    local app_python="${WGS_FUNCTIONAL_PYTHON:-$WGS_ENV_ROOT/bin/python}"
     if [[ ! -x "$app_python" ]]; then
         printf '%s\n' '[specialized] Python unavailable; annotation not run' >&2
         return 0
@@ -161,7 +151,7 @@ run_specialized_metabolism() {
 
 run_functional_annotations() {
     [[ "${WGS_FUNCTIONAL_ANNOTATIONS_ENABLED:-1}" == "1" ]] || return 0
-    local app_python="${WGS_FUNCTIONAL_PYTHON:-$APP_ROOT/.venv/bin/python}"
+    local app_python="${WGS_FUNCTIONAL_PYTHON:-$WGS_ENV_ROOT/bin/python}"
     if [[ ! -x "$app_python" ]]; then
         printf '%s\n' '[functional] Python unavailable; annotation not run' >&2
         return 0
@@ -233,6 +223,10 @@ require_file() {
 for tool in "$FASTP" "$KNEADDATA" "$METAPHLAN" "$HUMANN" "$HUMANN_RENORM"; do
     [[ -x "$tool" ]] || { log "ERROR missing executable: $tool"; exit 2; }
 done
+if ! wgs_run_tool "$FUNC_ENV" "$FUNC_ENV/bin/glpsol" --version >/dev/null 2>&1; then
+    log "ERROR GLPK_RUNTIME_UNAVAILABLE: check configured tool environment libraries"
+    exit 1
+fi
 for path in \
     "$KNEADDATA_DB/hg_39.1.bt2" \
     "$METAPHLAN_DB/$METAPHLAN_INDEX.pkl" \
@@ -378,7 +372,8 @@ if [[ ! -s "$pathabundance" || ! -s "$genefamilies" ]]; then
     # HUMAnN 3.9 parses the last nonempty line of `metaphlan --version`.
     # MetaPhlAn 4.2 appends database information; normalize only that probe.
     WGS_HUMANN_METAPHLAN_BIN="$METAPHLAN" \
-    PATH="$SCRIPT_ROOT/humann_compat:$FUNC_ENV/bin:$PATH" "$HUMANN" \
+    PATH="$SCRIPT_ROOT/humann_compat:$FUNC_ENV/bin:$PATH" \
+    LD_LIBRARY_PATH="$FUNC_ENV/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" "$HUMANN" \
         --input "$MERGED_FASTQ" --output "$HUMANN_SAMPLE_DIR" \
         --output-basename "$SAMPLE_ID" --threads "$THREADS" \
         --taxonomic-profile "$HUMANN_TAX_OUT" \
@@ -399,7 +394,7 @@ for input in "$pathabundance" "$genefamilies"; do
     output="${base}_relab.tsv"
     if [[ ! -s "$output" ]]; then
         log "HUMANN normalize $(basename "$input")"
-        PATH="$FUNC_ENV/bin:$PATH" "$HUMANN_RENORM" \
+        wgs_run_tool "$FUNC_ENV" "$HUMANN_RENORM" \
             --input "$input" --output "$output" --units relab
     fi
     require_file "$output"

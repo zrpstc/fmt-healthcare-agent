@@ -1,6 +1,8 @@
 """Prepare a separate MetaPhlAn3/v30 spectrum; report rendering stays offline."""
 from __future__ import annotations
 
+
+from wgs_fmt_platform.paths import bioinformatics_env_root, bioinformatics_database_root, tool_environment
 import argparse
 from datetime import UTC, datetime
 import json
@@ -53,19 +55,19 @@ def get_cmd_status(sample_id):
 
 
 def _configuration():
-    env_root = runtime_path("ENV_ROOT", "runtime", "envs")
+    env_root = bioinformatics_env_root()
     python = project_path(os.environ.get("WGS_CMD_PYTHON") or env_root/"fmt-tax/bin/python").resolve(strict=True)
     vendor = runtime_path("WGS_CMD_VENDOR_DIR", "runtime", "vendor", "metaphlan-3.0.14").resolve(strict=True)
     script = (vendor/"metaphlan/metaphlan.py").resolve(strict=True)
     tools = project_path(os.environ.get("WGS_CMD_TOOL_BIN") or env_root/"fmt-tax/bin").resolve(strict=True)
-    database = project_path(os.environ.get("WGS_CMD_DATABASE") or runtime_path("DB_ROOT", "databases")/"metaphlan3_cmd").resolve(strict=True)
+    database = project_path(os.environ.get("WGS_CMD_DATABASE") or bioinformatics_database_root()/"metaphlan3_cmd").resolve(strict=True)
     index = cmd.PIPELINE["database_version"]
     required = [database/(index+ext) for ext in (".pkl", ".1.bt2", ".2.bt2", ".3.bt2", ".4.bt2", ".rev.1.bt2", ".rev.2.bt2")]
     if not all(p.is_file() and p.stat().st_size > 0 for p in required):
         raise FileNotFoundError("incomplete cMD database")
     environment = dict(os.environ)
     environment["PYTHONPATH"] = str(vendor)
-    environment["PATH"] = str(tools) + os.pathsep + environment.get("PATH", "")
+    environment = tool_environment(tools, environment)
     v = subprocess.run([str(python), "-m", "metaphlan.metaphlan", "--version"], capture_output=True, text=True,
                        env=environment, check=True, timeout=30)
     match = re.search(r"MetaPhlAn(?: version)?\s+(\d+\.\d+\.\d+)", v.stdout+v.stderr, re.I)

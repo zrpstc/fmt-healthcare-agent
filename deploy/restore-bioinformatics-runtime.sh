@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 APP_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
-FMT_ROOT="${FMT_ROOT:-${WGS_FMT_RESOURCE_ROOT:-$APP_ROOT/var}}"
+source "$APP_ROOT/runtime/scripts/runtime_paths.sh"
 BUNDLE_DIR="${1:-}"
 
 [[ -d "$BUNDLE_DIR" ]] || {
@@ -23,7 +23,7 @@ for archive in "$BUNDLE_DIR"/environment_*.tar.gz; do
     [[ -e "$archive" ]] || continue
     environment="$(basename "$archive" .tar.gz)"
     environment="${environment#environment_}"
-    target="$FMT_ROOT/runtime/envs/$environment"
+    target="$ENV_ROOT/$environment"
     [[ ! -e "$target" ]] || {
         printf 'Target environment already exists; move it aside first: %s\n' "$target" >&2
         exit 3
@@ -47,12 +47,14 @@ done
 while IFS= read -r archive; do
     [[ -n "$archive" ]] || continue
     archive_name="$(basename "$archive")"
+    strip_components=0
     if [[ "$archive_name" == "model_fmt-triplet-v1.tar.zst" ]]; then
         target="$FMT_ROOT/models/fmt-triplet-v1"
     elif [[ "$archive_name" == "data_fmt-matching.tar.zst" ]]; then
-        target="$FMT_ROOT/data/fmt-matching"
+        target="$WGS_FMT_MATCHING_DIR"
     else
-        target="$FMT_ROOT"
+        target="$DB_ROOT"
+        strip_components=1
     fi
     printf 'INSPECT %s\n' "$archive"
     while IFS= read -r member; do
@@ -63,7 +65,7 @@ while IFS= read -r archive; do
     done < <(zstd -dc -- "$archive" | tar -tf -)
     mkdir -p "$target"
     printf 'RESTORE %s -> %s\n' "$archive" "$target"
-    zstd -dc -- "$archive" | tar -C "$target" -xf -
+    zstd -dc -- "$archive" | tar -C "$target" --strip-components="$strip_components" -xf -
 done < <(find "$BUNDLE_DIR" -maxdepth 1 -type f -name '*.tar.zst' -print | sort)
 
 FMT_ROOT="$FMT_ROOT" "$SCRIPT_DIR/check-bioinformatics-runtime.sh"

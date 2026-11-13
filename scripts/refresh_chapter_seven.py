@@ -17,6 +17,8 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from wgs_fmt_platform.paths import runtime_path
+
 
 def replace_sections(markdown, replacement):
     start = re.search(r"^### 7\.2 .+$", markdown, re.M)
@@ -34,8 +36,8 @@ def main():
     sid = args.sample_id
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,99}", sid):
         parser.error("invalid sample identifier")
-    report = (args.report_path or ROOT / "var/results" / f"{sid}_report.json").resolve()
-    if not report.is_relative_to(ROOT) or report.name != f"{sid}_report.json":
+    report = (args.report_path or runtime_path("WGS_RESULTS_DIR", "results") / f"{sid}_report.json").resolve()
+    if not report.is_relative_to(runtime_path("WGS_RESULTS_DIR", "results").resolve()) or report.name != f"{sid}_report.json":
         parser.error("report must use its sample filename inside the project")
     output = report.parent
     with (output / f".{sid}.report.lock").open("a") as lock:

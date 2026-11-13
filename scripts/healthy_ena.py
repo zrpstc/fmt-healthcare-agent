@@ -20,8 +20,13 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+import sys
+
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DIRECTORY = ROOT / "var/reference-sources/healthy-ena-demo"
+sys.path.insert(0, str(ROOT / "src"))
+
+from wgs_fmt_platform.paths import runtime_path
+DEFAULT_DIRECTORY = runtime_path("WGS_HEALTHY_ENA_DIR", "reference-sources", "healthy-ena-demo")
 FIELDS = (
     "run_accession", "study_accession", "sample_accession", "experiment_accession",
     "library_strategy", "library_source", "library_layout", "instrument_platform",
@@ -297,7 +302,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="action", required=True)
     preparation = commands.add_parser("prepare", help="Select candidates and fetch only the small ENA index")
-    preparation.add_argument("--metadata", type=Path, default=ROOT / "var/reference-sources/cmd/sample_metadata.tsv")
+    preparation.add_argument("--metadata", type=Path, default=runtime_path("WGS_CMD_SOURCE_DIR", "reference-sources", "cmd") / "sample_metadata.tsv")
     preparation.add_argument("--study", required=True)
     preparation.add_argument("--ena-project", required=True)
     preparation.add_argument("--limit", type=int, default=50)

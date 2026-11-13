@@ -21,6 +21,8 @@ FMT 配型预测模块 (独立) — 移植到 WGS-FMT-Agent
 ===============================================================================
 """
 
+
+from wgs_fmt_platform.paths import fmt_matching_dir, resource_root
 import os
 import sys
 import logging
@@ -41,7 +43,7 @@ from wgs_fmt_platform.paths import (
 
 def _find_fmt_matching_dir() -> str:
     """Only use the configured local compatibility pipeline; never scan other projects."""
-    return str(runtime_path("WGS_FMT_MATCHING_DIR", "fmt-matching"))
+    return str(fmt_matching_dir())
 
 
 # 将 WGS.FMT/new_FMT_Matching 加入 sys.path 以便导入其模块
@@ -87,9 +89,7 @@ R_SCRIPT = os.path.join(_FMT_SCRIPT_DIR, "run_zippca_mbdenoise.r")
 # self-contained artifact so reports do not silently lose donor ranking.
 _AGENT_ROOT = PROJECT_ROOT
 _FMT_ROOT = runtime_path("WGS_FMT_DATA_ROOT", "fmt")
-_RESOURCE_ROOT = project_path(
-    os.environ.get("WGS_FMT_RESOURCE_ROOT") or os.environ.get("FMT_ROOT") or workspace_root()
-)
+_RESOURCE_ROOT = resource_root()
 
 
 def _resource_path(env_name: str, portable: Path, local: Path) -> Path:
@@ -105,16 +105,8 @@ TRIPLET_MODEL_DIR = _resource_path(
     runtime_path("WGS_FMT_TRIPLET_MODEL_DIR", "model-training", "fmt-triplet-v1"),
 )
 TRIPLET_PREDICTOR_SCRIPT = project_path(os.environ.get("WGS_FMT_TRIPLET_PREDICTOR") or _AGENT_ROOT / "scripts/predict_fmt_triplet_model.py")
-TRIPLET_BASELINE_SPECIES = _resource_path(
-    "WGS_FMT_BASELINE_SPECIES",
-    _RESOURCE_ROOT / "data/fmt-matching/species_abundance_train.csv",
-    _FMT_ROOT / "species_abundance_train.csv",
-)
-TRIPLET_MATCH_FILE = _resource_path(
-    "WGS_FMT_MATCH_FILE",
-    _RESOURCE_ROOT / "data/fmt-matching/match.xlsx",
-    _FMT_ROOT / "match.xlsx",
-)
+TRIPLET_BASELINE_SPECIES = project_path(os.environ.get("WGS_FMT_BASELINE_SPECIES") or fmt_matching_dir() / "species_abundance_train.csv")
+TRIPLET_MATCH_FILE = project_path(os.environ.get("WGS_FMT_MATCH_FILE") or fmt_matching_dir() / "match.xlsx")
 TRIPLET_POST_SPECIES = project_path(os.environ.get("WGS_FMT_POST_SPECIES") or bioinformatics_root() / "matrices/species_relative_abundance_percent.tsv")
 TRIPLET_PROFILE_DIR = project_path(os.environ.get("WGS_FMT_PROFILE_DIR") or bioinformatics_root() / "profiles/metaphlan")
 

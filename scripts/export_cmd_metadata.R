@@ -1,10 +1,23 @@
 #!/usr/bin/env Rscript
+configured_cmd_source <- function() {
+  invocation <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
+  script <- sub("^--file=", "", invocation[[1]])
+  root <- normalizePath(file.path(dirname(script), ".."), mustWork = TRUE)
+  interpreter_root <- Sys.getenv("WGS_ENV_ROOT", unset = file.path(root, ".venv"))
+  if (!startsWith(interpreter_root, "/")) interpreter_root <- file.path(root, interpreter_root)
+  value <- system2(file.path(interpreter_root, "bin", "python"),
+                   c(shQuote(file.path(root, "scripts", "runtime_paths.py")), "--get", "WGS_CMD_SOURCE_DIR"),
+                   stdout = TRUE)
+  if (!is.null(attr(value, "status")) || length(value) != 1L) stop("Runtime path configuration could not be loaded")
+  value[[1]]
+}
+
 # Export the official sampleMetadata data.frame with base R only.
 # No package installation, namespace loading, FASTQ download or healthy filtering.
 
 main <- function() {
     args <- commandArgs(trailingOnly=TRUE)
-    output_dir <- "var/reference-sources/cmd"
+    output_dir <- configured_cmd_source()
     if (length(args)) {
         if (length(args) != 2L || args[[1L]] != "--output-dir")
             stop("Usage: Rscript scripts/export_cmd_metadata.R [--output-dir DIRECTORY]")

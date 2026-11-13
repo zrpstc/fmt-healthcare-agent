@@ -1,6 +1,8 @@
 """Independent, resumable chapter-four sequence analyses (stdlib orchestration)."""
 from __future__ import annotations
 
+
+from wgs_fmt_platform.paths import bioinformatics_env_root, bioinformatics_database_root, project_path, tool_environment
 import argparse
 import bz2
 from collections import Counter, defaultdict
@@ -456,12 +458,8 @@ def executable(env_bin, name):
 
 
 def settings_from_env(root, sid, *, reads=None, db_root=None, env_bin=None, threads=4):
-    from wgs_fmt_platform.paths import PROJECT_ROOT
-    resource = Path(os.environ.get("WGS_FMT_RESOURCE_ROOT") or PROJECT_ROOT / "var")
-    db = Path(db_root or os.environ.get("DB_ROOT") or resource / "databases")
-    if not db.is_dir() and (PROJECT_ROOT / "fmt-databases").is_dir():
-        db = PROJECT_ROOT / "fmt-databases"
-    tax = Path(env_bin or os.environ.get("WGS_CHAPTER4_TAX_BIN") or resource / "runtime/envs/fmt-tax/bin")
+    db = project_path(db_root or os.environ.get("WGS_CHAPTER4_DATABASE_ROOT") or bioinformatics_database_root())
+    tax = project_path(env_bin or os.environ.get("WGS_CHAPTER4_TAX_BIN") or bioinformatics_env_root() / "fmt-tax/bin")
     sid = sample_name(sid)
     if reads is None:
         candidates = [Path(root) / directory / (sid + suffix)
@@ -506,7 +504,7 @@ def run_module(module, settings, *, force=False, vfdb=None, marker_db=None,
                         "database_sha256": database_hash, "thresholds": thresholds,
                         "method": "VFDB-core Bowtie2 nucleotide screening" if module == "virulence" else "MetaPhlAn sample2markers consensus"}
                 atomic_json(output, envelope(module, sid, "running", "RUNNING", **base))
-                env = {**os.environ, "PATH": str(settings["env_bin"]) + os.pathsep + os.environ.get("PATH", "")}
+                env = tool_environment(settings["env_bin"])
                 # Per-run directory avoids consuming a partial or stale subprocess output after retry.
                 with tempfile.TemporaryDirectory(prefix="run-", dir=log_dir) as run_name:
                     run = Path(run_name)

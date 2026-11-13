@@ -14,6 +14,8 @@
 
 from __future__ import annotations
 
+
+from wgs_fmt_platform.paths import fmt_matching_dir
 import os
 import sys
 from pathlib import Path
@@ -23,7 +25,7 @@ import pandas as pd
 
 from wgs_fmt_platform.paths import runtime_path
 
-WGS_FMT_ROOT = runtime_path("WGS_FMT_MATCHING_DIR", "fmt-matching")
+WGS_FMT_ROOT = fmt_matching_dir()
 REF_DIR = runtime_path("WGS_REFERENCE_DIR", "reference")
 
 

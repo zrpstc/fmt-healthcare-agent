@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 APP_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
-FMT_ROOT="${FMT_ROOT:-${WGS_FMT_RESOURCE_ROOT:-$APP_ROOT/var}}"
+source "$APP_ROOT/runtime/scripts/runtime_paths.sh"
 BUNDLE_DIR="${1:-}"
 
 [[ -n "$BUNDLE_DIR" ]] || {
@@ -36,8 +36,8 @@ checksum_file="$BUNDLE_DIR/SHA256SUMS"
 for environment in "${environments[@]}"; do
     archive_name="environment_${environment}.tar.gz"
     archive="$BUNDLE_DIR/$archive_name"
-    printf 'PACK relocatable environment %s -> %s\n' "$FMT_ROOT/runtime/envs/$environment" "$archive"
-    conda-pack --prefix "$FMT_ROOT/runtime/envs/$environment" --output "$archive" --force
+    printf 'PACK relocatable environment %s -> %s\n' "$ENV_ROOT/$environment" "$archive"
+    conda-pack --prefix "$ENV_ROOT/$environment" --output "$archive" --force
     (
         cd -- "$BUNDLE_DIR"
         sha256sum "$archive_name"
@@ -46,19 +46,15 @@ done
 for relative in "${databases[@]}"; do
     archive_name="${relative//\//_}.tar.zst"
     archive="$BUNDLE_DIR/$archive_name"
-    printf 'PACK %s -> %s\n' "$FMT_ROOT/$relative" "$archive"
-    tar -C "$FMT_ROOT" -cf - "$relative" | zstd -T0 -10 -f -o "$archive"
+    printf 'PACK %s -> %s\n' "$DB_ROOT/${relative#databases/}" "$archive"
+    tar -C "$DB_ROOT" --transform='flags=rh;s,^,databases/,' -cf - "${relative#databases/}" | zstd -T0 -10 -f -o "$archive"
     (
         cd -- "$BUNDLE_DIR"
         sha256sum "$archive_name"
     ) >> "$checksum_file"
 done
 
-legacy_model="$APP_ROOT/data/model-training/fmt-triplet-v1"
-model_source="${WGS_FMT_TRIPLET_MODEL_DIR:-$FMT_ROOT/models/fmt-triplet-v1}"
-if [[ ! -d "$model_source" && -d "$legacy_model" ]]; then
-    model_source="$legacy_model"
-fi
+model_source="$WGS_FMT_TRIPLET_MODEL_DIR"
 [[ -s "$model_source/feature_schema.json" && -s "$model_source/fmt_triplet_contrastive_model.npz" ]] || {
     printf 'FMT triplet model is missing: %s\n' "$model_source" >&2
     exit 2
@@ -71,15 +67,9 @@ tar -C "$model_source" -cf - . | zstd -T0 -10 -f -o "$BUNDLE_DIR/$model_archive_
     sha256sum "$model_archive_name"
 ) >> "$checksum_file"
 
-matching_source="${WGS_FMT_MATCHING_DATA_ROOT:-$FMT_ROOT/data/fmt-matching}"
-baseline_source="${WGS_FMT_BASELINE_SPECIES:-$matching_source/species_abundance_train.csv}"
-match_source="${WGS_FMT_MATCH_FILE:-$matching_source/match.xlsx}"
-if [[ ! -s "$baseline_source" && -s "$FMT_ROOT/species_abundance_train.csv" ]]; then
-    baseline_source="$FMT_ROOT/species_abundance_train.csv"
-fi
-if [[ ! -s "$match_source" && -s "$FMT_ROOT/match.xlsx" ]]; then
-    match_source="$FMT_ROOT/match.xlsx"
-fi
+matching_source="$WGS_FMT_MATCHING_DIR"
+baseline_source="$WGS_FMT_BASELINE_SPECIES"
+match_source="$WGS_FMT_MATCH_FILE"
 [[ -s "$baseline_source" && -s "$match_source" ]] || {
     printf 'FMT matching baseline or match metadata is missing.\n' >&2
     exit 2

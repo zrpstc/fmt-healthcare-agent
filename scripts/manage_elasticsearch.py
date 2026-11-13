@@ -26,6 +26,9 @@ from urllib.request import ProxyHandler, Request, build_opener
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from wgs_fmt_platform.paths import workspace_root
 LABEL = "io.wgs-fmt.elasticsearch.workspace"
 CONFIG_LABEL = "io.wgs-fmt.elasticsearch.config"
 APP_USER = "wgs-platform"
@@ -51,7 +54,7 @@ def private_write(path: Path, content: str) -> None:
 
 class ManagedElasticsearch:
     def __init__(self) -> None:
-        workspace = Path(os.environ.get("WGS_WORKSPACE") or ROOT / "var").expanduser()
+        workspace = workspace_root()
         self.workspace = (ROOT / workspace).resolve()
         if self.workspace in {Path("/"), Path.home().resolve(), ROOT}:
             raise ManagedElasticsearchError("WGS_WORKSPACE must be a dedicated data directory")

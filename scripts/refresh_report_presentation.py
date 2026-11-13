@@ -14,6 +14,8 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from wgs_fmt_platform.paths import runtime_path
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("sample_id")
@@ -22,8 +24,8 @@ def main():
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,99}", args.sample_id):
         parser.error("invalid sample identifier")
     sid = args.sample_id
-    report = (args.report_path or ROOT / "var/results" / f"{sid}_report.json").resolve()
-    if not report.is_relative_to(ROOT):
+    report = (args.report_path or runtime_path("WGS_RESULTS_DIR", "results") / f"{sid}_report.json").resolve()
+    if not report.is_relative_to(runtime_path("WGS_RESULTS_DIR", "results").resolve()):
         parser.error("report must be inside the project")
     output = report.parent
     original = report.read_bytes()

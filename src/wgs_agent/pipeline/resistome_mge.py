@@ -6,6 +6,8 @@ infer phenotype, plasmid structure, host assignment or physical linkage.
 """
 from __future__ import annotations
 
+
+from wgs_fmt_platform.paths import bioinformatics_env_root, bioinformatics_database_root, project_path, tool_environment
 import argparse
 from collections import Counter, defaultdict
 from contextlib import contextmanager
@@ -291,7 +293,7 @@ def run_module(root, sid, reads, database_root, tax_bin, module, *, threads=4, f
                         return old
                     base = {"fingerprint": fingerprint, "database_sha256": checksum, "thresholds": thresholds, "database": manifest["database"], "database_version": manifest["version"], "reference_scope": manifest["scope"], "method": "Bowtie2 reference-read screen"}
                     atomic_json(output, envelope(module, sid, "running", **base))
-                    env = {**os.environ, "PATH": str(tax_bin)+os.pathsep+os.environ.get("PATH", "")}
+                    env = tool_environment(tax_bin)
                     with lock(db/".index.lock"):
                         index = db/"index"/"reference"
                         index.parent.mkdir(parents=True, exist_ok=True)
@@ -327,11 +329,10 @@ def main():
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
-    from wgs_fmt_platform.paths import PROJECT_ROOT
     sid = sample_name(args.sample_id)
     reads = args.reads or args.output_root/"clean_merged"/(sid+".dehosted.fastq.gz")
-    db = args.database_root or Path(os.environ.get("WGS_CHAPTER5_DATABASE_ROOT") or PROJECT_ROOT/"fmt-databases/resistome_mge")
-    tax = args.tax_bin or Path(os.environ.get("WGS_CHAPTER5_TAX_BIN") or PROJECT_ROOT/"var/runtime/envs/fmt-tax/bin")
+    db = project_path(args.database_root or os.environ.get("WGS_CHAPTER5_DATABASE_ROOT") or bioinformatics_database_root()/"resistome_mge")
+    tax = project_path(args.tax_bin or os.environ.get("WGS_CHAPTER5_TAX_BIN") or bioinformatics_env_root()/"fmt-tax/bin")
     results = {module: run_module(args.output_root, sid, reads, db, tax, module, threads=args.threads, force=args.force) for module in MODULES}
     print(json.dumps({k: {"status": v["status"], "reason_code": v["reason_code"], "summary": v.get("summary", {})} for k, v in results.items()}))
     return 0 if all(v["status"] == "completed" for v in results.values()) else 2

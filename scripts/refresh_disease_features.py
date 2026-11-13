@@ -7,11 +7,13 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from wgs_fmt_platform.paths import runtime_path
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sample-id", required=True)
-    parser.add_argument("--results-dir", type=Path, default=ROOT / "var/results")
+    parser.add_argument("--results-dir", type=Path, default=runtime_path("WGS_RESULTS_DIR", "results"))
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     from wgs_agent.pipeline.strain_virulence import sample_name, atomic_json

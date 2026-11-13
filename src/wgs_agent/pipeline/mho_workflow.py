@@ -1,6 +1,8 @@
 """Automatic, resumable preparation of the independent MHOmicrobiome branch."""
 from __future__ import annotations
 
+
+from wgs_fmt_platform.paths import bioinformatics_env_root, bioinformatics_database_root, tool_environment
 import argparse
 import ctypes
 import hashlib
@@ -119,10 +121,10 @@ def _metadata(sample_id: str, group_json: Path | None, supplied: dict | None) ->
 
 
 def _configuration() -> tuple[dict, Path, Path, Path]:
-    env_root = runtime_path("ENV_ROOT", "runtime", "envs")
+    env_root = bioinformatics_env_root()
     executable = project_path(os.environ.get("WGS_MHO_METAPHLAN") or env_root / "mho-tax/bin/metaphlan").resolve(strict=True)
     tool_bin = project_path(os.environ.get("WGS_MHO_TOOL_BIN") or env_root / "fmt-tax/bin").resolve(strict=True)
-    db_root = runtime_path("DB_ROOT", "databases")
+    db_root = bioinformatics_database_root()
     database = project_path(os.environ.get("WGS_MHO_DATABASE") or db_root / "metaphlan4").resolve(strict=True)
     pkl = database / (mho.PIPELINE["database_version"] + ".pkl")
     db_stat, exe_stat = pkl.stat(), executable.stat()
@@ -134,8 +136,7 @@ def _configuration() -> tuple[dict, Path, Path, Path]:
 
 
 def _verify_version(executable: Path, tool_bin: Path) -> bool:
-    environment = dict(os.environ)
-    environment["PATH"] = str(tool_bin) + os.pathsep + environment.get("PATH", "")
+    environment = tool_environment(tool_bin)
     result = subprocess.run([str(executable), "--version"], capture_output=True, text=True,
                             check=True, env=environment, timeout=60)
     match = re.search(r"MetaPhlAn(?: version)?\s+(\d+\.\d+\.\d+)", result.stdout + result.stderr, re.I)

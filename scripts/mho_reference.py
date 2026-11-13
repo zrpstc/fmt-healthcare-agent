@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+
+from wgs_fmt_platform.paths import tool_environment
 import argparse
 import csv
 import io
@@ -182,9 +184,7 @@ def profile(args: argparse.Namespace) -> dict:
     database = args.database.resolve(strict=True)
     if not (database / (mho.PIPELINE["database_version"] + ".pkl")).is_file():
         raise ValueError("The exact Jan25 database .pkl is missing")
-    environment = dict(os.environ)
-    if args.tool_bin:
-        environment["PATH"] = str(args.tool_bin.resolve()) + os.pathsep + environment.get("PATH", "")
+    environment = tool_environment(args.tool_bin or executable.parent)
     version = subprocess.run([str(executable), "--version"], capture_output=True,
                              text=True, check=True, env=environment, timeout=60)
     match = re.search(r"MetaPhlAn(?: version)?\s+(\d+\.\d+\.\d+)", version.stdout + version.stderr, re.I)

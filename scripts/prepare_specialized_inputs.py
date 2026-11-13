@@ -11,7 +11,12 @@ import pwd
 import re
 import tempfile
 
+import sys
+
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from wgs_fmt_platform.paths import bioinformatics_root
 
 
 def export_profile(source, target, sid):
@@ -71,14 +76,14 @@ def main():
     target_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     output = {}
     for suffix in ["genefamilies_relab.tsv", "genefamilies.tsv"]:
-        source = ROOT / "var/bioinformatics/profiles/humann" / f"{args.sample_id}_{suffix}"
+        source = bioinformatics_root() / "profiles/humann" / f"{args.sample_id}_{suffix}"
         if not source.is_file():
             output[suffix] = {"status": "missing"}
             continue
         target = target_root / source.name
         result = export_profile(source, target, args.sample_id)
         output[suffix] = result
-    artifact = ROOT / "var/bioinformatics/profiles/functional_modules" / f"{args.sample_id}.json"
+    artifact = bioinformatics_root() / "profiles/functional_modules" / f"{args.sample_id}.json"
     if artifact.is_file():
         value = json.loads(artifact.read_text())
         output["existing_annotation"] = {k: value.get(k) for k in ["status", "reason_code", "functional_annotation_schema"]}
