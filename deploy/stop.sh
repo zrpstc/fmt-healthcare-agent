@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec bash "$(dirname -- "${BASH_SOURCE[0]}")/project.sh" stop "$@"
+exec bash "$(dirname -- "${BASH_SOURCE[0]}")/lib/command.sh" stop "$@"

@@ -7,7 +7,7 @@
 
 - 上传分析和报告输入此前没有生成diseases模块，疾病预测模型也没有载入。
 - test_complete_data有完整105项物种谱（MetaPhlAn Jan25），可以复用现有物种丰度进行文献特征注释。
-- phenotype_species_stats.csv未在本项目参考目录发现；现有物种健康分位数和MHNO健康对照没有同口径疾病病例/对照数据，不能由它们推出疾病分值。
+- phenotype_species_stats.csv未在本项目参考目录发现；现有cMD健康对照没有同口径疾病病例/对照数据，不能由它们推出疾病分值。
 - 本地curatedMetagenomicData是包源码、样本元数据和资源目录，不能作为已下载且完成同版本处理的疾病队列矩阵。
 - 现有FMT triplet模型用途为FMT配对，不能作为疾病预测模型。未发现可执行疾病模型及其特征/预处理定义、独立验证和适用性材料。
 

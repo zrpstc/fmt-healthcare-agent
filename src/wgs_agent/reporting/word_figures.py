@@ -203,11 +203,11 @@ def chart_data(document, spec):
             method=payload.get("method"), n_reference=payload.get("n_reference"),
         )
     if ident == "1.4.1":
-        mho = bool(data.inputs.get("healthy_comparison"))
+        population = bool(data.inputs.get("healthy_comparison"))
         rows = sorted(
             [
                 r
-                for r in data.group("healthy_species" if mho else "species")
+                for r in data.group("healthy_species" if population else "species")
                 if r.get("comparison") in {"above", "below", "within"} and r.get("unit") == "%"
             ],
             key=lambda r: (r.get("comparison") == "within", -(r.get("value") or 0)),
@@ -215,7 +215,7 @@ def chart_data(document, spec):
         return _dataset(
             [r["label"] for r in rows],
             [
-                _series(reference_labels.profile(data.inputs) if mho else "本次样本", [finite(r.get("value")) for r in rows]),
+                _series(reference_labels.profile(data.inputs) if population else "本次样本", [finite(r.get("value")) for r in rows]),
                 _series("参考人群中位数", [finite(r.get("reference_median")) for r in rows]),
             ],
             "%",

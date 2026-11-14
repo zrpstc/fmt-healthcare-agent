@@ -3,7 +3,7 @@ import json
 
 from wgs_agent.reporting.document import build_document
 from wgs_agent.reporting.overview_chart import overview_items, render_overview_figure, translate_overview_taxa
-from test_mho_reference import cohort, refresh, rewrite_manifest
+from test_cmd_population import cohort, refresh, rewrite_manifest
 
 
 def build(rows):

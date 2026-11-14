@@ -38,7 +38,8 @@ API 和 daemon 仅绑定回环地址；默认不启用跨域访问，如需独�
 | `var/bioinformatics/` | 单样本分析结果、矩阵和 runner 状态 | `WGS_BIOINFORMATICS_OUTPUT_ROOT` |
 | `var/bioinformatics/legacy/` | 兼容旧流程的矩阵结果（初始为空） | `WGS_LEGACY_PIPELINE_OUTPUT_DIR` |
 | `var/results/` | 分析 JSON、报告及配型图 | `WGS_RESULTS_DIR` |
-| `var/reference/` | 健康参考数据 | `WGS_REFERENCE_DIR` |
+| `var/reference/` | 通路、代谢物及疾病表描述性统计；不作为健康物种参考 | `WGS_REFERENCE_DIR` |
+| `var/reference/cmd/native-v3/` | cMD健康物种参考 | `WGS_CMD_REFERENCE_DIR` |
 | `var/databases/` | 生信数据库 | 各工具数据库配置 |
 | `var/model-training/`、`var/model-registry/` | 模型训练产物与注册信息 | `WGS_FMT_TRIPLET_MODEL_DIR`、`WGS_MODEL_REGISTRY_ROOT` |
 | `var/fmt/` | 供体丰度及配对数据 | `WGS_FMT_DATA_ROOT` |

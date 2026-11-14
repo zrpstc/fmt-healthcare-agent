@@ -1,21 +1,5 @@
 #!/usr/bin/env python3
-"""从公开宏基因组数据集下载健康样本，计算物种和代谢物参考范围
-
-数据来源:
-  curatedMetagenomicData v3 (https://waldronlab.io/curatedMetagenomicData/)
-  Zenodo record 7919439 — 预计算的 MetaPhlAn4 物种丰度矩阵
-
-策略:
-  1. 下载样本元数据 → 筛选健康成年人粪便样本
-  2. 下载物种丰度 TSV（必须另行核验实际分析版本）
-  3. 下载 HUMAnN 通路丰度 → 通过 AGORA 模型推算代谢物参考范围
-  4. 计算 P5/P50/P95 并保存
-
-用法:
-  python3 src/wgs_agent/pipeline/download_public_reference.py
-  # 或指定输出目录:
-  python3 src/wgs_agent/pipeline/download_public_reference.py --out-dir /path/to/output
-"""
+"""Existing cMD HUMAnN pathway descriptive utility; never a species control provider."""
 
 from __future__ import annotations
 
@@ -47,11 +31,6 @@ METADATA_URL = (
 )
 
 # 历史物种矩阵 URL；不能据文件名推断为 MetaPhlAn4，使用前核验来源和版本。
-SPECIES_MATRIX_URL = (
-    "https://zenodo.org/records/7919439/files/"
-    "curatedMetagenomicData_metaphlan_bugs_species_3.8.0.tsv.gz"
-)
-
 # HUMAnN 通路丰度矩阵 (pathway × sample)
 PATHWAY_MATRIX_URL = (
     "https://zenodo.org/records/7919439/files/"
@@ -155,70 +134,6 @@ def filter_healthy_adult_stool(metadata_path: Path) -> pd.DataFrame:
     return healthy
 
 
-def build_species_reference_from_matrix(
-    species_matrix_path: Path,
-    sample_ids: set[str],
-    output_path: Path,
-    min_detection_rate: float = 0.02,
-    min_median: float = 0.0001,
-) -> Path:
-    """从公开物种矩阵计算参考范围"""
-    print("\n[物种参考] 读取矩阵...")
-
-    # 读取矩阵 (可能 gzip)
-    if species_matrix_path.suffix == ".gz":
-        matrix = pd.read_csv(species_matrix_path, sep="\t", index_col=0, compression="gzip")
-    else:
-        matrix = pd.read_csv(species_matrix_path, sep="\t", index_col=0)
-
-    print(f"  矩阵: {matrix.shape[0]} 物种 × {matrix.shape[1]} 样本")
-
-    # 匹配样本列
-    avaliable = [c for c in matrix.columns if c in sample_ids]
-    print(f"  匹配到 {len(avaliable)} 个目标样本")
-
-    if len(avaliable) < 30:
-        raise ValueError("匹配健康参考样本不足 30，禁止回退到包含疾病样本的全量矩阵")
-
-    sub = matrix[avaliable]
-    sub = sub.loc[sub.sum(axis=1) > 0]  # 移除全零行
-    print(f"  有效物种: {len(sub)}")
-
-    # 计算百分位数
-    n = len(avaliable)
-    results = []
-    for species, row in sub.iterrows():
-        vals = row.values.astype(float)
-        detection_rate = (vals > 0).sum() / n
-        p5 = float(np.percentile(vals, 5))
-        p25 = float(np.percentile(vals, 25))
-        p50 = float(np.percentile(vals, 50))
-        p75 = float(np.percentile(vals, 75))
-        p95 = float(np.percentile(vals, 95))
-
-        results.append({
-            "species": species,
-            "p5": round(p5, 6),
-            "p25": round(p25, 6),
-            "p50": round(p50, 6),
-            "p75": round(p75, 6),
-            "p95": round(p95, 6),
-            "detection_rate": round(detection_rate, 4),
-            "n_detected": int((vals > 0).sum()),
-            "mean": round(float(np.mean(vals)), 6),
-            "max": round(float(np.max(vals)), 6),
-        })
-
-    ref = pd.DataFrame(results)
-    mask = (ref["detection_rate"] >= min_detection_rate) | (ref["p50"] >= min_median)
-    ref = ref[mask].sort_values("p50", ascending=False)
-
-    print(f"  过滤后保留物种: {len(ref)}")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    ref.to_csv(output_path, sep="\t", index=False)
-    print(f"  已保存: {output_path}")
-
-    return output_path
 
 
 def build_pathway_reference_from_matrix(
@@ -325,20 +240,6 @@ def main():
             sample_ids = set(sorted(sample_ids)[: args.max_samples])
             print(f"  限制样本数至: {len(sample_ids)}")
 
-    # ── Step 3: 下载物种丰度矩阵 ──
-    species_cache = cache / "metaphlan_species.tsv.gz"
-    if not args.skip_download:
-        download_file(SPECIES_MATRIX_URL, species_cache, "物种丰度矩阵")
-
-    if species_cache.exists():
-        build_species_reference_from_matrix(
-            species_matrix_path=species_cache,
-            sample_ids=sample_ids if sample_ids else set(),
-            output_path=out_dir / "species_p5_p95_public.tsv",
-            min_detection_rate=0.02,
-            min_median=0.0001,
-        )
-
     # ── Step 4: 下载通路丰度矩阵 ──
     pathway_cache = cache / "humann_pathabundance.tsv.gz"
     if not args.skip_download:
@@ -365,7 +266,6 @@ def main():
     if sample_ids:
         readme.append(f"健康样本数: {len(sample_ids)}")
     readme.append(f"\n## 文件说明")
-    readme.append(f"- `species_p5_p95_public.tsv`: 物种 P5/P50/P95 参考范围")
     readme.append(f"- `pathway_reference_public.tsv`: 代谢通路 P5/P50/P95 参考范围")
     readme.append(f"- `public_healthy_samples.tsv`: 使用的健康样本列表")
 

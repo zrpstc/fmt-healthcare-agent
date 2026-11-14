@@ -56,16 +56,15 @@ curl -fsS http://127.0.0.1:18503/api/knowledge-base/snapshot
 
 原有 Python `load_dotenv(..., override=False)` 不覆盖已有进程环境；原有 start.sh 遇到存活 PID 直接复用。关闭编辑器或网页，不等于停止这个预览后端。标准 PID 文件还属于 root，且不管理当前用户的 18503 预览进程。
 
-本次已更新实际预览后端到 KB 30，并增加独立管理入口和 PID 文件 `var/run/workspace-api-preview.pid`，不与标准服务的 PID 文件混用：
+预览与标准 API 现由同一项目运行核心统一发现、检查和停止。修改 `.env` 后使用统一重启入口，避免继续复用旧进程配置：
 
 ```bash
-/home/zhanghaiyang/fmt-healthcare-agent/.venv/bin/python /home/zhanghaiyang/fmt-healthcare-agent/deploy/manage-preview-api.py status
-/home/zhanghaiyang/fmt-healthcare-agent/.venv/bin/python /home/zhanghaiyang/fmt-healthcare-agent/deploy/manage-preview-api.py restart
-/home/zhanghaiyang/fmt-healthcare-agent/.venv/bin/python /home/zhanghaiyang/fmt-healthcare-agent/deploy/manage-preview-api.py stop
-/home/zhanghaiyang/fmt-healthcare-agent/.venv/bin/python /home/zhanghaiyang/fmt-healthcare-agent/deploy/manage-preview-api.py start
+cd /home/zhanghaiyang/fmt-healthcare-agent
+bash deploy/restart.sh
+bash deploy/status.sh
 ```
 
-标准 start.sh 也加入知识配置匹配检查，不再无条件复用配置过时且可由当前账户管理的 API 进程。
+旧预览管理入口与独立 PID 兼容脚本已归档，当前入口见 `deploy/README.md`。
 
 ## 验证记录
 

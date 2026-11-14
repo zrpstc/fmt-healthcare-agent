@@ -183,8 +183,8 @@ def test_cache_recovery_runs_all_supplements_without_base_pipeline(tmp_path):
 
 
 def test_empty_done_marker_is_not_complete(tmp_path, monkeypatch):
-    from wgs_agent.pipeline import upload_workflow, mho_workflow
-    monkeypatch.setattr(mho_workflow, "get_mho_status", lambda sid: {"ready": False})
+    from wgs_agent.pipeline import upload_workflow, cmd_workflow
+    monkeypatch.setattr(cmd_workflow, "get_cmd_status", lambda sid: {"ready": False})
     settings = SimpleNamespace(job_root=tmp_path / "jobs", output_root=tmp_path / "bio")
     done = settings.output_root / "status/done/sample.done"
     done.parent.mkdir(parents=True)

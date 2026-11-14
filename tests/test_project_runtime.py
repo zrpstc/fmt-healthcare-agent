@@ -10,7 +10,7 @@ import time
 from unittest.mock import Mock
 import pytest
 
-spec = importlib.util.spec_from_file_location('project_runtime_under_test', Path(__file__).resolve().parents[1] / 'deploy/runtime.py')
+spec = importlib.util.spec_from_file_location('project_runtime_under_test', Path(__file__).resolve().parents[1] / 'deploy/lib/runtime.py')
 runtime = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = runtime
 spec.loader.exec_module(runtime)
@@ -158,6 +158,7 @@ def test_all_components_use_dependency_then_application_order(config, monkeypatc
     assert events == ['search:status', 'search:start', 'initialize', 'search-index', *runtime.ROLES]
 
 def test_partial_startup_is_cleaned_up(config, monkeypatch):
+    monkeypatch.setattr(runtime, 'search_health', lambda cfg: {'state': 'running', 'health': 'yellow'})
     monkeypatch.setattr(runtime, 'discover', lambda *a: {})
     monkeypatch.setattr(runtime, 'ensure_build', lambda *a: ('.next-project-test', False))
     monkeypatch.setattr(runtime, 'run_checked', lambda *a, **kw: None)
@@ -175,7 +176,7 @@ def test_partial_startup_is_cleaned_up(config, monkeypatch):
 
 def test_shell_entrypoints_are_valid():
     directory = Path(__file__).resolve().parents[1] / 'deploy'
-    for name in ['project.sh', 'start.sh', 'stop.sh', 'restart.sh', 'reload.sh', 'status.sh', 'restart-report-api.sh', 'restart-web.sh', 'restart-agent.sh', 'restart-elasticsearch.sh']:
+    for name in ['lib/command.sh', 'start.sh', 'stop.sh', 'restart.sh', 'status.sh']:
         assert subprocess.run(['bash', '-n', str(directory / name)], capture_output=True).returncode == 0
 
 @pytest.mark.parametrize('health,expected', [('green','running'),('yellow','running'),('red','unhealthy')])
@@ -232,7 +233,7 @@ def test_data_endpoints_must_work_before_service_is_ready(config, monkeypatch):
             return {'knowledge_base_id': 30}
         raise HTTPError(url, 500, 'test failure', {}, None)
     monkeypatch.setattr(runtime, 'read_json', endpoint)
-    with pytest.raises(runtime.RuntimeFailure, match='DATA_ENDPOINT_FAILED_WORKSPACE_API'):
+    with pytest.raises(runtime.RuntimeFailure, match='READINESS_TIMEOUT_WORKSPACE_API'):
         runtime.wait_ready(config, 'workspace-api', proc, timeout=1)
 
 def test_empty_but_valid_sample_and_report_lists_are_healthy(config, monkeypatch):

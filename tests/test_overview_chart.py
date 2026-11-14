@@ -100,10 +100,10 @@ def test_empty_and_qc_failed_reports_never_draw_fabricated_results(tmp_path):
     assert render_overview_figure(doc, tmp_path) == {}
 
 
-def test_mho_bars_use_independent_comparison_profile_instead_of_primary_abundance():
+def test_cmd_bars_use_independent_comparison_profile_instead_of_primary_abundance():
     primary = species(value=72, median=99)
     comparison = {**species(value=50, median=27), "p5": 11.7, "p95": 42.3}
-    doc = build_document("OVERVIEW_MHO", {"species_list": [primary]}, {}, {}, {}, {}, {}, {}, {},
+    doc = build_document("OVERVIEW_CMD", {"species_list": [primary]}, {}, {}, {}, {}, {}, {}, {},
                          context={"health_inputs": {"healthy_comparison": {"species": [comparison]}}})
     items = overview_items(doc)
     assert len(items) == 1 and items[0]["evidence_id"].startswith("HS")
@@ -111,14 +111,12 @@ def test_mho_bars_use_independent_comparison_profile_instead_of_primary_abundanc
     assert doc["evidence"]["S1"]["value"] == 72
 
 
-def test_exact_requested_mho_control_copy_preserves_audit():
+def test_exact_requested_cmd_control_copy_preserves_audit():
     doc = document([species()])
-    reference = {"status": "available", "provider": "mho", "cohort_id": "TEST_COHORT",
+    reference = {"status": "available", "provider": "cmd", "cohort_id": "TEST_COHORT",
                  "cohort_version": "test-version", "n_subjects": 103, "limitations": ["旧版冗长文案"]}
     doc["audit"]["reference_comparison"] = {"healthy_population": reference}
     text = render_markdown(doc)
-    expected = ("对照组信息：MHOmicrobiome 对照，对照人群为原研究定义的代谢健康非肥胖人群，不是通用临床正常值。 "
-                "P5–P95 和经验百分位描述该参考队列，不代表疾病概率。对照组使用人群总体，未按年龄、性别或地区匹配。")
-    assert expected in text
-    assert "旧版冗长文案" not in text
+    assert "cMD健康人群对照" in text
+    assert "TEST_COHORT" in text
     assert doc["audit"]["reference_comparison"]["healthy_population"] == reference

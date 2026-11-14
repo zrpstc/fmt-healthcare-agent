@@ -20,6 +20,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from functools import wraps
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import ProxyHandler, Request, build_opener
@@ -29,6 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from wgs_fmt_platform.paths import workspace_root
+from wgs_fmt_platform.process_identity import ProcessIdentity, application_owned_filesystem
 LABEL = "io.wgs-fmt.elasticsearch.workspace"
 CONFIG_LABEL = "io.wgs-fmt.elasticsearch.config"
 APP_USER = "wgs-platform"
@@ -52,6 +54,24 @@ def private_write(path: Path, content: str) -> None:
             temporary.unlink(missing_ok=True)
 
 
+def application_filesystem(function):
+    @wraps(function)
+    def invoke(self, *args, **kwargs):
+        if application_owned_filesystem(self.workspace):
+            with self.identity.application():
+                return function(self, *args, **kwargs)
+        return function(self, *args, **kwargs)
+    return invoke
+
+
+def docker_administrator(function):
+    @wraps(function)
+    def invoke(self, *args, **kwargs):
+        with self.identity.administrator():
+            return function(self, *args, **kwargs)
+    return invoke
+
+
 class ManagedElasticsearch:
     def __init__(self) -> None:
         workspace = workspace_root()
@@ -59,6 +79,7 @@ class ManagedElasticsearch:
         if self.workspace in {Path("/"), Path.home().resolve(), ROOT}:
             raise ManagedElasticsearchError("WGS_WORKSPACE must be a dedicated data directory")
         self.directory = self.workspace / "elasticsearch"
+        self.identity = ProcessIdentity.configured(ROOT, os.environ)
         suffix = hashlib.sha256(str(self.workspace).encode()).hexdigest()[:12]
         self.name = f"wgs-elasticsearch-{suffix}"
         self.volume = f"{self.name}-data"
@@ -69,6 +90,7 @@ class ManagedElasticsearch:
         self.docker = ["docker", "--host", f"unix://{docker_socket}"]
         self.opener = build_opener(ProxyHandler({}))
 
+    @docker_administrator
     def _docker(self, *arguments: str, missing_ok: bool = False, timeout: int = 30):
         try:
             result = subprocess.run(
@@ -196,6 +218,7 @@ class ManagedElasticsearch:
             )
         raise ManagedElasticsearchError(f"Elasticsearch startup timed out; inspect docker logs {self.name}")
 
+    @application_filesystem
     def start(self) -> None:
         self._configure()
         self._docker("version", "--format", "{{.Server.Version}}")
@@ -244,9 +267,13 @@ class ManagedElasticsearch:
                 if self._inspect("image", self.image) is None:
                     print(f"Pulling {self.image}", flush=True)
                     self._docker("image", "pull", self.image, timeout=600)
-                env_file = self.directory / "docker.env"
-                private_write(env_file, f"ELASTIC_PASSWORD={password}\n")
+                # Root Docker clients cannot read a root-squashed NFS env file.
+                # Only this short-lived private transfer file lives on local /tmp.
+                descriptor, name = tempfile.mkstemp(prefix="wgs-elasticsearch-", dir="/tmp")
+                os.close(descriptor)
+                env_file = Path(name)
                 try:
+                    private_write(env_file, f"ELASTIC_PASSWORD={password}\n")
                     self._docker(
                         "container", "run", "--detach", "--name", self.name,
                         "--label", f"{LABEL}={self.workspace}",
@@ -286,6 +313,7 @@ class ManagedElasticsearch:
             raise
         print(f"Elasticsearch ready: {self.url} (authenticated, container {self.name})")
 
+    @application_filesystem
     def stop(self) -> None:
         if not self.directory.exists():
             print("elasticsearch not managed in this workspace")
@@ -297,6 +325,7 @@ class ManagedElasticsearch:
                 self._docker("container", "stop", "--time", "30", self.name, timeout=40)
         print("elasticsearch stopped; container, credentials and data volume preserved")
 
+    @application_filesystem
     def status(self) -> None:
         if not self.directory.exists():
             print("elasticsearch not managed in this workspace")

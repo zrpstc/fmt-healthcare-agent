@@ -19,9 +19,8 @@ from wgs_agent.pipeline.report_common import (
     METABOLITE_MATRIX_FILE, METABOLITE_SUMMARY_FILE, METABOLITE_CONTRIB_FILE,
     DRUG_ANALYSIS_DIR, DRUG_ANALYSIS_FILE, METABOLITE_DRUG_FILE,
     METHOD_COMPARISON_FILE,
-    SPECIES_REF_FILE, SPECIES_REF_EXTENDED, SPECIES_STATS_FILE, PHENOTYPE_FILE,
+    PHENOTYPE_FILE,
     metaphlan_name_to_species, metaphlan_name_to_genus,
-    get_health_status, parse_p5p95,
 )
 
 
@@ -100,49 +99,8 @@ def load_species_data(sample_id: str) -> Tuple[pd.Series, pd.DataFrame, pd.DataF
             return pd.Series(dtype=float), None, None
     sample_data = sample_data[sample_data > 0]
 
-    # 优先使用扩充参考库（694 种物种），回退到旧库
-    ref_p5p95 = None
-    ref_stats = None
-    ref_source = "无"
-
-    # ── 层级 1: 扩充参考库 (扩展长表格式) ──
-    if os.path.exists(SPECIES_REF_EXTENDED):
-        try:
-            reference_separator = (
-                '\t' if str(SPECIES_REF_EXTENDED).lower().endswith(('.tsv', '.txt')) else ','
-            )
-            ref_p5p95 = pd.read_csv(SPECIES_REF_EXTENDED, sep=reference_separator)
-            # 验证格式：必须包含 species/p5/p95 列
-            if 'species' in ref_p5p95.columns and 'p5' in ref_p5p95.columns and 'p95' in ref_p5p95.columns:
-                ref_source = f"扩充库 ({len(ref_p5p95)} 种)"
-                print(f"       [参考] ✅ 使用扩充参考库 ({len(ref_p5p95)} 种)")
-            else:
-                print(f"       [参考] ⚠️ 扩充库格式不符，回退...")
-                ref_p5p95 = None
-        except Exception as e:
-            print(f"       [参考] ⚠️ 扩充库加载失败: {e}，回退...")
-            ref_p5p95 = None
-
-    # ── 层级 2: 旧版参考库 (宽表格式) ──
-    if ref_p5p95 is None:
-        if os.path.exists(SPECIES_REF_FILE):
-            try:
-                ref_p5p95 = pd.read_csv(SPECIES_REF_FILE).set_index('Phenotype')
-                ref_stats = pd.read_csv(SPECIES_STATS_FILE)
-                ref_source = f"旧参考库 ({len(ref_p5p95.columns)} 种)"
-                print(f"       [参考] ✅ 使用旧版参考库 ({len(ref_p5p95.columns)} 种)")
-            except Exception as e:
-                print(f"       [参考] ⚠️ 旧参考库加载失败: {e}")
-                ref_p5p95 = None
-                ref_stats = None
-        else:
-            print(f"       [参考] ⚠️ 旧参考库文件不存在: {SPECIES_REF_FILE}")
-
-    # ── 层级 3: 无参考 — 所有物种标记为 unknown ──
-    if ref_p5p95 is None:
-        print(f"       [参考] ❌ 无可用参考库，所有物种将标记为「无参考」")
-
-    return sample_data, ref_p5p95, ref_stats
+    # Population comparisons require an independently profiled cMD target.
+    return sample_data, None, None
 
 
 # ============================================================================
@@ -209,84 +167,16 @@ def _is_unclassified_sgb(species_name: str) -> bool:
 
 
 def compare_species_with_reference(sample_data: pd.Series,
-                                   ref_p5p95: pd.DataFrame,
-                                   ref_stats: pd.DataFrame,
+                                   ref_p5p95=None, ref_stats=None,
                                    top_n: int | None = None) -> List[Dict]:
-    """将样本物种丰度与健康参考范围逐一比较
-
-    支持两种参考库格式：
-    1. 扩展长表: columns = [species, p5, p25, p50, p75, p95, ...]
-    2. 旧宽表: index='Phenotype', species as columns with 'P5-P95' range strings
-    """
+    """Retain primary abundance rows; only reporting.cmd establishes controls."""
     results = []
-    if ref_p5p95 is None:
-        for metaphlan_name, abundance in sample_data.items():
-            species_name = metaphlan_name_to_species(metaphlan_name)
-            if _is_unclassified_sgb(species_name):
-                continue
-            results.append(dict(
-                species=species_name, abundance=round(abundance, 4),
-                p5=0, p95=0, status='unknown', status_cn='无参考',
-                deviation=0, mean_health=0, n_health=0
-            ))
-        return results if top_n is None else results[:top_n]
-
-    # 检测格式：长表有 'species' 列，宽表有 'Phenotype' 索引
-    ref_ranges: dict[str, tuple[float, float]] = {}
-    n_health_lookup: dict[str, int] = {}
-
-    if 'species' in ref_p5p95.columns and 'p5' in ref_p5p95.columns and 'p95' in ref_p5p95.columns:
-        # ── 扩展长表格式 ──
-        for _, row in ref_p5p95.iterrows():
-            species_key = str(row['species']).strip()
-            # 去掉 s__ 前缀（兼容 MetaPhlAn 命名风格）
-            if species_key.startswith('s__'):
-                species_key = species_key[3:]
-            species_key = species_key.replace('_', ' ').lower().strip()
-            p5 = float(row.get('p5', 0) or 0)
-            p95 = float(row.get('p95', 0) or 0)
-            ref_ranges[species_key] = (p5, p95)
-            n_health_lookup[species_key] = int(row.get('n_detected', 0) or 0)
-    else:
-        # ── 旧宽表格式 ──
-        for col in ref_p5p95.columns:
-            val = ref_p5p95[col].values[0]
-            p5, p95 = parse_p5p95(str(val))
-            ref_ranges[col.lower().strip()] = (p5, p95)
-
-        stats_lookup = {}
-        if ref_stats is not None:
-            for _, r in ref_stats.iterrows():
-                stats_lookup[r['Taxon'].lower().strip()] = r
-
     for metaphlan_name, abundance in sample_data.items():
-        species_name = metaphlan_name_to_species(metaphlan_name)
-        if _is_unclassified_sgb(species_name):
+        name = metaphlan_name_to_species(metaphlan_name)
+        if _is_unclassified_sgb(name):
             continue
-        key = species_name.lower().strip()
-        p5, p95 = ref_ranges.get(key, (0, 0))
-        status, status_cn = get_health_status(abundance, p5, p95)
-
-        n_health = n_health_lookup.get(key, 0)
-        mean_health = 0
-
-        deviation = 0
-        if p95 > p5:
-            mid = (p5 + p95) / 2
-            half = (p95 - p5) / 2
-            if abundance > 0:
-                deviation = (abundance - mid) / half
-
-        results.append(dict(
-            species=species_name, abundance=round(abundance, 4),
-            p5=round(p5, 4), p95=round(p95, 4),
-            status=status, status_cn=status_cn,
-            deviation=round(deviation, 2),
-            mean_health=mean_health, n_health=n_health,
-        ))
-
-    status_order = {'high': 0, 'low': 1, 'unknown': 2, 'normal': 3, 'absent': 4}
-    results.sort(key=lambda x: (status_order.get(x['status'], 9), -abs(x['deviation'])))
+        results.append({"species": name, "abundance": round(abundance, 4),
+                        "status": "unknown", "status_cn": "未建立健康对照"})
     return results if top_n is None else results[:top_n]
 
 

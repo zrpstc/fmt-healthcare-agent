@@ -75,11 +75,11 @@ def test_diversity_figure_contains_both_profiles_and_true_reference_statistics()
     assert shannon["reference_median"]==3 and shannon["p95"]==4 and shannon["n_subjects"]==103
     payload=chart_payload(doc,{"id":"2.1.1"})
     assert draw_chart({},payload,1800).height>900
-    original=[["观测物种数","10"],["Shannon指数","2.1"],["MHNO 独立谱 · Shannon指数","2"],["丰富度估计","未提供"]]
+    original=[["观测物种数","10"],["Shannon指数","2.1"],["cMD 独立谱 · Shannon指数","2"],["丰富度估计","未提供"]]
     assert filter_diversity_table(doc,original)==[["丰富度估计","未提供"]]
     md=render_markdown(doc);block=md.split("### 2.1 ",1)[1].split("### 2.2 ",1)[0]
     assert "| 观测物种数 |" not in block and "| 丰富度估计 |" in block
-    assert "MHOmicrobiome MHNO 独立对照" not in block and "意义解读：" not in block
+    assert "curatedMetagenomicData cMD 独立对照" not in block and "意义解读：" not in block
 
 
 def test_existing_functions_are_populated_without_turning_lactate_production_into_use():

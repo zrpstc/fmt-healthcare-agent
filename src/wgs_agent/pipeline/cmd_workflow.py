@@ -14,14 +14,111 @@ import tempfile
 
 from wgs_fmt_platform.paths import bioinformatics_root, project_path, runtime_path
 from wgs_agent.reporting import cmd
-from .mho_workflow import _digest_file, _json_write, _metadata, _publish
+import ctypes
+import gzip
+import hashlib
+import uuid
 from .sample_registry import require_active, sample_lock
 
 VERSION = "cmd-workflow-v1"
 
 
+
+IDENTITY_FIELDS = ("subject_id", "study_id", "source_runs", "run_ids", "NCBI_accession",
+                   "age", "sex", "country", "qc_status", "number_reads", "number_bases")
+
+def _digest_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(8 * 1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+def _json_write(path: Path, value: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o750)
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent,
+                                     prefix=".publish-", delete=False) as handle:
+        temporary = Path(handle.name)
+        try:
+            os.chmod(temporary, 0o640)
+            json.dump(value, handle, ensure_ascii=False, allow_nan=False, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        except BaseException:
+            temporary.unlink(missing_ok=True)
+            raise
+    try:
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+def _metadata(sample_id: str, group_json: Path | None, supplied: dict | None) -> dict:
+    result = {}
+    if group_json is not None:
+        group = json.loads(group_json.read_bytes())
+        if not isinstance(group, dict) or group.get("sample_id") != sample_id:
+            raise ValueError("group sample ID mismatch")
+        result.update({key: group[key] for key in IDENTITY_FIELDS if key in group})
+        if group.get("project") and group["project"] != "USER_UPLOAD":
+            result.setdefault("study_id", group["project"])
+        result.setdefault("source_runs", ",".join(str(run.get("run_accession", ""))
+                          for run in group.get("runs", []) if isinstance(run, dict)))
+    analysis = runtime_path("WGS_RESULTS_DIR", "results") / f"{sample_id}_analysis.json"
+    if analysis.is_file():
+        data = json.loads(analysis.read_bytes())
+        if not isinstance(data, dict) or data.get("sample_id") not in {None, "", sample_id}:
+            raise ValueError("analysis sample ID mismatch")
+        fields = data.get("metadata") or {}
+        if not isinstance(fields, dict):
+            raise ValueError("invalid analysis metadata")
+        result.update({key: fields[key] for key in IDENTITY_FIELDS if key in fields})
+    if supplied:
+        result.update({key: supplied[key] for key in IDENTITY_FIELDS if key in supplied})
+    return result
+
+def _publish(source: Path, destination: Path) -> None:
+    if destination.is_symlink():
+        raise ValueError("unexpected target symlink")
+    if not destination.exists():
+        source.rename(destination)
+        return
+    archive = destination.parent / ".history" / destination.name
+    archive.mkdir(parents=True, exist_ok=True, mode=0o750)
+    # Linux atomic directory exchange keeps the previous complete profile
+    # visible to concurrent report readers until the new one is published.
+    libc = ctypes.CDLL(None, use_errno=True)
+    exchange = getattr(libc, "renameat2", None)
+    if exchange is None:
+        raise OSError("atomic directory exchange unavailable")
+    exchange.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
+    if exchange(-100, os.fsencode(source), -100, os.fsencode(destination), 2) != 0:
+        raise OSError(ctypes.get_errno(), "atomic directory exchange failed")
+    source.rename(archive / uuid.uuid4().hex)
+
+def _fastq_depth(path):
+    """Count the exact dehosted input records and bases; never downsample."""
+    reads = bases = 0
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rb") as handle:
+        while True:
+            title = handle.readline()
+            if not title:
+                break
+            sequence, plus, quality = (handle.readline() for _ in range(3))
+            sequence = sequence.rstrip(b"\r\n")
+            quality = quality.rstrip(b"\r\n")
+            if not title.startswith(b"@") or not plus.startswith(b"+") or not sequence or len(sequence) != len(quality):
+                raise ValueError("invalid FASTQ input")
+            reads += 1
+            bases += len(sequence)
+    if not reads:
+        raise ValueError("empty FASTQ input")
+    return {"number_reads": reads, "number_bases": bases, "depth_source": "dehosted_fastq_record_count"}
+
+
 def enabled():
-    return (os.environ.get("WGS_HEALTHY_REFERENCE_PROVIDER", "").strip().lower() == "cmd"
+    return (os.environ.get("WGS_HEALTHY_REFERENCE_PROVIDER", "").strip().lower() in {"", "cmd"}
             and os.environ.get("WGS_CMD_AUTO_PROFILE", "true").strip().lower()
             not in {"0", "false", "no", "off"})
 
@@ -124,7 +221,11 @@ def _ensure_locked(sample_id, output_root, group_json, metadata, threads):
                       and old.get("profile_sha256") == _digest_file(folder/"profile.tsv"))
         except (OSError, ValueError, TypeError, AttributeError):
             pass
-        updates = {"workflow_version": VERSION, "sample_id": sample_id, "pipeline": config["pipeline"],
+        depth = {key: old[key] for key in ("number_reads", "number_bases", "depth_source")} if reused and all(key in old for key in ("number_reads", "number_bases", "depth_source")) else _fastq_depth(reads)
+        depth_checked = reads.stat()
+        if (before.st_size, before.st_mtime_ns) != (depth_checked.st_size, depth_checked.st_mtime_ns):
+            return save(state="failed", reason="input_changed")
+        updates = {**depth, "workflow_version": VERSION, "sample_id": sample_id, "pipeline": config["pipeline"],
                    "normalization": cmd.NORMALIZATION, "input_sha256": input_sha,
                    "reads": str(reads), "reads_bytes": before.st_size,
                    "reads_mtime_ns": before.st_mtime_ns, "comparison_metadata": values,

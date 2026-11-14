@@ -329,9 +329,9 @@ def get_workflow_status(
             log_tail = "\n".join(pipeline_log.read_text(encoding="utf-8", errors="replace").splitlines()[-30:])
         except OSError:
             pass
-    from .mho_workflow import get_mho_status
+    from .cmd_workflow import get_cmd_status
 
-    healthy_reference = get_mho_status(sample_id)
+    healthy_reference = get_cmd_status(sample_id)
     artifacts["healthy_reference"] = healthy_reference["ready"]
     from .strain_virulence import load_chapter4_inputs
     chapter_four = {key: {"status": value.get("status", "not_run"),

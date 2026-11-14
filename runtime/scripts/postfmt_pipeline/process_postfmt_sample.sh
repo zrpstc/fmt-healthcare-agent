@@ -62,17 +62,17 @@ HUMANN_NUC_DB="$DB_ROOT/humann3/chocophlan"
 HUMANN_PROT_DB="$DB_ROOT/humann3/uniref"
 
 prepare_healthy_comparison() {
-    [[ "${WGS_HEALTHY_REFERENCE_PROVIDER:-}" == "mho" || "${WGS_HEALTHY_REFERENCE_PROVIDER:-}" == "cmd" ]] || return 0
-    local app_python="${WGS_MHO_PYTHON:-$WGS_ENV_ROOT/bin/python}"
+    [[ "${WGS_HEALTHY_REFERENCE_PROVIDER:-cmd}" == "cmd" ]] || return 0
+    local app_python="$WGS_ENV_ROOT/bin/python"
     if [[ ! -x "$app_python" ]]; then
         printf 'HEALTHY_REFERENCE unavailable: application Python missing\n' >&2
         return 0
     fi
     if ! ENV_ROOT="$ENV_ROOT" DB_ROOT="$DB_ROOT" \
         PYTHONPATH="$APP_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" \
-        "$app_python" -m wgs_agent.pipeline.mho_workflow ensure \
+        "$app_python" -m wgs_agent.pipeline.cmd_workflow \
         --sample-id "$SAMPLE_ID" --output-root "$OUTPUT_ROOT" \
-        --group-json "$GROUP_JSON" --threads "${WGS_MHO_THREADS:-$METAPHLAN_THREADS}"; then
+        --group-json "$GROUP_JSON" --threads "${WGS_CMD_THREADS:-$METAPHLAN_THREADS}"; then
         printf 'HEALTHY_REFERENCE failed; see independent workflow state\n' >&2
     fi
 }

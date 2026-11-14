@@ -50,3 +50,6 @@ fmt-databases/
 
 apps/workspace-web/.next-knowledge/
 apps/workspace-web/.next-preview/
+
+# Local historical deployment scripts.
+/deploy-backup/

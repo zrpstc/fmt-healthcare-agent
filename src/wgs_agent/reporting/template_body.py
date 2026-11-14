@@ -178,11 +178,13 @@ class Body:
         self.emit(headers, [[_pick(r, *fields) for fields in columns] for r in rows], missing)
 
 
-    def mho_table(self, group):
+    def population_table(self, group):
         comparison = self.inputs.get("healthy_comparison") or {}
         audit = comparison.get("audit") or {}
         self.out.append(f"**{reference_labels.title(self.inputs)} 独立对照（{reference_labels.method(self.inputs)}）**")
         self.out.append("本区使用独立待测谱；参考与待测谱均按已分类物种总和归一化至 100%。")
+        if group == "healthy_species":
+            self.out.extend(reference_labels.audit_summary(self.inputs))
         self.emit(
             ["物种" if group == "healthy_species" else "多样性指标", "独立对照谱结果", reference_labels.short(self.inputs) + " P5–P95", reference_labels.short(self.inputs) + " 经验百分位"],
             [[r["label"], r["result_text"], r["reference_text"], _pick(r, "percentile")]
@@ -280,7 +282,7 @@ class Body:
             self.out.append("肠型用于描述群落组成特征。")
         else:
             if self.inputs.get("healthy_comparison"):
-                self.mho_table("healthy_species")
+                self.population_table("healthy_species")
                 self.absolute_quantities()
                 return
             rows = [r for r in species if r.get("comparison") in {"above", "below", "within"}]
@@ -373,7 +375,7 @@ class Body:
                 "Shannon 指数同时反映丰富度与均匀度；仅在相同分析口径和适用参考人群下比较，不设置通用健康分界值。"
             )
             if self.inputs.get("healthy_comparison"):
-                self.mho_table("healthy_diversity")
+                self.population_table("healthy_diversity")
         elif block == 2:
             if self.inputs.get("healthy_comparison"):
                 audit = self.inputs["healthy_comparison"].get("audit") or {}

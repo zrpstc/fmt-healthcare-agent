@@ -52,7 +52,7 @@ PDF/Markdown/结构化报告/证据/图片先完整生成后发布，失败保�
 正式API/Web由root运行，服务所有者执行：
 
     cd /home/zhanghaiyang/fmt-healthcare-agent
-    sudo bash deploy/activate-report-templates.sh
+    sudo bash deploy/restart.sh
 
 该脚本验证新暂存构建，备份旧Web，构建并重启API/Web；构建失败恢复旧Web，不停止生信工作进程。
 已经生成的旧报告保持不变，重新生成后应用新正文。

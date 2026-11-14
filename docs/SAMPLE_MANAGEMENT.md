@@ -48,47 +48,12 @@
 
 ## 在 gpu02 应用
 
-本次仅修改工作区源码，不重启服务，不删除实际样本。应用时需要重新构建前端，并重新
-启动 API/Web/Agent。下面保留当前运行的 Elasticsearch，只重启应用服务，以避开已知
-ES 冷启动期间的认证等待问题。请在准备好应用修改时手动执行：
+修改代码或配置后，使用统一入口重新读取配置并按需构建前端：
 
 ```bash
-sudo bash <<'SH'
-set -euo pipefail
 cd /home/zhanghaiyang/fmt-healthcare-agent
-source deploy/common.sh
-
-for name in workspace-web workspace-api agent-daemon; do
-  pid_file="$DATA_ROOT/run/$name.pid"
-  if [[ -f "$pid_file" ]]; then
-    pid="$(cat "$pid_file")"
-    if kill -0 "$pid" 2>/dev/null; then
-      command_line="$(tr '\0' ' ' < "/proc/$pid/cmdline")"
-      if [[ "$command_line" != *"$ROOT"* && "$command_line" != *"next-server"* ]]; then
-        echo "PID $pid does not match the expected application; stopping."
-        exit 1
-      fi
-      kill "$pid"
-      for attempt in {1..60}; do
-        state="$(ps -o stat= -p "$pid" || true)"
-        if [[ -z "$state" || "$state" == Z* ]]; then break; fi
-        sleep 1
-      done
-      state="$(ps -o stat= -p "$pid" || true)"
-      if [[ -n "$state" && "$state" != Z* ]]; then
-        echo "$name has not stopped; wait for active requests before retrying."
-        exit 1
-      fi
-    fi
-    rm -f "$pid_file"
-  fi
-done
-
-NEXT_TELEMETRY_DISABLED=1 npm run build --prefix apps/workspace-web
-bash deploy/start.sh
+bash deploy/restart.sh
 bash deploy/status.sh
-SH
 ```
 
-应用后，登录有写权限的账号，在“样本与分析”选中样本。先用测试样本检查编辑保存和
-删除确认交互；永久删除只会在输入 ID 并提交后执行。
+当前服务器复用外部 Elasticsearch，应用重启保留该依赖及其索引。启动、停止和状态入口见 `deploy/README.md`。

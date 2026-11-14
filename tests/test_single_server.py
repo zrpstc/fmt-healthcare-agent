@@ -111,38 +111,31 @@ with TestClient(app) as client:
 
 
 def test_shell_config_matches_python_from_other_directory(clean_runtime_env, tmp_path):
-    # The production .env overrides shell variables. Exercise relocation in a
-    # clean project instead of sourcing live server settings during this test.
+    import json
+    import shlex
+    # Exercise the maintained shared core in an isolated checkout with no live .env.
     isolated_root = tmp_path / "project"
-    deploy = isolated_root / "deploy"
-    deploy.mkdir(parents=True)
-    for name in ("common.sh", "status.sh"):
-        shutil.copyfile(PROJECT_ROOT / "deploy" / name, deploy / name)
-    env = {**os.environ, "WGS_WORKSPACE": "var-relocated", "WGS_API_PORT": "8603"}
-    result = subprocess.run(
-        [
-            "bash",
-            "-c",
-            'source "$1"; printf "%s\\n" "$WGS_WORKSPACE" "$WGS_API_PORT"',
-            "bash",
-            str(deploy / "common.sh"),
-        ],
-        env=env,
-        cwd=tmp_path,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    assert result.stdout.splitlines() == [str(isolated_root / "var-relocated"), "8603"]
-    env["WGS_API_PORT"] = "invalid"
-    result = subprocess.run(
-        ["bash", str(deploy / "status.sh")],
-        env=env,
-        cwd=tmp_path,
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 2
+    shutil.copytree(PROJECT_ROOT / "deploy", isolated_root / "deploy")
+    source = isolated_root / "src/wgs_fmt_platform"
+    source.mkdir(parents=True)
+    (source / "__init__.py").write_text("")
+    shutil.copy2(PROJECT_ROOT / "src/wgs_fmt_platform/process_identity.py", source / "process_identity.py")
+    interpreter = isolated_root / ".venv/bin/python"
+    interpreter.parent.mkdir(parents=True)
+    interpreter.write_text('#!/bin/bash\nexec ' + shlex.quote(sys.executable) + ' "$@"\n')
+    interpreter.chmod(0o700)
+    (isolated_root / ".env").write_text(
+        'WGS_WORKSPACE=var-relocated\nWGS_API_PORT=8604\n'
+        'WGS_ELASTICSEARCH_MANAGED=false\nWGS_ELASTICSEARCH_URL=http://127.0.0.1:1\n')
+    env = {**os.environ, "WGS_WORKSPACE": "stale-workspace", "WGS_API_PORT": "8603"}
+    command = ["bash", str(isolated_root / "deploy/status.sh")]
+    result = subprocess.run(command, env=env, cwd=tmp_path, capture_output=True, text=True, timeout=10)
+    assert result.returncode == 0
+    assert json.loads(result.stdout)['result']['ports']['api'] == 8604
+    (isolated_root / ".env").write_text('WGS_API_PORT=invalid\n')
+    result = subprocess.run(command, env=env, cwd=tmp_path, capture_output=True, text=True, timeout=10)
+    assert result.returncode == 1
+    assert json.loads(result.stdout)['error'] == 'INVALID_PORT'
 
 
 def test_local_preparation_does_not_connect_to_external_database(clean_runtime_env, tmp_path):
