@@ -288,7 +288,10 @@ def render(document):
         output.append("主要差异："+("；".join((["明显偏高："+"、".join(high)] if high else [])+(["明显偏低："+"、".join(low)] if low else [])) or "没有菌明显偏离常见范围")+"。")
         if not figure("1.4.1","图1-5 您的菌种与参考人群比较",data["reference_rows"]):
             output.append(table(["菌名","占比","参考位置"],[[names.name(r),pct(r["value"]),r["tier_label"]+"；"+percentile_phrase(r["percentile"])] for r in data["reference_rows"]]))
-        output.append("> 为与对照人群同口径比较，此处丰度经重新计算，与 1.1 数值可能略有差异。")
+        from .consumer_basis import comparison_basis_note
+        note = comparison_basis_note(document, 1)
+        if note:
+            output.append("> " + note)
         output.append(interpretation(document,4))
     else:
         omit(document,1,"1.4 人群比较","reference_comparison_unavailable","没有可发布的人群比较结果");output.append(EMPTY_SECTION)

@@ -4,7 +4,8 @@ from __future__ import annotations
 import math
 
 
-def community_ordination(target, matrix, selected, *, reference_version="", stratify_by=()):
+def community_ordination(target, matrix, selected, *, reference_version="", stratify_by=(),
+                         reference_distances=None, target_distances=None):
     """Use the complete union of species and the already vetted reference selection.
 
     Bray-Curtis is computed after independently closing every profile to one.
@@ -44,7 +45,18 @@ def community_ordination(target, matrix, selected, *, reference_version="", stra
         if not math.isfinite(total) or total <= 0:
             return unavailable("empty_profile")
         values.append([value / total for value in row])
-    distances = squareform(pdist(np.asarray(values, dtype=float), metric="braycurtis"))
+    if reference_distances is not None or target_distances is not None:
+        reference_distances = np.asarray(reference_distances, dtype=float)
+        target_distances = np.asarray(target_distances, dtype=float)
+        if (reference_distances.shape != (len(ids), len(ids)) or target_distances.shape != (len(ids),)
+                or not np.isfinite(reference_distances).all() or not np.isfinite(target_distances).all()
+                or (reference_distances < 0).any() or (target_distances < 0).any()):
+            return unavailable("invalid_precomputed_distances")
+        distances = np.zeros((len(ids) + 1, len(ids) + 1))
+        distances[1:, 1:] = reference_distances
+        distances[0, 1:] = distances[1:, 0] = target_distances
+    else:
+        distances = squareform(pdist(np.asarray(values, dtype=float), metric="braycurtis"))
     n = len(profiles)
     centering = np.eye(n) - np.ones((n, n)) / n
     gram = -0.5 * centering @ np.square(distances) @ centering

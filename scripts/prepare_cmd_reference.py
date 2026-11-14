@@ -229,16 +229,24 @@ def build(package, metadata, catalog, source_dir, output, r_library=None, *,
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--package-dir", type=Path, required=True)
-    parser.add_argument("--metadata", type=Path, required=True)
-    parser.add_argument("--catalog", type=Path, required=True)
-    parser.add_argument("--source-dir", type=Path, required=True)
+    parser.add_argument("--derive-from", type=Path, help="Build G10 assets from an existing validated bundle")
+    parser.add_argument("--block-size", type=int, default=64)
+    parser.add_argument("--package-dir", type=Path)
+    parser.add_argument("--metadata", type=Path)
+    parser.add_argument("--catalog", type=Path)
+    parser.add_argument("--source-dir", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--r-library", type=Path)
     parser.add_argument("--stratify-by", nargs="+", choices=("country", "sex", "age_band"), default=[])
     parser.add_argument("--age-band-boundaries", nargs="+", type=float, default=list(DEFAULT_AGE_BANDS),
                         help="Ascending age-band lower bounds, beginning with 18; final band is open-ended")
     args = parser.parse_args()
+    if args.derive_from:
+        from wgs_agent.reporting.cmd_derived import prepare_derived_reference
+        print(json.dumps(prepare_derived_reference(args.derive_from, args.output, block_size=args.block_size)))
+        return
+    if not all((args.package_dir, args.metadata, args.catalog, args.source_dir)):
+        parser.error("native build requires --package-dir, --metadata, --catalog and --source-dir")
     result = build(args.package_dir, args.metadata, args.catalog, args.source_dir, args.output, args.r_library,
                    stratify_by=args.stratify_by, age_band_boundaries=args.age_band_boundaries)
     print(json.dumps(result))

@@ -66,8 +66,41 @@ def load_bundle(base: Path):
 
 
 def compare(sample_id: str, metadata: dict) -> dict:
-    return population.compare(sample_id, metadata, spec=SPEC, loader=load_bundle,
-                              ordination=community_ordination, reasons=REASONS)
+    """Keep the vetted selection authoritative and attach optional G10 results."""
+    captured = {}
+    def ordinate(target, matrix, selected, **kwargs):
+        from .cmd_derived import load_derived, typicality_comparison
+        try:
+            manifest, _, _, _, hashes = load_bundle(reference_dir())
+            derived = load_derived(reference_dir(), manifest, hashes)
+            typicality, vector = typicality_comparison(target, matrix, selected, derived,
+                                                       reference_version=kwargs.get("reference_version", ""))
+            typicality["derived_sha256"] = manifest["files"]["consumer_derived.json"]
+            captured["typicality"] = typicality
+            from .ordination import community_ordination as calculate
+            import numpy as np
+            chosen = sorted(selected)
+            if len(chosen) > 300:
+                version = str(kwargs.get("reference_version", ""))
+                chosen = sorted(chosen, key=lambda sid: digest((version + "|" + str(sid)).encode()))[:300]
+                chosen.sort()
+            index = {sid: i for i, sid in enumerate(derived[0]["ids"])}
+            positions = [index[sid] for sid in chosen]
+            sample_positions = {sid: i for i, sid in enumerate(selected)}
+            result = calculate(target, matrix, chosen,
+                reference_distances=derived[1][np.ix_(positions, positions)],
+                target_distances=vector[[sample_positions[sid] for sid in chosen]], **kwargs)
+            result["n_reference_total"] = len(selected)
+            result["reference_sampling"] = "deterministic_hash_subset_300" if len(selected)>len(chosen) else "all_selected_reference"
+            result["reference_distance_source"] = "sha_verified_offline_float32"
+            return result
+        except (OSError, ValueError, TypeError, KeyError):
+            captured["typicality"] = {"status": "unavailable", "reason": "derived_reference_unavailable"}
+            return community_ordination(target, matrix, selected, **kwargs)
+    result = population.compare(sample_id, metadata, spec=SPEC, loader=load_bundle,
+                                ordination=ordinate, reasons=REASONS)
+    result["typicality"] = captured.get("typicality", {"status": "unavailable", "reason": "reference_comparison_unavailable"})
+    return result
 
 
 def community_ordination(target, matrix, selected, **kwargs):
