@@ -98,6 +98,8 @@ def module_bibliographies(document: dict) -> list[dict]:
 
 
 def render_bibliographies(document: dict) -> list[str]:
+    from .consumer_chapter import _data
+    _data(document)
     modules = module_bibliographies(document)
     document["module_bibliographies"] = modules
     output = ["### 分模块参考文献"]

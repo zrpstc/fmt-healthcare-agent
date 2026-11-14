@@ -1123,6 +1123,11 @@ def prepare_presentation(document):
     document["overview_findings"] = select_findings(document)
     if len(document["presentation"].get("chapters", [])) > 2:
         document["presentation"]["chapters"][2]["subsections"] = document["presentation"]["chapters"][2]["subsections"][:3]
+    from .consumer_copy import CHAPTERS as CONSUMER_COPY
+    first = document["presentation"]["chapters"][0]
+    document.setdefault("consumer", {}).setdefault("source_chapter_one_title", first["title"])
+    first["title"] = CONSUMER_COPY[1]["title"]
+    first["subsections"] = [f"1.{i} {CONSUMER_COPY[1]['subsections'][i]}" for i in [1, 2, 4]]
 
 
 def render_body(document):
@@ -1136,10 +1141,12 @@ def render_toc():
     def anchor(title):
         return title.lower().replace(" ", "-")
 
+    from .consumer_copy import CHAPTERS as CONSUMER_COPY
+    chapters = [(n, CONSUMER_COPY.get(n, {}).get("title", title)) for n, title, _, _ in REPORT_CHAPTERS]
     return [
         "## 目录",
         "- [检测结果总览](#检测结果总览)",
-        *[f"- [{n} {title}](#{anchor(f'{n} {title}')})" for n, title, _, _ in REPORT_CHAPTERS],
+        *[f"- [{n} {title}](#{anchor(f'{n} {title}')})" for n, title in chapters],
         "- [附录与参考资料](#附录与参考资料)",
     ]
 

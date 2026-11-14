@@ -20,6 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("sample_id")
     parser.add_argument("--report-path", type=Path)
+    parser.add_argument("--preserve-other-chapters", action="store_true", help="Reuse existing non-consumer chapter images byte for byte")
     args = parser.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,99}", args.sample_id):
         parser.error("invalid sample identifier")
@@ -57,7 +58,7 @@ def main():
         staging = Path(folder)
         attach_subgraphs(document)
         figures = render_graph_figures(document, staging)
-        figures.update(render_word_figures(document, staging))
+        figures.update(render_word_figures(document, staging, preserve_existing_from=output if args.preserve_other_chapters else None))
         figures.update(render_overview_figure(document, staging))
         markdown = render_markdown(document)
         if "无量纲" in markdown:
@@ -80,6 +81,7 @@ def main():
             if not target.is_relative_to(staging) or not target.is_file():
                 raise ValueError("invalid generated figure path")
         for name in [*figures.values(), *names.values()]:
+            (output / name).parent.mkdir(parents=True, exist_ok=True)
             os.chmod(staging / name, 0o600)
             os.replace(staging / name, output / name)
     print("REFRESH_OK")

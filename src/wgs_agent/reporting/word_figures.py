@@ -452,7 +452,6 @@ def draw_tier_scale(rows, width=1800):
     return image
 
 
-
 def draw_chart(spec, payload, width):
     if payload.get("chapter_eight_mode"):
         from .chapter_eight import draw_chart as draw_chapter_eight
@@ -853,7 +852,7 @@ def draw_flow(spec, labels, width):
     return image
 
 
-def render_word_figures(document, output_dir):
+def render_word_figures(document, output_dir, *, preserve_existing_from=None):
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     # Overview is needed by the action diagram, and is kept traceable in the JSON.
@@ -862,6 +861,22 @@ def render_word_figures(document, output_dir):
     prepare_presentation(document)
     figures = {}
     manifest = {}
+    previous = document.get("word_figures", {})
+    def preserve(key):
+        import copy
+        import shutil
+        item = previous[key]
+        source_root = Path(preserve_existing_from).resolve()
+        source = (source_root / item["filename"]).resolve()
+        if not source.is_relative_to(source_root) or not source.is_file():
+            raise ValueError("preserved_figure_unavailable")
+        target = (output / item["filename"]).resolve()
+        if not target.is_relative_to(output.resolve()):
+            raise ValueError("invalid_preserved_figure_path")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+        manifest[key] = copy.deepcopy(item)
+        figures[key] = item["filename"]
     for chapter in contract()["chapters"]:
         if chapter["number"] == REMOVED_CHAPTER:
             continue
@@ -869,8 +884,17 @@ def render_word_figures(document, output_dir):
             if block["type"] != "visuals":
                 continue
             key = "+".join(v["id"] for v in block["items"])
+            if preserve_existing_from is not None and chapter["number"] != 1 and key in previous:
+                preserve(key)
+                continue
             width = 1800
             active_items = block["items"]
+            if chapter["number"] == 1:
+                from .consumer_state import omit
+                active_items = [v for v in active_items if chart_data(document, v)["status"] == "available"]
+                if not active_items:
+                    omit(document, 1, key, "figure_data_missing", "没有可绘制的数据")
+                    continue
             if chapter["number"] == 1 and any(v["id"] == "1.2.2" for v in active_items):
                 core = next(v for v in active_items if v["id"] == "1.2.2")
                 if chart_data(document, core)["status"] != "available":
@@ -937,7 +961,12 @@ def render_word_figures(document, output_dir):
             manifest[key] = {"filename": name, "items": payloads, "width": width, "height": height}
             figures[key] = name
     from .chapter_seven import render_figures as render_chapter_seven_figures
-    figures.update(render_chapter_seven_figures(document, output, manifest))
+    if preserve_existing_from is None:
+        figures.update(render_chapter_seven_figures(document, output, manifest))
+    else:
+        for key in ("7.2.flow", "7.3.1", "7.4.graph"):
+            if key in previous:
+                preserve(key)
     document["word_figures"] = manifest
     document["presentation"]["word_source_hashes"] = contract()["sources"]
     document['presentation']['word_chart_count'] = sum(item.get('type') == 'chart' for chapter in contract()['chapters'] if chapter["number"] != REMOVED_CHAPTER for block in chapter['blocks'] for item in block.get('items', []))

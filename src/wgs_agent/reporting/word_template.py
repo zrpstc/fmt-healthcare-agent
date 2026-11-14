@@ -783,11 +783,24 @@ def narrative_sections(document):
                     "source_subsections": [f"{display_number(chapter)}.{i}" for i in scope],
                 }
             )
+        if chapter == 1:
+            from .consumer_chapter import displayed_values
+            from .consumer_copy import WRITING_FOCUS, CHAPTERS as CONSUMER_COPY
+            for topic in topics:
+                index = int(topic["id"].split(".")[-1])
+                topic["consumer_displayed_values"] = displayed_values(document, index)
+                topic["writing_focus"] = [WRITING_FOCUS[topic["id"]]]
+                topic["title"] = CONSUMER_COPY[1]["subsections"][index]
+                if index == 3:
+                    topic["status"] = "missing"
         sections.append({"id": f"word.{chapter}", "title": f"{display_number(chapter)} {title}", "topics": topics})
     return sections
 
 
 def _narrative(document, chapter, sub):
+    if chapter == 1:
+        from .consumer_chapter import interpretation
+        return interpretation(document, sub)
     if chapter == 4:
         from .chapter_four import interpretation as chapter4_interpretation
         message = chapter4_interpretation(document, sub)
@@ -1002,6 +1015,10 @@ def render_body(document):
     for chapter in contract()["chapters"]:
         n = chapter["number"]
         if n == REMOVED_CHAPTER:
+            continue
+        if n == 1:
+            from .consumer_chapter import render
+            output.extend(render(document))
             continue
         if n == 5:
             from .chapter_five import has_results_schema, render_chapter

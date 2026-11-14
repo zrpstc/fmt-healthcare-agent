@@ -722,6 +722,8 @@ def render_markdown(document: dict) -> str:
         ]
     )
     from .bibliography import render_bibliographies
+    from .consumer_appendix import render_appendices
+    output.extend(render_appendices(document))
     output.extend(render_bibliographies(document))
     matching = document.get("fmt_matching") or {}
     if matching.get("top_k_matches"):

@@ -6,6 +6,7 @@ import copy
 import json
 import os
 import re
+from .consumer_copy import CONSUMER_CHAPTERS, FORBIDDEN
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Callable
 
@@ -29,6 +30,33 @@ WRITING_RULES = """写作与事实约束：
 10. 耐药基因只讨论给定基因检测证据；药物交互分不是耐药性。不得建议服药、停药、换药或补充特定制剂，不给药物、益生菌或补充剂剂量。
 11. 不反复写大段免责声明、百科定义、泛化饮食清单。不写“综上所述”“值得注意的是”“全面揭示”“显著改善”等套话。
 12. 支持不足的解读宁可省略，程序会保留对应结果和固定分析方向。JSON之外不输出任何文字。"""
+
+
+CONSUMER_RULES = """仅对已启用消费者展示层的章节生效（当前word.1）：
+读者是普通消费者，称您。写1–2句，总共不超过80字，先给结论。
+只综合已经展示的结果，最多引用两个数字，且必须与consumer_displayed_values格式完全一致。
+此规则替代该章节写作规则3的禁数字要求。其余章节仍按原规则执行。
+不复述图表结构，不写本节展示了什么，不写方法、软件、版本或统计术语。
+偏离常见范围只说明较少见，不写异常，不推断疾病。提到菌名用中文。
+禁用词：""" + "、".join(FORBIDDEN)
+
+
+def consumer_text_error(text, displayed):
+    if not isinstance(text, str) or not 8 <= len(text.strip()) <= 80:
+        return "consumer_length"
+    if any(word.lower() in text.lower() for word in FORBIDDEN):
+        return "consumer_forbidden_word"
+    if re.search(r"[A-Za-z_]|异常|患病|导致|引起|造成|治疗|有益菌|有害菌", text):
+        return "consumer_unsupported_language"
+    plain = re.sub(r"\[\d+\]", "", text)
+    if len([s for s in re.split(r"[。！？]", plain) if s.strip()]) > 2:
+        return "consumer_sentence_count"
+    pattern = r"\d[\d,]*(?:\.\d+)?%?"
+    numbers = re.findall(pattern, plain)
+    allowed = {n for value in displayed for n in re.findall(pattern, str(value))}
+    if len(numbers) > 2 or any(n not in allowed for n in numbers):
+        return "consumer_numeric_mismatch"
+    return None
 
 
 def _topics(sections: list[dict]) -> dict[str, dict]:
@@ -151,6 +179,8 @@ def build_prompt(document: dict, sections: list[dict]) -> str:
             topics.append({key: topic[key] for key in ("id", "title", "status", "finding", "note")})
             topics[-1]["allowed_evidence_ids"] = allowed
             topics[-1]["writing_focus"] = topic.get("writing_focus", [])
+            if "consumer_displayed_values" in topic:
+                topics[-1]["consumer_displayed_values"] = topic["consumer_displayed_values"]
             for key in allowed:
                 record = evidence[key]
                 chosen[key] = {
@@ -216,7 +246,12 @@ def _text_error(item: dict, topic: dict, evidence: dict) -> str | None:
     if re.search(r"[<>\n\r]|```|!\[|\]\(|^\s*#|\|", prose):
         return "formatting_or_process_text"
     names_removed = re.sub(r"B\s*\d{1,2}|5[-－]?HT|TMAO?|GLP[-－]?1|TGR5", "", prose, flags=re.I)
-    if re.search(r"\d|[％%]|百分之|[一二三四五六七八九十百]+成", names_removed):
+    consumer_topic = topic["id"].startswith("word.") and int(topic["id"].split(".")[1]) in CONSUMER_CHAPTERS
+    if consumer_topic:
+        error = consumer_text_error(interpretation, topic.get("consumer_displayed_values", []))
+        if error:
+            return error
+    elif re.search(r"\d|[％%]|百分之|[一二三四五六七八九十百]+成", names_removed):
         return "numeric_claim_in_narrative"
     if re.search(
         r"确诊|患有|诊断为|导致|引起|造成|治愈|保证|服用|停药|停用|换药|补充.{0,8}(?:铁|锌|益生菌|制剂)|(?:血清素|多巴胺|雌激素|GABA)水平(?:偏|升|降|不足)|(?:缺铁|缺锌|维生素缺乏)|(?:高|中|低)(?:患病)?风险",
@@ -430,12 +465,18 @@ def generate_narrative(
 ) -> dict:
     """Generate bounded batches, validate independently and keep rule text on failure."""
     result = copy.deepcopy(document)
+    original_has_sample = any(r.get("kind") not in {"method_reference", "literature"} for r in result.get("evidence", {}).values())
+    optional_inputs = result.get("template_inputs", {})
+    original_has_sample = original_has_sample or any(value for key, value in optional_inputs.items() if key not in {"healthy_comparison", "taxonomy", "diversity"})
     result["audit"]["narrative_validation"] = []
     from .word_template import narrative_sections
     result["word_sections"] = narrative_sections(result)
     result["audit"]["narrative_contract"] = "word-subsections-1-14-v2"
     if not config:
         result["audit"]["llm_status"] = "not_configured"
+        return result
+    if not original_has_sample:
+        result["audit"]["llm_status"] = "no_eligible_data"
         return result
     sections = [section for section in result["word_sections"] if _topics([section])]
     batches = [sections[index : index + 3] for index in range(0, len(sections), 3)]
@@ -445,7 +486,7 @@ def generate_narrative(
 
     def run_batch(batch: list[dict]) -> tuple[dict, list[str]]:
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": SYSTEM_PROMPT + ("\n" + CONSUMER_RULES if any(s["id"] == "word.1" for s in batch) else "")},
             {"role": "user", "content": build_prompt(result, batch)},
         ]
         accepted, errors = {}, []

@@ -20,24 +20,22 @@ def _rows(document, kind, limit):
     if data.qc_failed:
         return []
     return sorted([r for r in data.group(kind) if r.get("unit") == "%"
-                   and finite(r.get("value")) is not None and r["value"] >= 0],
+                   and finite(r.get("value")) is not None and 0 < r["value"] <= 100],
                   key=lambda r: -r["value"])[:limit]
 
 
 def reference_rows(document):
     from .word_template import Data
     data = Data(document)
-    if data.qc_failed:
-        return []
-    # Same eight entries formerly shown in table 1.4.t1, including unavailable comparisons.
     kind = "healthy_species" if data.inputs.get("healthy_comparison") else "species"
-    return sorted(data.group(kind), key=lambda r: -(finite(r.get("value")) or 0))[:8]
+    return sorted(data.group(kind), key=lambda r: -(finite(r.get("value")) or 0))
 
 
 def prepare_chapter_one(document, config, *, post=None, fallback_config=None):
     from .word_figures import chart_data
     rows = _rows(document, "tax_phylum", 5) + _rows(document, "tax_genus", 5)
-    rows += _rows(document, "species", 6) + reference_rows(document)
+    from .consumer_chapter import comparison_rows, prepare
+    rows += _rows(document, "species", 5) + comparison_rows(document)
     translate_overview_taxa(document, config, post=post, fallback_config=fallback_config,
                             rows=rows, label_field=LABEL_FIELD, audit_field="chapter_one_taxon_translation")
     core = chart_data(document, {"id":"1.2.2", "kind":"doughnutChart"})
@@ -46,15 +44,22 @@ def prepare_chapter_one(document, config, *, post=None, fallback_config=None):
         "core_chart_reason": core.get("reason", ""),
         "removed_tables": ["1.1.t1", "1.2.t2", "1.4.t1"],
     }
+    prepare(document, config=config)
 
 
 def name(document, row):
-    return display_taxon(document, row, label_field=LABEL_FIELD)["label"]
+    from .taxon_labels import display_name
+    resolved = display_taxon(document, row, label_field=LABEL_FIELD)
+    return display_name({**row, "display_label": resolved["label"]})
 
 
 def scientific(row):
     original = str(row.get("species") or row.get("name") or row.get("label", ""))
-    return re.sub(r"\s+ex\s+.*$", "", original, flags=re.I).replace("_", " ")
+    original = re.sub(r"\s+ex\s+.*$", "", original, flags=re.I).replace("_", " ")
+    original = re.sub(r"(?:^|\|)[kpcofgs]__", " ", original).strip()
+    if re.search(r"SGB|unclassified|uncultured", original, re.I):
+        return ""
+    return original[:1].upper() + original[1:]
 
 
 def translate_text(document, text):
@@ -68,28 +73,8 @@ def translate_text(document, text):
 
 
 def chart_payload(document, spec):
-    from .word_figures import _dataset, _series
-    ident = spec["id"]
-    if ident == "1.4.1":
-        rows = reference_rows(document)
-        payload = _dataset([name(document,r) for r in rows], [
-            _series(reference_labels.profile(document.get("template_inputs", {})) if any(r.get("kind")=="healthy_species" for r in rows) else "本次样本", [finite(r.get("value")) for r in rows]),
-            _series("参考人群中位数", [finite(r.get("reference_median")) for r in rows])], "%")
-        payload.update(chapter_one_mode="reference", rows=[{**r,"display_label":name(document,r),"scientific_label":scientific(r)} for r in rows])
-        return payload
-    kind = {"1.1.1":"tax_phylum", "1.1.2":"tax_genus", "1.1.3":"species", "1.2.1":"species"}[ident]
-    rows = _rows(document, kind, 100000 if ident=="1.1.1" else 6 if ident=="1.2.1" else 5)
-    if ident == "1.1.1":
-        shown = [{**r,"display_label":name(document,r),"scientific_label":scientific(r)} for r in rows[:5]]
-        remaining = math.fsum(r["value"] for r in rows[5:])
-        if remaining > 0:
-            shown.append({"display_label":"其余已记录类群","scientific_label":"","value":remaining})
-        payload = _dataset(["本样本"], [_series(r["display_label"],[r["value"]]) for r in shown], "相对丰度（%）")
-        payload.update(chapter_one_mode="phylum", rows=shown, recorded_total=math.fsum(r["value"] for r in rows))
-        return payload
-    payload = _dataset([name(document,r) for r in rows], [_series("相对丰度",[r["value"] for r in rows])], "%")
-    payload.update(chapter_one_mode="bars", rows=[{**r,"display_label":name(document,r),"scientific_label":scientific(r)} for r in rows])
-    return payload
+    from .consumer_chapter import chart_payload as payload
+    return payload(document, spec)
 
 
 def _label(draw, xy, text, size=28, **kwargs):
@@ -102,30 +87,8 @@ def _pct(value):
 
 
 def draw_chart(spec, payload, width):
-    mode = payload["chapter_one_mode"]
-    rows = payload["rows"]
-    if mode == "reference":
-        return _reference(payload, width)
-    if mode == "phylum":
-        return _phylum(payload, width)
-    height = max(240, 100 + len(rows)*125)
-    image = Image.new("RGB",(width,height),"white");draw=ImageDraw.Draw(image)
-    color = "#" + spec["series"][0]["color"]
-    if not rows:
-        _label(draw,(35,70),"未提供可用的相对丰度结果",26)
-        return image
-    left, right = width*.46, width-145
-    maximum = max(r["value"] for r in rows) or 1
-    for index,row in enumerate(rows):
-        y = 35+index*125
-        _label(draw,(20,y),row["display_label"],28,width=left-40,max_lines=2)
-        _label(draw,(20,y+76),row["scientific_label"],20,width=left-40,max_lines=1)
-        end = left+(right-left)*row["value"]/maximum
-        draw.rounded_rectangle((left,y+25,right,y+55),radius=4,fill="#EDF2F6")
-        if row["value"]>0:draw.rectangle((left,y+25,end,y+55),fill=color)
-        _label(draw,(end+12,y+40),_pct(row["value"]),26,anchor="lm")
-    _label(draw,(width/2,height-35),"相对丰度（%）",24,anchor="mm")
-    return image
+    from .consumer_chapter import draw_chart as draw
+    return draw(payload, width)
 
 
 def _phylum(payload,width):
