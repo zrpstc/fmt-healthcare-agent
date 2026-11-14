@@ -59,7 +59,7 @@ def test_lingoes_correction_matches_euclidean_reconstruction():
 def test_descriptive_summary_does_not_assign_an_enterotype():
     doc = {"template_inputs": {"taxonomy": {"complete": True, "ranks": {"genus": [{"name": "Bacteroides", "abundance": 60}, {"name": "Prevotella", "abundance": 20}]}}}}
     summary = composition_summary(doc)
-    assert "Bacteroides、Prevotella" in summary
+    assert "拟杆菌属、普雷沃菌属" in summary
     assert "未完成可靠肠型分类" in summary
     assert "2.2" in summary
     assert "暂不判断" in composition_summary({})

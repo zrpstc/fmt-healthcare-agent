@@ -45,7 +45,7 @@ def test_percent_values_are_bound_without_renormalizing(ident,expected):
     doc=build();prepare_chapter_one(doc,None)
     payload=chart_data(doc,{"id":ident,"kind":"barChart"})
     assert payload["series"][0]["values"][0]==expected
-    assert payload["chapter_one_mode"] in {"bars","phylum"}
+    assert payload["chapter_one_mode"] in {"bars","phylum","concentration"}
     spec={"id":ident,"series":[{"color":"246a73"}]}
     assert draw_chart(spec,payload,900 if ident!="1.1.1" else 1800).width in {900,1800}
     assert payload["rows"][0]["display_label"]
@@ -57,7 +57,8 @@ def test_missing_core_hides_placeholder_ring_and_uses_full_width(tmp_path):
     assert [item["id"] for item in panel["items"]]==["1.2.1"]
     assert panel["width"]==1800 and not doc["chapter_one_presentation"]["core_chart_visible"]
     md=render_markdown(doc)
-    assert "未绘制核心检出圆环" in subsection(md,"1.2")
+    assert "未绘制核心检出圆环" not in subsection(md,"1.2")
+    assert any(r["reason_code"] == "core_definition_missing" for r in doc["consumer_omissions"])
 
 
 def test_defined_core_keeps_useful_member_count_ring(tmp_path):
@@ -79,7 +80,7 @@ def test_all_eight_reference_table_entries_move_to_chart_without_primary_mixing(
     for row in payload["rows"]:
         assert row["reference_median"]==0 and row["p95"]==2
         assert row["percentile"]==98.05825 and row["n_reference"]==103
-    assert draw_chart({},payload,1800).height>1500
+    assert 800 < draw_chart({},payload,1800).height < 1100
 
 
 def test_only_requested_tables_removed_other_chapters_and_13_unchanged():
@@ -90,8 +91,8 @@ def test_only_requested_tables_removed_other_chapters_and_13_unchanged():
     assert "| 参考核心成员 |" not in subsection(after,"1.2")
     assert "| 组成指标 |" in subsection(after,"1.2")
     assert "| 重点物种 |" not in subsection(after,"1.4")
-    assert before.split("## 2 ",1)[1]==after.split("## 2 ",1)[1]
-    assert subsection(before,"1.3")==subsection(after,"1.3")
+    assert before.split("## 2 ",1)[1].split("## 附录与参考资料",1)[0]==after.split("## 2 ",1)[1].split("## 附录与参考资料",1)[0]
+    assert "### 1.3 " not in before and "### 1.3 " not in after
 
 
 def test_failed_qc_never_displays_abundance_or_core_counts():

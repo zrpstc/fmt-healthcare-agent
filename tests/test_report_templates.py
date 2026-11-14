@@ -45,7 +45,7 @@ def test_template_chapters_replace_the_old_body_and_keep_a_complete_toc():
     md = render_markdown(doc)
     headings = re.findall(r"^## (\d+) (.+)$", md, re.M)
     assert [int(n) for n, _ in headings] == list(range(1, 14))
-    assert headings[0][1] == "菌群组成与群落结构"
+    assert headings[0][1] == "您的肠道里住着哪些菌"
     assert headings[1][1] == "菌群多样性与生态功能结构"
     assert headings[-1][1] == "综合解读与行动建议"
     assert "### 8.8 脂多糖与其他细胞组分合成特征" in md
@@ -223,7 +223,9 @@ def test_core_members_use_defined_reference_and_actual_detection_without_zero_fi
         },
     )
     body = block(render_markdown(doc), "1.2")
-    assert "Core A" in body and "5 %" in body
+    assert "5.0%" in body
+    assert "核心成员" not in body
+    assert any(r["reason_code"] == "core_members_unverifiable" for r in doc["consumer_omissions"])
     from wgs_agent.reporting.word_figures import chart_data
     assert doc["template_inputs"]["core_microbiome"]["members"][1]["species"] == "Core B"
     assert chart_data(doc, {"id": "1.2.2", "kind": "doughnutChart"})["status"] == "missing"

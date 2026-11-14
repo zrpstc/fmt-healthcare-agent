@@ -86,7 +86,7 @@ def test_measured_abundance_reference_and_reads_are_not_substituted():
     relative = chart_data(doc, visual("1.1.3"))
     assert relative["series"][0]["values"] == [4]
     ref = chart_data(doc, visual("1.4.1"))
-    assert ref["series"][1]["values"] == [None]  # No midpoint inferred from P5/P95.
+    assert ref["series"][1]["values"] == []  # Missing percentile: hide comparison, never infer a median.
     reads = chart_data(doc, visual("3.3.1"))
     assert 317 in reads["series"][0]["values"]
     assert chart_data(doc, visual('2.2.1'))["status"] == "missing"  # No fake reference clouds.

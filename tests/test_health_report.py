@@ -73,7 +73,8 @@ def test_fixed_outline_is_complete_even_without_inputs():
     assert all(s["status"] == "missing" for s in doc["sections"])
     markdown = render_markdown(doc)
     from wgs_agent.reporting.template_catalog import REPORT_CHAPTERS
-    assert all(f"## {n} {title}" in markdown for n, title, _, _ in REPORT_CHAPTERS)
+    from wgs_agent.reporting.consumer_copy import CHAPTERS as CONSUMER_COPY
+    assert all(f"## {n} {CONSUMER_COPY.get(n, {}).get('title', title)}" in markdown for n, title, _, _ in REPORT_CHAPTERS)
     assert "结果覆盖" not in markdown
     assert "综合健康评分" not in markdown
     assert "模型解释状态" not in markdown
@@ -335,11 +336,11 @@ def fake_response(payload):
                 {
                     "id": t["id"],
                     "mode": "observation",
-                    "interpretation": "本项已记录对应的检测线索，可与本次同类结果一起阅读。后续比较时请保持采样背景和分析方法一致。",
+                    "interpretation": ("您的菌群中包含这些检出的成员。" if t["id"].startswith("word.1.") else "本项已记录对应的检测线索，可与本次同类结果一起阅读。后续比较时请保持采样背景和分析方法一致。"),
                     "advice": "",
                     "evidence_ids": [key],
                     "support_quotes": [
-                        {"id": key, "quote": packet["evidence"][key]["support_texts"][0]}
+                        {"id": key, "quote": packet["evidence"][key]["support_texts"][0][:80]}
                     ],
                 }
             )
