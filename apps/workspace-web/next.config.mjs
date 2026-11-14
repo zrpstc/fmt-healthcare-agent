@@ -3,7 +3,7 @@ import nextEnv from "@next/env";
 
 // Load the repository environment for both `next build` and `next start`.
 nextEnv.loadEnvConfig(fileURLToPath(new URL("../../", import.meta.url)));
-const apiPort = process.env.WGS_API_PORT || "8503";
+const apiPort = process.env.WGS_API_PORT || "18503";
 const proxyTimeout = Number(process.env.WGS_WEB_PROXY_TIMEOUT_MS || "900000");
 if (!/^\d{1,5}$/.test(apiPort) || Number(apiPort) < 1 || Number(apiPort) > 65535) {
   throw new Error("WGS_API_PORT must be a port between 1 and 65535");

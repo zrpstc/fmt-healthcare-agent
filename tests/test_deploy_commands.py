@@ -105,3 +105,57 @@ def test_health_supports_external_api_key_without_reading_password(config, monke
         return io.BytesIO(b'{"status":"yellow"}')
     monkeypatch.setattr(runtime.urllib.request,'urlopen',request)
     assert runtime.search_health(config)['state'] == 'running'
+
+
+@pytest.mark.parametrize("outside_project", [False, True])
+@pytest.mark.parametrize("extra_args", [[], ["--json"], ["--component", "all"], ["--component=elasticsearch"]])
+def test_report_restart_keeps_api_scope_from_any_directory(tmp_path, outside_project, extra_args):
+    root = tmp_path / "project"
+    shutil.copytree(runtime.ROOT / "deploy", root / "deploy")
+    interpreter = root / '.venv/bin/python'
+    interpreter.parent.mkdir(parents=True)
+    interpreter.write_text('#!/bin/sh\nprintf "%s\\n" "$@"\n')
+    interpreter.chmod(0o755)
+    result = subprocess.run(
+        ["bash", str(root / "deploy/restart-report-api.sh"), *extra_args],
+        cwd=tmp_path if outside_project else root,
+        capture_output=True, text=True, env={"PATH": os.environ["PATH"]},
+    )
+    assert result.returncode == 0
+    assert result.stdout.splitlines() == [
+        str(root / "deploy/lib/runtime.py"), "restart", *extra_args,
+        "--component", "workspace-api",
+    ]
+
+
+def test_report_restart_reloads_configuration_and_does_not_broaden_scope(config, monkeypatch, capsys):
+    env_path = config.root / ".env"
+    original = env_path.read_text()
+    env_path.write_text(original + "\nWGS_CLAIM_API_KNOWLEDGE_BASE_ID=30\n")
+    original_load = runtime.Config.load
+    loaded = []
+    events = []
+
+    def load():
+        value = original_load(config.root, parent_env={"PATH": os.environ["PATH"]})
+        loaded.append(value)
+        return value
+
+    def stop(value, component):
+        events.append(("stop", component, value.env["WGS_CLAIM_API_KNOWLEDGE_BASE_ID"]))
+        env_path.write_text(original + "\nWGS_CLAIM_API_KNOWLEDGE_BASE_ID=31\n")
+
+    def start(value, component, force_build):
+        events.append(("start", component, value.env["WGS_CLAIM_API_KNOWLEDGE_BASE_ID"]))
+        assert force_build is False
+        return {"services": {"workspace-api": 123}}
+
+    monkeypatch.setattr(runtime.Config, "load", load)
+    monkeypatch.setattr(runtime, "deployment_lock", lambda value: contextlib.nullcontext())
+    monkeypatch.setattr(runtime, "external_search_preflight", lambda value: None)
+    monkeypatch.setattr(runtime, "stop", stop)
+    monkeypatch.setattr(runtime, "start", start)
+    assert runtime.main(["restart", "--component", "all", "--component", "workspace-api"]) == 0
+    assert len(loaded) == 2 and loaded[0] is not loaded[1]
+    assert events == [("stop", "workspace-api", "30"), ("start", "workspace-api", "31")]
+    assert json.loads(capsys.readouterr().out)["component"] == "workspace-api"

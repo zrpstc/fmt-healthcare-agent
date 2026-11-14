@@ -305,3 +305,27 @@ def test_hardlinks_entirely_inside_project_remain_linked(config, monkeypatch):
     assert result['external_hardlinks_isolated'] == 0
     assert first.stat().st_ino == second.stat().st_ino
     assert first.stat().st_mode & 0o777 == 0o644
+
+
+@pytest.mark.parametrize("key", ["WGS_WEB_PORT", "WGS_API_PORT", "WGS_PORT"])
+@pytest.mark.parametrize("port", [8502, 8503])
+def test_retired_workspace_ports_cannot_be_reintroduced(config, key, port):
+    env_path = config.root / ".env"
+    env_path.write_text(env_path.read_text() + f"\n{key}={port}\n")
+    with pytest.raises(runtime.RuntimeFailure, match="RETIRED_WORKSPACE_PORT"):
+        runtime.Config.load(config.root, parent_env={"PATH": os.environ["PATH"]})
+
+
+def test_retired_port_configuration_is_rejected_before_restart_shutdown(config, monkeypatch, capsys):
+    env_path = config.root / ".env"
+    env_path.write_text(env_path.read_text() + "\nWGS_WEB_PORT=8502\n")
+    original_load = runtime.Config.load
+    monkeypatch.setattr(runtime.Config, "load", lambda: original_load(config.root, parent_env={"PATH": os.environ["PATH"]}))
+    shutdown = Mock()
+    startup = Mock()
+    monkeypatch.setattr(runtime, "stop", shutdown)
+    monkeypatch.setattr(runtime, "start", startup)
+    assert runtime.main(["restart"]) == 1
+    assert json.loads(capsys.readouterr().out)["error"] == "RETIRED_WORKSPACE_PORT"
+    shutdown.assert_not_called()
+    startup.assert_not_called()

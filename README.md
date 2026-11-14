@@ -78,8 +78,8 @@ WGS_ENV_ROOT=./.venv
 WGS_WORKSPACE=./var
 
 WGS_WEB_HOST=0.0.0.0
-WGS_WEB_PORT=8502
-WGS_API_PORT=8503
+WGS_WEB_PORT=18502
+WGS_API_PORT=18503
 WGS_CORS_ORIGINS=
 
 FMT_ROOT=/home/zhanghaiyang/fmt-healthcare-agent/var
@@ -145,10 +145,10 @@ bash deploy/status.sh
 默认访问地址：
 
 ```text
-http://<服务器IP>:8502/
+http://<服务器IP>:18502/
 ```
 
-服务器防火墙需要允许访问 Web 端口。API 默认仅监听本机 `127.0.0.1:8503`。
+服务器防火墙需要允许访问 Web 端口。API 默认仅监听本机 `127.0.0.1:18503`。
 
 首次使用：
 
@@ -161,8 +161,8 @@ http://<服务器IP>:8502/
 健康检查：
 
 ```bash
-curl -fsS http://127.0.0.1:8503/health
-curl -fsS http://127.0.0.1:8503/api/backend/health
+curl -fsS http://127.0.0.1:18503/health
+curl -fsS http://127.0.0.1:18503/api/backend/health
 ```
 
 健康接口正常后，仍需通过实际样本确认生信流程和报告功能可用。

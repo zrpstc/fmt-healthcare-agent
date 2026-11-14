@@ -137,7 +137,7 @@ class ManagedElasticsearch:
             raise ManagedElasticsearchError("Invalid Elasticsearch port")
         if self.port in {
             int(os.environ.get(name, default))
-            for name, default in (("WGS_WEB_PORT", "8502"), ("WGS_API_PORT", "8503"), ("WGS_PORT", "7438"))
+            for name, default in (("WGS_WEB_PORT", "18502"), ("WGS_API_PORT", "18503"), ("WGS_PORT", "7438"))
         }:
             raise ManagedElasticsearchError("Elasticsearch port conflicts with another project service")
         version = os.environ.get("WGS_ELASTICSEARCH_VERSION", DEFAULT_VERSION)
