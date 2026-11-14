@@ -184,7 +184,8 @@ def build_document(
         p5, p95 = finite(item.get("p5")), finite(item.get("p95"))
         item["comparison"] = "unknown"
         if (
-            item.get("status") in {"normal", "high", "low", "absent"}
+            item.get("status") in {"normal", "high", "low", "not_detected", "absent"}
+            and not item.get("borderline", False)
             and p5 is not None
             and p95 is not None
             and p95 > p5
@@ -226,14 +227,26 @@ def build_document(
                 reference += f"；参考样本 n={int(n_reference)}"
             percentile = finite(item.get("percentile"))
             if percentile is not None:
-                population = (
-                    "cMD 健康对照" if item.get("generated_by") == "cmd-reference-v1" else
-                    "MHNO 参考队列" if item.get("generated_by") == "mhomic-reference-v1" else
-                    "健康人群" if item.get("generated_by") == "healthy-reference-v1" else "供体子集"
-                )
+                population = "cMD 健康对照" if item.get("generated_by") == "cmd-reference-v1" else str(item.get("reference_population") or "参考人群")
                 reference += f"；{population}经验百分位 {number(percentile)}"
-            if item.get("generated_by") == "reference-comparison-v1":
-                reference += "（探索性）"
+            item["reference_text"] = reference
+        if group in {"healthy_species", "healthy_diversity"}:
+            from .reference import STATUS_LABELS
+            if item.get("status") == "not_detected" and not item.get("borderline") and p5 is not None and p5 > 0:
+                item["comparison"] = "below"
+            reference = (f"cMD P5–P95：{number(p5)}–{number(p95)}；"
+                         + STATUS_LABELS.get(item.get("status"), "未建立健康对照"))
+            for field, title in (("p5_ci95", "P5的95%CI"), ("p95_ci95", "P95的95%CI"),
+                                 ("percentile_ci95", "目标百分位95%CI")):
+                ci = item.get(field)
+                if isinstance(ci, (list, tuple)) and len(ci) == 2:
+                    reference += f"；{title} {number(ci[0])}–{number(ci[1])}"
+            if item.get("borderline") and item.get("status") == "not_detected":
+                reference += "（边界不确定，不计为确认越界）"
+            if item.get("percentile") is not None:
+                reference += f"；cMD经验百分位 {number(item['percentile'])}"
+            if item.get("n_reference") is not None:
+                reference += f"；参考独立人数 n={item['n_reference']}"
             item["reference_text"] = reference
         item["result_text"] = result
         item["finding"] = (
@@ -272,7 +285,7 @@ def build_document(
     for row in sp:
         if healthy_comparison:
             # Primary abundance is retained; its old reference intervals do not
-            # describe the separately profiled MHNO comparison.
+            # describe the separately profiled cMD comparison.
             row = {**row, "p5": None, "p95": None, "percentile": None,
                    "status": "unknown", "comparison_reason_cn": "主分析谱；" + reference_labels.short(inputs) + " 对照见独立比较区"}
         add("species", "S", row, "taxonomic_estimate", species)
@@ -680,43 +693,14 @@ def render_markdown(document: dict) -> str:
     output.extend(render_overview(document))
     reference = document["audit"].get("reference_comparison") or {}
     healthy = reference.get("healthy_population") or {}
-    if healthy.get("status") == "available" and healthy.get("provider") == "mho":
+    if healthy.get("status") == "available":
         output.append(
-            "对照组信息：MHOmicrobiome 对照，对照人群为原研究定义的代谢健康非肥胖人群，不是通用临床正常值。 "
-            "P5–P95 和经验百分位描述该参考队列，不代表疾病概率。对照组使用人群总体，未按年龄、性别或地区匹配。"
-        )
-    elif healthy.get("status") == "available":
-        output.append(
-            f"{'MHOmicrobiome 对照' if healthy.get('provider') == 'mho' else '健康人群对照'}：{text(healthy.get('cohort_id'))}，参考独立个体 n={healthy['n_subjects']}；"
+            f"cMD健康人群对照：{text(healthy.get('cohort_id'))}，参考独立个体 n={healthy['n_subjects']}；"
             f"队列版本：{text(healthy.get('cohort_version'))}。"
             + " ".join(healthy.get("limitations", []))
         )
     elif healthy:
-        output.append("健康人群对照：未建立。" + text(healthy.get("reason_cn")) + "。")
-    species_reference = reference.get("species") or {}
-    if species_reference.get("status") == "available":
-        output.append(
-            f"参考比较：本次 {species_reference.get('compared_count', 0)} 个物种条目有可用参考区间，"
-            f"{species_reference.get('uncovered_count', 0)} 个条目因覆盖、单位或参考分布限制暂不比较。"
-            + (
-                "物种 P5–P95 描述所选健康队列中央 90% 的分布。"
-                if healthy.get("status") == "available" else
-                "物种 P5–P95 描述参考人群中央 90% 的分布；参考人群的健康筛选和分析数据库版本尚待核验。"
-            )
-        )
-    elif species_reference:
-        output.append(
-            "参考比较：健康参考条件不满足，本次不发布物种高低判断。"
-            if healthy.get("configured") else
-            "参考比较：当前物种参考表不可用，未自动建立新的物种比较；输入中已有比较予以保留。"
-        )
-    diversity_reference = reference.get("diversity") or {}
-    if diversity_reference.get("status") == "available" and healthy.get("status") != "available":
-        output.append(
-            f"多样性参照：使用 {diversity_reference['n_reference']} 份标注健康供体的研究样本，"
-            "与本样本采用相同公式计算。该子集未按年龄、性别和地区匹配，数据库与完整特征口径尚待核验，"
-            "仅呈现探索性人群位置；样本数不等同于已核验的独立人数。"
-        )
+        output.append("未建立健康对照：" + text(healthy.get("reason_cn")) + "；原因码：" + text(healthy.get("reason")) + "。")
     output.append(
         "> 阅读提示：本报告分别标识菌群估计、功能潜能、检测结果和模型推算。未评估项目不表示正常，报告用于健康管理与研究参考，不能替代临床诊断。"
     )

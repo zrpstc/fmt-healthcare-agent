@@ -80,7 +80,7 @@ Fact 5037 的直接负相关作过强解读；该原句只明确陈述抗炎菌�
 
 ```bash
 cd /home/zhanghaiyang/fmt-healthcare-agent
-sudo bash deploy/restart-report-api.sh
+sudo bash deploy/restart.sh
 .venv/bin/python scripts/enable_litkg_graphrag.py
 ```
 

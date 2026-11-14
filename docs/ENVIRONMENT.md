@@ -121,19 +121,7 @@ npm run build
 
 ## 宏基因组运行时
 
-在线重建：
-
-```bash
-export FMT_ROOT=/srv/wgs-fmt
-bash deploy/install-bioinformatics-envs.sh
-```
-
-离线迁移与参考库恢复见 `runtime/resources/README.md`。部署完成后必须验证：
-
-```bash
-export FMT_ROOT=/srv/wgs-fmt
-bash deploy/check-bioinformatics-runtime.sh
-```
+环境定义保存在 `runtime/environments/`；资源路径和准备方式见 `runtime/resources/README.md`。历史生信安装、检查、打包及恢复脚本已转存本机 Git 忽略的 `deploy-backup/`，不再作为维护入口。当前项目日常操作统一使用 `deploy/README.md` 中的四个命令。
 
 ## 路径解析规则
 

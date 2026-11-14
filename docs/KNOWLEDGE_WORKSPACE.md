@@ -44,6 +44,6 @@ WGS_WEB_DIST_DIR=.next-knowledge NEXT_TELEMETRY_DISABLED=1 npm run build
 ```
 
 生产构建可使用 `WGS_WEB_DIST_DIR` 隔离验证，默认仍使用 `.next`。
-若现有服务由 root 运行，执行 `sudo bash deploy/activate-knowledge-ui.sh`。
+若现有服务由 root 运行，执行 `sudo bash deploy/restart.sh`。
 该脚本备份旧 Web 构建，构建默认 `.next`，只重启 API/Web，检查两个服务的 HTTP 响应。
 构建失败会恢复旧 Web 构建；不重启 Elasticsearch 或生信流水线。

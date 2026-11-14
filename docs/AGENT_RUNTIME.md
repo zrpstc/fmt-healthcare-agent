@@ -51,7 +51,7 @@
 
 ```bash
 cd /home/zhanghaiyang/fmt-healthcare-agent
-sudo bash deploy/activate-agent-runtime.sh
+sudo bash deploy/restart.sh
 ```
 
 脚本只重启本项目 API/Web，备份 Agent 配置和 `.env`，迁移提示词，设置 Web 构建目录，

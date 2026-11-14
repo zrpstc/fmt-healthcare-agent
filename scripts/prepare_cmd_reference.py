@@ -17,6 +17,9 @@ import urllib.request
 
 from wgs_agent.reporting import cmd
 from wgs_agent.reporting.reference import species_key
+from wgs_agent.reporting.population_reference import (
+    DEFAULT_AGE_BANDS, age_band, depth_distribution, stratum_counts, validate_stratification,
+)
 
 
 def eligible(row):
@@ -35,7 +38,7 @@ def eligible(row):
 def fetch(url, destination):
     parsed = urllib.parse.urlsplit(url)
     if parsed.scheme != "https" or parsed.username or parsed.password:
-        raise ValueError("public HTTPS source required")
+        raise ValueError("official HTTPS URL required")
     if parsed.hostname not in {"experimenthub.bioconductor.org", "mghp.osn.xsede.org",
                                "bioconductorhubs.blob.core.windows.net"}:
         raise ValueError("unrecognized official hub location")
@@ -97,9 +100,14 @@ for(i in seq_len(nrow(plan))) {
 '''
 
 
-def build(package, metadata, catalog, source_dir, output, r_library=None):
+def build(package, metadata, catalog, source_dir, output, r_library=None, *,
+          stratify_by=(), age_band_boundaries=DEFAULT_AGE_BANDS):
+    validate_stratification(stratify_by, age_band_boundaries)
     if output.exists():
-        cmd.load_bundle(output)
+        manifest = cmd.load_bundle(output)[0]
+        if (manifest.get("stratify_by", []) != list(stratify_by)
+                or manifest.get("age_band_boundaries", list(DEFAULT_AGE_BANDS)) != list(age_band_boundaries)):
+            raise ValueError("existing bundle has different stratification; choose a new output")
         return {"status": "already_built", "output": str(output)}
     source_dir.mkdir(parents=True, exist_ok=True)
     with metadata.open() as handle:
@@ -157,7 +165,7 @@ def build(package, metadata, catalog, source_dir, output, r_library=None):
         return days, row["sample_id"]
     selected = {}
     for row in sorted(candidates, key=priority):
-        key = row["study_name"], row["subject_id"]
+        key = str(row["study_name"]), str(row["subject_id"])
         if key not in selected and (row["study_name"], row["sample_id"]) in profiles:
             selected[key] = row
     labels = []; matrix = {}; feature_set = set()
@@ -169,9 +177,15 @@ def build(package, metadata, catalog, source_dir, output, r_library=None):
         labels.append({"sample_id": sid, "original_sample_id": row["sample_id"], "subject_id": person,
                        "study_id": study, "phenotype": cmd.PHENOTYPE, "source_runs": row.get("NCBI_accession", ""),
                        "age": row["age"], "sex": row.get("gender", ""), "country": row.get("country", ""),
-                       "BMI": row.get("BMI", ""), "body_site": "stool", "raw_species_sum": total})
+                       "BMI": row.get("BMI", ""), "body_site": "stool", "raw_species_sum": total,
+                       "age_band": age_band(row["age"], age_band_boundaries),
+                       "number_reads": row.get("number_reads", ""), "number_bases": row.get("number_bases", "")})
     if len(labels)<30:
         raise ValueError("insufficient eligible independent controls")
+    counts = stratum_counts(labels, stratify_by, age_band_boundaries)
+    for key, count in sorted(counts.items()):
+        print(json.dumps({"stratum": json.loads(key), "n_subjects": count,
+                          "available_before_self_exclusion": count >= 30}, ensure_ascii=False))
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".cmd-build-", dir=output.parent) as directory:
         stage = Path(directory)/"bundle";stage.mkdir(mode=0o750)
@@ -194,7 +208,9 @@ def build(package, metadata, catalog, source_dir, output, r_library=None):
                     "target_profiler_version": cmd.TARGET_VERSION,
                     "normalization": cmd.NORMALIZATION, "unit": "%", "phenotype": cmd.PHENOTYPE,
                     "body_site": "stool", "complete_species_profiles": True, "feature_level": "species",
-                    "minimum_subjects": 30, "stratify_by": [], "age_window_years": 10,
+                    "minimum_subjects": 30, "stratify_by": list(stratify_by),
+                    "age_band_boundaries": list(age_band_boundaries), "stratum_subject_counts": counts,
+                    "depth_distribution": depth_distribution(labels),
                     "selection_criteria": {"minimum_age": 18, "disease": "healthy", "study_condition": "control",
                         "antibiotics_current_use": "no", "exclude_known_pregnant_or_lactating": True,
                         "deduplicate_by": ["study_id", "subject_id"], "repeat_selection": "earliest eligible valid profile then sample_id"},
@@ -219,8 +235,12 @@ def main():
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--r-library", type=Path)
+    parser.add_argument("--stratify-by", nargs="+", choices=("country", "sex", "age_band"), default=[])
+    parser.add_argument("--age-band-boundaries", nargs="+", type=float, default=list(DEFAULT_AGE_BANDS),
+                        help="Ascending age-band lower bounds, beginning with 18; final band is open-ended")
     args = parser.parse_args()
-    result = build(args.package_dir, args.metadata, args.catalog, args.source_dir, args.output, args.r_library)
+    result = build(args.package_dir, args.metadata, args.catalog, args.source_dir, args.output, args.r_library,
+                   stratify_by=args.stratify_by, age_band_boundaries=args.age_band_boundaries)
     print(json.dumps(result))
 
 

@@ -11,7 +11,7 @@ from typing import Tuple, List, Dict
 
 from fpdf import FPDF
 from wgs_fmt_platform.paths import (
-    legacy_output_root, project_path, runtime_path, species_reference_path,
+    legacy_output_root, project_path, runtime_path,
 )
 
 # ============================================================================
@@ -36,10 +36,6 @@ DRUG_ANALYSIS_DIR = os.path.join(BASE_DIR, "07_drug_analysis")
 DRUG_ANALYSIS_FILE = os.path.join(DRUG_ANALYSIS_DIR, "drug_analysis_report_{sample}.tsv")
 METABOLITE_DRUG_FILE = os.path.join(DRUG_ANALYSIS_DIR, "metabolite_drug_links.tsv")
 METHOD_COMPARISON_FILE = os.path.join(DRUG_ANALYSIS_DIR, "method_comparison_summary.tsv")
-SPECIES_REF_FILE = os.path.join(DATA_DIR, "species_matrix_P5_P95.csv")
-SPECIES_REF_EXTENDED = str(species_reference_path())
-SPECIES_STATS_FILE = os.path.join(DATA_DIR, "health_species_stats.csv")
-GENUS_STATS_FILE = os.path.join(DATA_DIR, "health_genus_stats.csv")
 PHENOTYPE_FILE = os.path.join(DATA_DIR, "phenotype_species_stats.csv")
 
 
@@ -47,12 +43,6 @@ PHENOTYPE_FILE = os.path.join(DATA_DIR, "phenotype_species_stats.csv")
 # 工具函数
 # ============================================================================
 
-def parse_p5p95(range_str: str) -> Tuple[float, float]:
-    try:
-        parts = range_str.strip().split('-')
-        return float(parts[0]), float(parts[1])
-    except:
-        return 0.0, 0.0
 
 def metaphlan_name_to_species(metaphlan_name: str) -> str:
     parts = metaphlan_name.split('|')
@@ -68,16 +58,6 @@ def metaphlan_name_to_genus(metaphlan_name: str) -> str:
             return part[3:].strip()
     return ''
 
-def get_health_status(abundance: float, p5: float, p95: float) -> Tuple[str, str]:
-    if abundance == 0:
-        return "absent", "未检出"
-    if p5 == 0 and p95 == 0:
-        return "unknown", "无参考"
-    if abundance < p5:
-        return "low", "偏低"
-    if abundance > p95:
-        return "high", "偏高"
-    return "normal", "正常"
 
 def format_pathway_name(pw_name: str) -> str:
     if ':' in pw_name:

@@ -228,12 +228,12 @@ def bind_table(document, block, data=None):
     if block["id"] == "2.4.t1":
         from .chapter_two import cooperation_table
         return cooperation_table(document)
-    mho = data.inputs.get("healthy_comparison") or {}
-    if mho and block["id"] == "1.4.t1":
+    population = data.inputs.get("healthy_comparison") or {}
+    if population and block["id"] == "1.4.t1":
         rows = data.group("healthy_species")[:8]
         return [[r["label"], r["result_text"], r["reference_text"], _pick(r, "percentile"),
                  {"above": "高于 " + reference_labels.short(data.inputs) + " 参考", "below": "低于 " + reference_labels.short(data.inputs) + " 参考", "within": reference_labels.short(data.inputs) + " 区间内"}.get(r["comparison"], "暂不判定高低")]
-                for r in rows] or [[reference_labels.short(data.inputs) + " 独立对照", "未比较", (mho.get("audit") or {}).get("reason_cn", "对照不可用"), "未提供", "暂不判定"]]
+                for r in rows] or [[reference_labels.short(data.inputs) + " 独立对照", "未比较", (population.get("audit") or {}).get("reason_cn", "对照不可用"), "未提供", "暂不判定"]]
     direct = _rows(data, headers)
     if direct and ident_not_special(block["id"]):
         return [[clean(v) for v in row] for row in direct]
@@ -329,7 +329,7 @@ def bind_table(document, block, data=None):
         even = data.group("div_evenness")
         shannon = data.group("div_shannon")
         parent = data.inputs.get("diversity") or {}
-        refs = [] if mho else data.group("div_reference")
+        refs = [] if population else data.group("div_reference")
         result = []
         for label, key, items in (
             ("观测物种数", "richness", observed),
@@ -349,7 +349,7 @@ def bind_table(document, block, data=None):
             result.append(
                 [label, value, ref.get("reference_text", "未提供"), _pick(ref, "percentile")]
             )
-        if mho:
+        if population:
             for row in data.group("healthy_diversity"):
                 result.append([reference_labels.profile(data.inputs) + " · " + row["label"], row["result_text"],
                                row["reference_text"], _pick(row, "percentile")])
@@ -854,13 +854,14 @@ def paragraph(document, block, chapter):
             return community_paragraph(document, interpretation=True)
     s = block["text"].replace("图中位置仅用于版式展示。", "")
     sub = block["sub"]
-    mho = document.get("template_inputs", {}).get("healthy_comparison") or {}
-    if mho and (chapter, sub) in {(1, 4), (2, 1)}:
-        audit = mho.get("audit") or {}
+    population = document.get("template_inputs", {}).get("healthy_comparison") or {}
+    if population and (chapter, sub) in {(1, 4), (2, 1)}:
+        audit = population.get("audit") or {}
         if s.startswith("分析流程与参考版本") or s.startswith("指标介绍与解读"):
             return (f"分析流程与参考版本：{reference_labels.method(document.get('template_inputs', {}))}。"
                     "参考与待测谱均按已分类物种总和归一化至 100%。主分析数值与独立谱分别展示。"
-                    + " ".join(audit.get("limitations", [])))
+                    + " ".join(audit.get("limitations", []))
+                    + " ".join(reference_labels.audit_summary(document.get("template_inputs", {}))))
         if s.startswith("参考人群"):
             return (f"参考人群：{reference_labels.title(document.get('template_inputs', {}))}；独立人数：{audit.get('n_subjects', '未建立')}；"
                     f"匹配条件：{'、'.join(audit.get('stratify_by', [])) or '总体（未匹配人口学）'}；"

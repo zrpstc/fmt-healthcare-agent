@@ -28,6 +28,8 @@ def init_data() -> None:
     database_url = os.environ.get("WGS_DATABASE_URL", "")
     external_database = bool(database_url and not database_url.startswith("sqlite:"))
     os.umask(0o077)
+    # Reference databases are provisioned through the configured resource paths.
+    # Do not mkdir the legacy databases location, which may be an obsolete symlink.
     for directory in [
         root,
         *(
@@ -36,7 +38,6 @@ def init_data() -> None:
                 "logs",
                 "run",
                 "traces",
-                "databases",
                 "artifacts",
                 "model-registry",
                 "models",

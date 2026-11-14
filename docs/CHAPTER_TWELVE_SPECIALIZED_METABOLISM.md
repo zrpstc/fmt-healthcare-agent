@@ -54,7 +54,7 @@
 回填持有样本与报告锁，备份原分析并原子发布，保留其他章节和手动提供的专项结果。缓存同时核对输入文件、单位、目录版本和参考映射指纹。
 API由root运行的部署可执行：
 
-    sudo bash deploy/activate-specialized-metabolism.sh test_complete_data
+    sudo bash deploy/restart.sh test_complete_data
 
 随后由正常报告生成入口重建正式报告。原Word第13章内部ID保持稳定，公开编号仍为第12章。
 

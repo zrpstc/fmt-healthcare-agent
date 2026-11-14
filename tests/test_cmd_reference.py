@@ -106,7 +106,7 @@ def test_cmd_presentation_names_current_population():
     assert reference_labels.profile(data)=="cMD 独立谱"
     assert reference_labels.title(data)==cmd.POPULATION
     assert "v30" in reference_labels.method(data)
-    assert reference_labels.profile({})=="MHNO 独立谱"
+    assert reference_labels.profile({})=="cMD 独立谱"
 
 
 def test_cmd_large_ordination_has_explicit_deterministic_subset(monkeypatch):

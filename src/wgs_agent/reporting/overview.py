@@ -77,12 +77,13 @@ def select_findings(document: dict, limit: int = MAX_FINDINGS) -> list[dict]:
             if kind in {"disease", "prediction", "symptom", "diet", "nutrition"}:
                 continue  # No heuristic association score or questionnaire value is a health threshold.
             value, p5, p95 = (finite(row.get(k)) for k in ("value", "p5", "p95"))
-            if None in (value, p5, p95) or p95 <= p5 or value < 0:
+            zero_missing = kind == "healthy_species" and row.get("status") == "not_detected" and not row.get("borderline")
+            if None in (value, p5, p95) or (p95 <= p5 and not zero_missing) or value < 0:
                 continue
             focused = any(t.startswith("key_taxa.") for t in topics)
             rank = 2 if row.get("measurement_type") == "measured" else 3 if focused else 4
             source = "1.4" if kind in {"species", "healthy_species"} else source or "2.1"
-            deviation = (value - p95 if value > p95 else p5 - value) / (p95 - p5)
+            deviation = (value - p95 if value > p95 else p5 - value) / max(p95 - p5, abs(p5) if zero_missing else 0, 1e-15)
             reason = "偏离所用参考人群区间；健康含义需结合具体项目、参考人群适用性及背景解释。"
         if rank is None:
             continue

@@ -77,7 +77,7 @@ embedding 服务；若日后 LitKG 自身启用语义检索，适配层按其实
 
 ```bash
 cd /home/zhanghaiyang/fmt-healthcare-agent
-sudo bash deploy/restart-report-api.sh
+sudo bash deploy/restart.sh
 ```
 
 激活前相关源码和 `.env` 备份放在 `tmp/litkg-integration-20261024/backup/`；

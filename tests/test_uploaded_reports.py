@@ -1,3 +1,4 @@
+from test_cmd_population import cohort
 """Completed uploads must be able to create their first report without an analysis JSON."""
 
 import json
@@ -112,27 +113,28 @@ def test_first_report_bootstraps_real_artifacts_from_uploaded_profiles(runtime):
     assert before == (taxonomy.read_bytes(), pathways.read_bytes())
 
 
-def test_first_uploaded_report_automatically_compares_existing_reference(runtime, monkeypatch):
+def test_first_uploaded_report_automatically_compares_cmd_reference(runtime, monkeypatch, cohort):
     upload(runtime)
     profiles(runtime)
-    reference = runtime / "reference/species_reference_overall.csv"
-    reference.parent.mkdir(parents=True)
-    reference.write_text(
-        "species,p5,p95,median,n_samples,cond_n\n"
-        "Bifidobacterium longum,1,10,3,120,100\n"
-        "Bifidobacterium breve,0,50,10,120,80\n"
-    )
-    monkeypatch.setenv("WGS_SPECIES_REFERENCE_FILE", str(reference))
+    _, cmd_profiles, _ = cohort
+    folder = cmd_profiles / "SYNTHETIC"
+    folder.mkdir()
+    original = cmd_profiles / "TARGET"
+    (folder / "profile.tsv").write_bytes((original / "profile.tsv").read_bytes())
+    provenance = json.loads((original / "provenance.json").read_text())
+    provenance["sample_id"] = "SYNTHETIC"
+    (folder / "provenance.json").write_text(json.dumps(provenance))
     with TestClient(main.app) as client:
         response = client.post("/api/reports/SYNTHETIC/generate", json={"confirmed": True})
         assert response.status_code == 200, response.text
     data = json.loads((runtime / "results/SYNTHETIC_analysis.json").read_text())
-    assert data["species"]["n_high"] == data["species"]["n_normal"] == 1
-    assert data["species"]["n_unknown"] == 0
-    assert data["species"]["species_list"][0]["n_reference"] == 120
+    assert data["species"]["n_high"] == data["species"].get("n_normal", 0) == 0
+    assert data["healthy_comparison"]["audit"]["provider"] == "cmd"
+    assert data["healthy_comparison"]["audit"]["n_subjects"] == 35
     document = json.loads((runtime / "results/SYNTHETIC_report.json").read_text())
-    assert document["evidence"]["S1"]["comparison"] == "above"
-    assert "参考样本 n=120" in (runtime / "results/SYNTHETIC_health_report.md").read_text()
+    assert document["evidence"]["S1"]["comparison"] == "unknown"
+    assert any(r.get("kind") == "healthy_species" for r in document["evidence"].values())
+
 
 
 @pytest.mark.parametrize("problem", ["running", "missing", "invalid_taxonomy", "empty_functions"])

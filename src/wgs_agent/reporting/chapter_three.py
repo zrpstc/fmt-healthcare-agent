@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw
 
 from .inputs import finite
 from .reference import species_key
+from .population_reference import percentile
 
 FUNCTION_PREDICATES = {
     "PRODUCES", "CONSUMES", "UTILIZES", "DEGRADES", "FERMENTS", "TRANSFORMS",
@@ -188,7 +189,7 @@ def reference_for(document, row):
         if pct is None and isinstance(r.get("_distribution"), list) and observed is not None:
             values = [finite(v) for v in r["_distribution"]]
             if values and all(v is not None and v >= 0 for v in values):
-                pct = 100 * (sum(v < observed for v in values) + .5 * sum(v == observed for v in values)) / len(values)
+                pct = percentile(sorted(values), observed)
         if pct is not None and 0 <= pct <= 100 and observed is not None and observed >= 0:
             return {"percentile": pct, "value": observed, "scope": "independent_profile", "n_reference": r.get("n_subjects", r.get("n_reference"))}
     return None

@@ -63,7 +63,7 @@ def _get_cn_name(raw_name: str) -> str:
 def _load_and_compare(
     sample_id: str,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
-    """加载物种数据并完成参考对比（避免每个工具重复调用）"""
+    """加载主分析物种；健康比较由独立cMD工具完成。"""
     from wgs_agent.pipeline.report_data import (
         compare_species_with_reference,
         load_species_data,
@@ -296,9 +296,7 @@ class LoadSpeciesDataTool(BaseTool):
             # 可读摘要
             text = (
                 f"样本 {sid}: 共检测 {stats['n_total']} 种物种\n"
-                f"  正常: {stats['n_normal']} 种 | "
-                f"偏高: {stats['n_high']} 种 | "
-                f"偏低: {stats['n_low']} 种\n\n"
+                "主分析谱不直接判健康高低；cMD对照请使用compare_reference。\n\n"
                 f"Top 10 丰度物种:\n"
                 + "\n".join(
                     f"  {s['species']} ({s['chinese_name']}) "
@@ -364,7 +362,7 @@ class LoadSpeciesDataTool(BaseTool):
 
 class CompareReferenceTool(BaseTool):
     name = "compare_reference"
-    description = "将样本物种丰度与健康人群参考范围对比，返回所有异常物种及偏差值。"
+    description = "以独立MetaPhlAn3/v30待测谱比较cMD健康参考，返回置信区间、越界基线及不可用原因。"
     input_schema: dict[str, object] = {
         "type": "object",
         "properties": {
@@ -377,43 +375,32 @@ class CompareReferenceTool(BaseTool):
 
     async def invoke(self, params: dict[str, object]) -> ToolResult:
         try:
+            from wgs_agent.pipeline.cmd_workflow import _metadata
+            from wgs_agent.reporting.population_reference import abnormal, valid_sample_id
+            from wgs_agent.reporting.reference import refresh_reference_comparisons, STATUS_LABELS
+            from wgs_agent.reporting.reference_labels import audit_summary
             sid = str(params["sample_id"])
+            metadata = _metadata(sid, None, None) if valid_sample_id(sid) else {}
+            result = refresh_reference_comparisons({"sample_id": sid, "metadata": metadata}, {})
+            comparison = result["healthy_comparison"]
+            audit = comparison["audit"]
+            species_list = [{**row, "chinese_name": _get_cn_name(row["species"]),
+                             "status_cn": STATUS_LABELS.get(row["status"], "未建立健康对照")}
+                            for row in comparison["species"]]
             species_filter = params.get("species_name")
-
-            comparison, _, _ = _load_and_compare(sid)
-            species_list = _build_species_list(comparison)
-
-            if species_filter:
-                species_list = [
-                    s
-                    for s in species_list
-                    if str(species_filter).lower() in s["species"].lower()
-                ]
+            if species_filter and audit["status"] == "available":
+                species_list = [row for row in species_list if str(species_filter).casefold() in row["species"].casefold()]
                 if not species_list:
                     return ToolResult(content=f"未找到物种: {species_filter}", is_error=True)
-
-            abnormal = [s for s in species_list if s["status"] in ("high", "low")]
-            text = (
-                f"样本 {sid} 异常物种 ({len(abnormal)}/{len(species_list)}):\n\n"
-                + "\n".join(
-                    f"  {s['species']} ({s['chinese_name']}) "
-                    f": {s['abundance']:.4f}% [{s['status_cn']}], "
-                    f"参考 P5-P95: {s['p5']:.4f}-{s['p95']:.4f}, "
-                    f"偏差: {s['deviation']}"
-                    for s in abnormal[:20]
-                )
-            )
-
-            return _make_result(
-                text,
-                {
-                    "sample_id": sid,
-                    "abnormal_species": abnormal,
-                    "total_species": len(species_list),
-                    "n_abnormal": len(abnormal),
-                },
-            )
-
+            outliers = [row for row in species_list if abnormal(row)]
+            text = "\n".join(audit_summary({"healthy_comparison": comparison}))
+            if audit["status"] == "available":
+                text += f"\n查询范围内确认越界{len(outliers)}/{len(species_list)}个物种。"
+            return _make_result(text, {"sample_id": sid, "comparison": species_list,
+                "abnormal_species": outliers, "total_species": len(species_list),
+                "n_abnormal": len(outliers) if audit["status"] == "available" else None,
+                "reference": audit, "healthy_comparison": comparison,
+                "outlier_baseline": comparison.get("outlier_baseline")})
         except Exception as exc:
             return ToolResult(content=f"物种对比失败: {exc}", is_error=True, error_type="runtime_error")
 
