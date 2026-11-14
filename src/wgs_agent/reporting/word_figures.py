@@ -426,6 +426,33 @@ def _text(draw, xy, text, font, fill="#30343A", width=None, anchor="la", max_lin
         draw.text((xy[0], xy[1] + i * step), line, font=font, fill=fill, anchor=anchor)
 
 
+def draw_tier_scale(rows, width=1800):
+    """Shared percentile scale; abundance never determines the dot position."""
+    from .consumer_format import pct, percentile_phrase, tier
+    image = Image.new("RGB", (width, max(160, 35 + 104 * len(rows))), "white")
+    draw = ImageDraw.Draw(image)
+    left, right = int(width * .43), width - 54
+    for index, row in enumerate(rows):
+        y = 14 + index * 104
+        p = finite(row.get("percentile"))
+        if p is None or not 0 <= p <= 100:
+            continue
+        label = row.get("tier_label") or tier(p, row.get("borderline", False))
+        color = "#4F7C80" if label == "常见" else "#B47A24"
+        _text(draw, (24, y), row.get("display_label", ""), _font(30), width=left - 45, max_lines=1)
+        _text(draw, (24, y + 45), pct(row["value"]) + "  " + label, _font(27), fill=color)
+        draw.rounded_rectangle((left, y + 13, right, y + 37), radius=10, fill="#E9EDEF")
+        span = right - left
+        draw.rectangle((left + span*.25, y+13, left + span*.75, y+37), fill="#C5DEDA")
+        x = left + span*p/100
+        draw.ellipse((x-11, y+14, x+11, y+36), fill=color, outline=color, width=5 if label.startswith("明显") else 1)
+        if label.startswith("明显"):
+            draw.ellipse((x-15, y+10, x+15, y+40), outline=color, width=3)
+        _text(draw, (left, y+54), percentile_phrase(p), _font(26), fill="#46565B", width=span, max_lines=1)
+    return image
+
+
+
 def draw_chart(spec, payload, width):
     if payload.get("chapter_eight_mode"):
         from .chapter_eight import draw_chart as draw_chapter_eight

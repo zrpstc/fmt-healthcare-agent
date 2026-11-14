@@ -104,4 +104,19 @@ def render_bibliographies(document: dict) -> list[str]:
     for module in modules:
         output.append(f"#### {module['title']}")
         output.extend(f"[{i}] {row['citation']}" for i, row in enumerate(module["references"], 1))
+    sources = document.get("consumer", {}).get("sources", [])
+    if sources:
+        output.append("#### 消费者术语解释来源")
+        references = []
+        for index, source in enumerate(sources, 1001):
+            raw = str(source["id_or_url"])
+            row = {"title": source["title"], "year": source.get("year")}
+            if raw.startswith("https://"):
+                row["url"] = raw
+            elif source["type"] == "pubmed" and raw.isdigit():
+                row["pmid"] = raw
+            label = citation(row)
+            output.append(f"[{index}] {label}")
+            references.append({"number": index, "citation": label, "source": source})
+        modules.append({"id": "consumer_glossary", "title": "消费者术语解释来源", "references": references})
     return output

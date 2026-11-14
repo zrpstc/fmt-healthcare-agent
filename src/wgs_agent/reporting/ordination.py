@@ -118,7 +118,8 @@ def composition_summary(document):
     observed.sort(key=lambda row: (-row[1], row[0]))
     if not observed:
         return "本次未提供可核对的菌属组成，暂不判断组成倾向。群落位置与参考差异见 2.2；目前未完成可靠肠型分类。"
-    labels = [name.replace("g__", "").replace("_", " ") for name, _ in observed[:3]]
+    from .taxon_labels import display_name
+    labels = [display_name({"name": name}) for name, _ in observed[:3]]
     return "本次检出丰度较高的菌属依次为：" + "、".join(labels) + "。这是群落组成的描述，目前未完成可靠肠型分类。群落位置与参考差异统一见 2.2。"
 
 

@@ -24,6 +24,22 @@ Ruminococcus torques 应译为扭曲瘤胃球菌，不得误译为扭矩瘤胃�
 不要添加数字、健康解释或分类学推断。label只含中文及中文标点，不超过32字。
 只返回JSON：{"items":[{"id":"原id","label":"中文分类名"}]}。"""
 FALLBACK = {
+    'bacteroidetes': '拟杆菌门', 'proteobacteria': '变形菌门',
+    'actinobacteria': '放线菌门', 'verrucomicrobia': '疣微菌门',
+    'fusobacteriota': '梭杆菌门', 'fusobacteria': '梭杆菌门',
+    'desulfobacterota': '脱硫杆菌门', 'methanobacteriota': '甲烷杆菌门（古菌）',
+    'ascomycota': '子囊菌门', 'euryarchaeota': '广古菌门（古菌）',
+    'veillonella': '韦荣球菌属', 'prevotella': '普雷沃菌属',
+    'faecalibacterium': '粪杆菌属', 'fusobacterium': '梭杆菌属',
+    'limosilactobacillus': '黏液乳杆菌属',
+    'veillonella rogosae': '罗氏韦荣球菌',
+    'veillonella dispar': '不同韦荣球菌', 'veillonella infantium': '婴儿韦荣球菌',
+    'bacteroides fragilis': '脆弱拟杆菌', 'prevotella corporis': '体普雷沃菌',
+    'fusobacterium animalis': '动物梭杆菌', 'fusobacterium nucleatum': '具核梭杆菌',
+    'limosilactobacillus fermentum': '发酵黏液乳杆菌',
+    'lactobacillus fermentum': '发酵乳杆菌', 'roseburia hominis': '人罗斯拜瑞菌',
+    'bifidobacterium adolescentis': '青春双歧杆菌',
+    'clostridioides difficile': '艰难梭菌', 'methanobrevibacter smithii': '史密斯甲烷短杆菌',
     'bacteroidota': '拟杆菌门',
     'pseudomonadota': '变形菌门',
     'actinomycetota': '放线菌门',
@@ -151,6 +167,26 @@ def display_taxon(document, row, *, label_field="overview_taxon_labels"):
     name = description["name"]
     label = name if _valid_label(name) else FALLBACK.get(description["name_key"], "")
     return _assemble(description, label or ("菌种" if not description["unnamed"] else ""), "fallback")
+
+
+def display_name(row, first_mention=False):
+    """Consumer name; callers own the report-order first-mention registry."""
+    raw = str(row.get("species") or row.get("name") or row.get("label") or "")
+    raw = re.sub(r"(?:^|\|)[kpcofgs]__", " ", raw).strip().replace("_", " ")
+    raw = re.sub(r"\s+ex\s+.*$", "", raw, flags=re.I)
+    label = row.get("display_label") or row.get("chinese_name")
+    if not _valid_label(label):
+        label = FALLBACK.get(species_key(raw), "")
+    if re.search(r"SGB\s*\d+|GGB\s*\d+|unclassified|uncultured|unidentified", raw, re.I):
+        lineage = row.get("taxonomy_lineage") or row.get("lineage") or ""
+        genus = re.search(r"g__([^|]+)", lineage)
+        genus = FALLBACK.get(species_key(genus[1]), "") if genus else ""
+        return "未命名菌" + (f"（{genus}相关）" if genus else "")
+    label = label if _valid_label(label) else raw if _valid_label(raw) else "未命名菌"
+    if first_mention and raw and re.fullmatch(r"[A-Za-z][A-Za-z .()-]*", raw) and label != "未命名菌":
+        latin = raw[0].upper() + raw[1:]
+        return f"{label}（*{latin}*）"
+    return label
 
 
 def translate_overview_taxa(document, config, *, post=None, fallback_config=None, rows=None, label_field="overview_taxon_labels", audit_field="overview_taxon_translation"):

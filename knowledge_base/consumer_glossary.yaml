@@ -1,0 +1,362 @@
+{
+  "version": "consumer-glossary-v1",
+  "entries": [
+    {
+      "term_id": "relative_abundance",
+      "kind": "concept",
+      "display_name": "相对丰度",
+      "latin": "",
+      "one_liner": "某种菌占全部微生物的比例，不等于它的绝对数量。",
+      "detail": "比例升高也可能来自其他菌减少，不能据此推断总菌量。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-editorial-v1",
+          "title": "健康报告消费者术语编辑规则",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "taxonomic_ranks",
+      "kind": "concept",
+      "display_name": "门、属、种",
+      "latin": "",
+      "one_liner": "门是大类，属是较小的类，种是更具体的成员。",
+      "detail": "分类层级帮助描述群落组成，各层级的比例分别统计。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-editorial-v1",
+          "title": "健康报告消费者术语编辑规则",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "reference_population",
+      "kind": "concept",
+      "display_name": "参考人群",
+      "latin": "",
+      "one_liner": "用于比较的一组人，帮助了解您的结果是否常见。",
+      "detail": "这里的健康标签来自公开研究；人群差异、采样和分析方法都可能影响比较。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-editorial-v1",
+          "title": "健康报告消费者术语编辑规则",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "enterotype",
+      "kind": "concept",
+      "display_name": "肠型",
+      "latin": "",
+      "one_liner": "按整体菌群组成作出的描述性分类，不代表好坏。",
+      "detail": "需要经过验证的参考属谱与分类方法，不能只凭占比最高的菌属判定。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-editorial-v1",
+          "title": "健康报告消费者术语编辑规则",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "bacillota",
+      "kind": "phylum",
+      "display_name": "厚壁菌门",
+      "latin": "Bacillota",
+      "one_liner": "成员多样，包括粪杆菌和韦荣球菌等。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Bacillota",
+          "title": "NCBI Taxonomy: Bacillota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "bacteroidota",
+      "kind": "phylum",
+      "display_name": "拟杆菌门",
+      "latin": "Bacteroidota",
+      "one_liner": "包含拟杆菌和普雷沃菌等常见成员。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Bacteroidota",
+          "title": "NCBI Taxonomy: Bacteroidota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "pseudomonadota",
+      "kind": "phylum",
+      "display_name": "变形菌门",
+      "latin": "Pseudomonadota",
+      "one_liner": "包含埃希菌等成员，具体作用因菌种而异。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Pseudomonadota",
+          "title": "NCBI Taxonomy: Pseudomonadota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "actinomycetota",
+      "kind": "phylum",
+      "display_name": "放线菌门",
+      "latin": "Actinomycetota",
+      "one_liner": "包含双歧杆菌等成员。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Actinomycetota",
+          "title": "NCBI Taxonomy: Actinomycetota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "verrucomicrobiota",
+      "kind": "phylum",
+      "display_name": "疣微菌门",
+      "latin": "Verrucomicrobiota",
+      "one_liner": "包含阿克曼菌等成员。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Verrucomicrobiota",
+          "title": "NCBI Taxonomy: Verrucomicrobiota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "fusobacteriota",
+      "kind": "phylum",
+      "display_name": "梭杆菌门",
+      "latin": "Fusobacteriota",
+      "one_liner": "包含梭杆菌等成员。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Fusobacteriota",
+          "title": "NCBI Taxonomy: Fusobacteriota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "desulfobacterota",
+      "kind": "phylum",
+      "display_name": "脱硫杆菌门",
+      "latin": "Desulfobacterota",
+      "one_liner": "包含多种参与含硫物质转化的细菌。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Desulfobacterota",
+          "title": "NCBI Taxonomy: Desulfobacterota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "methanobacteriota",
+      "kind": "phylum",
+      "display_name": "甲烷杆菌门（古菌）",
+      "latin": "Methanobacteriota",
+      "one_liner": "包含产生甲烷的古菌，古菌与细菌不同。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Methanobacteriota",
+          "title": "NCBI Taxonomy: Methanobacteriota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "ascomycota",
+      "kind": "phylum",
+      "display_name": "子囊菌门",
+      "latin": "Ascomycota",
+      "one_liner": "这是一大类真菌，包含部分酵母。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=Ascomycota",
+          "title": "NCBI Taxonomy: Ascomycota",
+          "year": null
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "veillonella rogosae",
+      "kind": "taxon",
+      "display_name": "罗氏韦荣球菌",
+      "latin": "Veillonella rogosae",
+      "one_liner": "可产生乙酸和丙酸，最早从口腔菌斑中分离。",
+      "detail": "",
+      "evidence_scope": "species",
+      "sources": [
+        {
+          "type": "pubmed",
+          "id_or_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2884930/",
+          "title": "Veillonella rogosae sp. nov., an anaerobic, Gram-negative coccus isolated from dental plaque",
+          "year": 2008
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "bacteroides fragilis",
+      "kind": "taxon",
+      "display_name": "脆弱拟杆菌",
+      "latin": "Bacteroides fragilis",
+      "one_liner": "能利用部分复杂糖类，是肠道常见成员之一。",
+      "detail": "",
+      "evidence_scope": "species",
+      "sources": [
+        {
+          "type": "pubmed",
+          "id_or_url": "https://pubmed.ncbi.nlm.nih.gov/15466707/",
+          "title": "Genomic analysis of Bacteroides fragilis reveals extensive DNA inversions regulating cell surface adaptation",
+          "year": 2004
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "faecalibacterium prausnitzii",
+      "kind": "taxon",
+      "display_name": "普拉梭菌",
+      "latin": "Faecalibacterium prausnitzii",
+      "one_liner": "部分菌株能利用乙酸参与丁酸的生成。",
+      "detail": "",
+      "evidence_scope": "strain",
+      "sources": [
+        {
+          "type": "pubmed",
+          "id_or_url": "https://pubmed.ncbi.nlm.nih.gov/15182395/",
+          "title": "Contribution of acetate to butyrate formation by human faecal bacteria",
+          "year": 2004
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "escherichia coli",
+      "kind": "taxon",
+      "display_name": "大肠埃希菌",
+      "latin": "Escherichia coli",
+      "one_liner": "部分菌株能在有氧或缺氧环境中生长。",
+      "detail": "",
+      "evidence_scope": "strain",
+      "sources": [
+        {
+          "type": "pubmed",
+          "id_or_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2044527/",
+          "title": "Respiration of Escherichia coli in the Mouse Intestine",
+          "year": 2007
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    }
+  ]
+}
