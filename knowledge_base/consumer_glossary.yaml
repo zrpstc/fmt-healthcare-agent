@@ -293,7 +293,10 @@
       "review_status": "approved",
       "version": "consumer-glossary-v1",
       "generated_at": "2026-11-14T00:00:00Z",
-      "model": "curated-editorial"
+      "model": "curated-editorial",
+      "tags": [
+        "lactate_utilizer"
+      ]
     },
     {
       "term_id": "bacteroides fragilis",
@@ -335,7 +338,10 @@
       "review_status": "approved",
       "version": "consumer-glossary-v1",
       "generated_at": "2026-11-14T00:00:00Z",
-      "model": "curated-editorial"
+      "model": "curated-editorial",
+      "tags": [
+        "butyrate_producer"
+      ]
     },
     {
       "term_id": "escherichia coli",
@@ -351,6 +357,216 @@
           "id_or_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2044527/",
           "title": "Respiration of Escherichia coli in the Mouse Intestine",
           "year": 2007
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "diversity",
+      "kind": "concept",
+      "display_name": "多样性",
+      "latin": "",
+      "one_liner": "肠道里菌的种类有多丰富、分布有多均匀。研究中，多样性较高的菌群通常更稳定。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "richness",
+      "kind": "concept",
+      "display_name": "丰富度（菌种数）",
+      "latin": "",
+      "one_liner": "本次检测识别出的菌的种类数。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "shannon",
+      "kind": "concept",
+      "display_name": "Shannon 指数",
+      "latin": "",
+      "one_liner": "同时考虑种类多少和分布是否均匀的综合分数，数值越大，多样性越高。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "evenness",
+      "kind": "concept",
+      "display_name": "均衡度",
+      "latin": "",
+      "one_liner": "各种菌的数量是否接近；越均衡，越不容易由少数菌主导。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "functional_potential",
+      "kind": "concept",
+      "display_name": "功能潜力",
+      "latin": "",
+      "one_liner": "根据菌携带的基因推测它们「能做什么」，不代表实际做了多少。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "functional_backup",
+      "kind": "concept",
+      "display_name": "功能备份",
+      "latin": "",
+      "one_liner": "同一项工作由多种菌共同承担。某种菌减少时，其他菌仍可能接替。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "typicality",
+      "kind": "concept",
+      "display_name": "组成典型度",
+      "latin": "",
+      "one_liner": "您的菌群组成与健康人群整体的接近程度。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "fiber_stage",
+      "kind": "concept",
+      "display_name": "拆解膳食纤维和淀粉",
+      "latin": "",
+      "one_liner": "能够拆解膳食纤维和淀粉，为后续转化提供原料。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "lactate_stage",
+      "kind": "concept",
+      "display_name": "转化中间产物",
+      "latin": "",
+      "one_liner": "能够利用乳酸这一中间产物，参与后续代谢转化。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-14T00:00:00Z",
+      "model": "curated-editorial"
+    },
+    {
+      "term_id": "butyrate_stage",
+      "kind": "concept",
+      "display_name": "生成丁酸",
+      "latin": "",
+      "one_liner": "丁酸是肠道上皮细胞的重要能量来源。",
+      "detail": "",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch2-editorial-v1",
+          "title": "第2章消费者概念与阶段说明（用户批准）",
+          "year": 2026
         }
       ],
       "review_status": "approved",

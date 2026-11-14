@@ -32,6 +32,9 @@ def render_appendices(document):
         output.extend(["#### 第1章比较统计原始精度", table(["物种", "独立谱丰度", "P5", "P95", "经验百分位", "边界区间"],
             [[r.get("species") or r.get("label", ""), str(r.get("value")), str(r.get("p5")), str(r.get("p95")), str(r.get("percentile")),
               str(r.get("p5_ci95", ""))+" / "+str(r.get("p95_ci95", ""))] for r in comparison])])
+    from .consumer_chapter_two import appendix as chapter_two_appendix
+    if state.get("chapter_two"):
+        output.extend(chapter_two_appendix(document))
     output.append("### A2 术语表")
     entries = list(state.get("glossary", {}).values())
     if entries:

@@ -438,9 +438,9 @@ def draw_tier_scale(rows, width=1800):
         if p is None or not 0 <= p <= 100:
             continue
         label = row.get("tier_label") or tier(p, row.get("borderline", False))
-        color = "#4F7C80" if label == "常见" else "#B47A24"
+        color = row.get("color") or ("#4F7C80" if label == "常见" else "#B47A24")
         _text(draw, (24, y), row.get("display_label", ""), _font(30), width=left - 45, max_lines=1)
-        _text(draw, (24, y + 45), pct(row["value"]) + "  " + label, _font(27), fill=color)
+        _text(draw, (24, y + 45), (row.get("formatted_value") or pct(row["value"])) + "  " + label, _font(27), fill=color)
         draw.rounded_rectangle((left, y + 13, right, y + 37), radius=10, fill="#E9EDEF")
         span = right - left
         draw.rectangle((left + span*.25, y+13, left + span*.75, y+37), fill="#C5DEDA")
@@ -879,6 +879,10 @@ def render_word_figures(document, output_dir, *, preserve_existing_from=None):
         figures[key] = item["filename"]
     for chapter in contract()["chapters"]:
         if chapter["number"] == REMOVED_CHAPTER:
+            continue
+        if chapter["number"] == 2:
+            from .consumer_chapter_two import render_figures
+            figures.update(render_figures(document, output, manifest))
             continue
         for block in chapter["blocks"]:
             if block["type"] != "visuals":

@@ -6,7 +6,7 @@ import copy
 import json
 import os
 import re
-from .consumer_copy import CONSUMER_CHAPTERS, FORBIDDEN
+from .consumer_copy import CONSUMER_CHAPTERS, FORBIDDEN, CHAPTER_RULES
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Callable
 
@@ -32,7 +32,7 @@ WRITING_RULES = """写作与事实约束：
 12. 支持不足的解读宁可省略，程序会保留对应结果和固定分析方向。JSON之外不输出任何文字。"""
 
 
-CONSUMER_RULES = """仅对已启用消费者展示层的章节生效（当前word.1）：
+CONSUMER_RULES = """仅对已启用消费者展示层的章节生效：
 读者是普通消费者，称您。写1–2句，总共不超过80字，先给结论。
 只综合已经展示的结果，最多引用两个数字，且必须与consumer_displayed_values格式完全一致。
 此规则替代该章节写作规则3的禁数字要求。其余章节仍按原规则执行。
@@ -64,7 +64,7 @@ def _topics(sections: list[dict]) -> dict[str, dict]:
         topic["id"]: topic
         for section in sections
         for topic in section["topics"]
-        if topic["status"] != "missing"
+        if topic["status"] != "missing" and not topic.get("consumer_hidden")
     }
 
 
@@ -173,7 +173,7 @@ def build_prompt(document: dict, sections: list[dict]) -> str:
     for section in sections:
         topics = []
         for topic in section["topics"]:
-            if topic["status"] == "missing":
+            if topic["status"] == "missing" or topic.get("consumer_hidden"):
                 continue
             allowed = _allowed_ids(topic, evidence)
             topics.append({key: topic[key] for key in ("id", "title", "status", "finding", "note")})
@@ -249,6 +249,9 @@ def _text_error(item: dict, topic: dict, evidence: dict) -> str | None:
     consumer_topic = topic["id"].startswith("word.") and int(topic["id"].split(".")[1]) in CONSUMER_CHAPTERS
     if consumer_topic:
         error = consumer_text_error(interpretation, topic.get("consumer_displayed_values", []))
+        if not error and topic["id"].startswith("word.2."):
+            from .consumer_chapter_two import text_error
+            error = text_error(interpretation, int(topic["id"].split(".")[-1]))
         if error:
             return error
     elif re.search(r"\d|[％%]|百分之|[一二三四五六七八九十百]+成", names_removed):
@@ -486,7 +489,7 @@ def generate_narrative(
 
     def run_batch(batch: list[dict]) -> tuple[dict, list[str]]:
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT + ("\n" + CONSUMER_RULES if any(s["id"] == "word.1" for s in batch) else "")},
+            {"role": "system", "content": SYSTEM_PROMPT + ("\n" + CONSUMER_RULES if any(s["id"] in {f"word.{n}" for n in CONSUMER_CHAPTERS} for s in batch) else "") + ("\n" + CHAPTER_RULES[2] if any(s["id"] == "word.2" for s in batch) else "")},
             {"role": "user", "content": build_prompt(result, batch)},
         ]
         accepted, errors = {}, []

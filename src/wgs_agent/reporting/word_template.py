@@ -793,11 +793,31 @@ def narrative_sections(document):
                 topic["title"] = CONSUMER_COPY[1]["subsections"][index]
                 if index == 3:
                     topic["status"] = "missing"
+        if chapter == 2:
+            from .consumer_chapter_two import displayed_values
+            from .consumer_copy import WRITING_FOCUS, CHAPTERS as CONSUMER_COPY
+            merged = next((r for r in topics if r["id"] == "word.2.3"), None)
+            previous = next((r for r in topics if r["id"] == "word.2.4"), None)
+            if merged and previous:
+                for field in ("evidence_ids", "allowed_narrative_ids"):
+                    merged[field] = list(dict.fromkeys(merged.get(field, []) + previous.get(field, [])))
+                merged["source_subsections"] = ["2.3", "2.4"]
+                previous["consumer_hidden"] = True
+                previous["consumer_merged_into"] = "word.2.3"
+            for topic in topics:
+                index = int(topic["id"].split(".")[-1])
+                topic["writing_focus"] = [WRITING_FOCUS[topic["id"]]]
+                topic["consumer_displayed_values"] = displayed_values(document, min(index, 3))
+                if index in CONSUMER_COPY[2]["subsections"]:
+                    topic["title"] = CONSUMER_COPY[2]["subsections"][index]
         sections.append({"id": f"word.{chapter}", "title": f"{display_number(chapter)} {title}", "topics": topics})
     return sections
 
 
 def _narrative(document, chapter, sub):
+    if chapter == 2:
+        from .consumer_chapter_two import interpretation
+        return interpretation(document, sub) if sub <= 3 else ""
     if chapter == 1:
         from .consumer_chapter import interpretation
         return interpretation(document, sub)
@@ -834,6 +854,16 @@ def _narrative(document, chapter, sub):
 
 
 def paragraph(document, block, chapter):
+    if chapter == 2:
+        from .consumer_chapter_two import prepare, interpretation
+        sub, text = block.get("sub"), block.get("text", "")
+        if sub == 2 and text.startswith("参考人群"):
+            row = prepare(document).get("typicality")
+            return (row["tier"] + "；" + row["phrase"] + "。") if row else ""
+        if sub == 2 and text.startswith("结果解读"):
+            return interpretation(document, 2)
+        if sub in {3, 4} and text.startswith(("功能冗余", "贡献集中度")):
+            return ""
     if chapter == 13:
         from .chapter_twelve import paragraph_text
         override = paragraph_text(document, block, Data(document))
@@ -1018,6 +1048,10 @@ def render_body(document):
             continue
         if n == 1:
             from .consumer_chapter import render
+            output.extend(render(document))
+            continue
+        if n == 2:
+            from .consumer_chapter_two import render
             output.extend(render(document))
             continue
         if n == 5:

@@ -1,5 +1,5 @@
 """Presentation overrides; source Word contracts and evidence IDs stay immutable."""
-CONSUMER_CHAPTERS = {1}
+CONSUMER_CHAPTERS = {1, 2}
 CHAPTERS = {1: {
     "title": "您的肠道里住着哪些菌",
     "intro": "肠道里生活着数百种微生物。本章告诉您：哪几大类菌占多数，哪几种菌最多，和健康人相比有哪些不同。",
@@ -20,3 +20,17 @@ FORBIDDEN = (
     "P5", "P95", "经验百分位", "bootstrap", "MetaPhlAn", "cMD", "Jan25", "SGB",
 )
 EMPTY_SECTION = "本次检测未覆盖这部分内容。"
+
+CHAPTERS[2] = {
+    "title": "菌群的多样性与分工",
+    "intro": "健康的菌群通常种类丰富、分布均衡，各项工作也不只靠一两种菌。本章看三件事：菌的种类多不多，和健康人像不像，重要工作有没有「备份」。",
+    "subsections": {1: "菌的种类多不多", 2: "您的菌群和健康人像不像", 3: "菌群的分工与「备份」"},
+}
+WRITING_FOCUS.update({
+    "word.2.1": "说明种类多少与均衡度的组合含义，例如种类偏少但分布均衡；最多引用一个已展示数字。",
+    "word.2.2": "说明组成与健康人的接近程度；不推断原因，不涉及疾病。",
+    "word.2.3": "综合原word.2.3与word.2.4证据，点出哪些步骤由多种菌分担、哪些主要依赖少数菌；可点名一至两种菌。",
+    "word.2.4": "内容已合并至word.2.3，保留原证据和ID，不单独生成正文。",
+})
+FUNCTION_BACKUP = {"top_share_percent": 60, "minimum_named_contributors": 3}
+CHAPTER_RULES = {2: "讲功能一律使用能够或具备潜力，不写产生了多少或功能强弱。不写肠道生态失衡、菌群紊乱，不写某功能只由一种菌完成。第2.1节最多引用一个数字。"}

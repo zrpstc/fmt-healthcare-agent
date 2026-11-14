@@ -133,6 +133,8 @@ def prepare_chapter_two(document,config,*,post=None,fallback_config=None):
                            label_field="chapter_two_taxon_labels",audit_field="chapter_two_taxon_translation")
     document["chapter_two_results"]={"version":VERSION,"diversity":diversity_rows(document),
         "redundancy":redundancy_rows(document),"cooperation":cooperation_data(document)}
+    from .consumer_chapter_two import prepare
+    prepare(document)
 
 
 def redundancy_table(document):

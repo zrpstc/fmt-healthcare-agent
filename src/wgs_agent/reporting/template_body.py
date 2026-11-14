@@ -1128,6 +1128,10 @@ def prepare_presentation(document):
     document.setdefault("consumer", {}).setdefault("source_chapter_one_title", first["title"])
     first["title"] = CONSUMER_COPY[1]["title"]
     first["subsections"] = [f"1.{i} {CONSUMER_COPY[1]['subsections'][i]}" for i in [1, 2, 4]]
+    second = document["presentation"]["chapters"][1]
+    document["consumer"].setdefault("source_chapter_two_title", second["title"])
+    second["title"] = CONSUMER_COPY[2]["title"]
+    second["subsections"] = [f"2.{i} {CONSUMER_COPY[2]['subsections'][i]}" for i in [1, 2, 3]]
 
 
 def render_body(document):

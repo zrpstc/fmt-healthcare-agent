@@ -746,7 +746,7 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
                     FontFace(color=(52,101,164), size_pt=18)
                     if table_rows[0] == ["综合健康分", "失衡分", "模型肠龄"] else None
                 )
-                consumer_chapter = getattr(pdf, "chapter_title", "").startswith("1 ")
+                consumer_chapter = getattr(pdf, "chapter_title", "").startswith(("1 ", "2 "))
                 if consumer_chapter and table_rows[0] == ["菌名", "占比", "它是做什么的"]:
                     widths = (.42, .12, .46)
                 with pdf.table(col_widths=widths, line_height=5.0, padding=1.4, markdown=consumer_chapter,
@@ -794,7 +794,7 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
             elif next_image.startswith("|") and pdf.will_page_break(30):
                 pdf.add_page()
         if quote:
-            if getattr(pdf, "chapter_title", "").startswith("1 "):
+            if getattr(pdf, "chapter_title", "").startswith(("1 ", "2 ")):
                 pdf.set_fill_color(237, 246, 245)
                 pdf.set_text_color(55, 78, 82)
                 pdf.set_font("WgsCN", "", 9.5)
@@ -809,7 +809,7 @@ def _generate_fpdf_report(report_md: str, sample_id: str, output_path: str) -> s
                 pdf.set_font("WgsCN", "", 9.5)
                 pdf.multi_cell(0, 6, text, align="L", wrapmode="WORD", new_x="LMARGIN", new_y="NEXT")
             else:
-                pdf.multi_cell(0, 6, text, align="L", wrapmode="CHAR", markdown=getattr(pdf, "chapter_title", "").startswith("1 "), new_x="LMARGIN", new_y="NEXT")
+                pdf.multi_cell(0, 6, text, align="L", wrapmode="CHAR", markdown=getattr(pdf, "chapter_title", "").startswith(("1 ", "2 ")), new_x="LMARGIN", new_y="NEXT")
 
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     pdf.output(output_path)
