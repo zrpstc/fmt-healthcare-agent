@@ -71,6 +71,8 @@ class Config:
             raise RuntimeFailure('INVALID_PORT')
         if any(not 1 <= p <= 65535 for p in ports) or len(set(ports)) != len(ports):
             raise RuntimeFailure('INVALID_PORT')
+        if {8502, 8503}.intersection(ports):
+            raise RuntimeFailure("RETIRED_WORKSPACE_PORT")
         env.update(WGS_APP_ROOT=str(root), WGS_ENV_ROOT=str(python.parent.parent), WGS_WORKSPACE=str(workspace),
                    WGS_WEB_PORT=str(ports[0]), WGS_API_PORT=str(ports[1]), WGS_PORT=str(ports[2]),
                    PATH=str(python.parent) + ':' + env.get('PATH', '/usr/local/bin:/usr/bin:/bin'),

@@ -39,7 +39,7 @@ sudo bash deploy/status.sh
 服务启动后，打开报告中心，选择 `p2`，点击“生成报告”并确认。也可以在服务器调用：
 
 ```bash
-curl -fsS -X POST http://127.0.0.1:8503/api/reports/p2/generate \
+curl -fsS -X POST http://127.0.0.1:18503/api/reports/p2/generate \
   -H 'Content-Type: application/json' -d '{"confirmed":true}'
 ```
 

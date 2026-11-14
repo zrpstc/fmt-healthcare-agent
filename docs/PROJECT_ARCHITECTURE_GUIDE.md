@@ -13,8 +13,8 @@ WGS-FMT-Agent v2 是一个肠道菌群与 FMT 科研分析平台：浏览器使�
 
 ```mermaid
 flowchart LR
-    U[用户浏览器] -->|页面与交互| WEB[Next.js :8502]
-    WEB -->|/backend/* 反向代理| API[FastAPI :8503]
+    U[用户浏览器] -->|页面与交互| WEB[Next.js :18502]
+    WEB -->|/backend/* 反向代理| API[FastAPI :18503]
 
     API --> AUTH[用户与权限]
     API --> CHAT[会话与 Agent]
@@ -49,8 +49,8 @@ flowchart LR
 ```text
 WGS-FMT-Agent-v2/
 ├── apps/
-│   ├── workspace-web/          # Next.js 前端，端口 8502
-│   └── workspace-api/          # FastAPI 工作区接口，端口 8503
+│   ├── workspace-web/          # Next.js 前端，端口 18502
+│   └── workspace-api/          # FastAPI 工作区接口，端口 18503
 ├── src/
 │   ├── wgs_agent/              # Agent 循环、Skills、工具、分析与报告逻辑
 │   └── wgs_fmt_platform/       # 数据库、记忆、检索、模型、工作流等平台能力
@@ -86,15 +86,15 @@ WGS-FMT-Agent-v2/
 
 | 服务 | 技术 | 端口 | 职责 |
 |---|---|---:|---|
-| `workspace-web` | Next.js | 8502 | 登录、对话、样本、知识库、报告、设置页面 |
-| `workspace-api` | FastAPI | 8503 | REST API、数据库、Agent、文件和工作流接口 |
+| `workspace-web` | Next.js | 18502 | 登录、对话、样本、知识库、报告、设置页面 |
+| `workspace-api` | FastAPI | 18503 | REST API、数据库、Agent、文件和工作流接口 |
 | `agent-daemon` | Python Agent | 7438 | 可选后台 Agent 服务，配置模型密钥后启动 |
 | MySQL | SQL数据库 | 3306 | 正式环境的用户、会话和业务数据 |
 | Redis | 内存数据库 | 6379 | 短期/长期记忆缓存 |
 | Elasticsearch | 检索服务 | 9200 | 关键词、向量及融合检索 |
 | LitKG | 外部 Claim API | 由服务端配置 | 文献 Claim、实体关系与知识图谱 |
 
-浏览器一般只访问 `8502`。Next.js 将 `/backend/*` 转发到本机 `8503`，不需要把 FastAPI
+浏览器一般只访问 `18502`。Next.js 将 `/backend/*` 转发到本机 `18503`，不需要把 FastAPI
 端口直接暴露给普通用户。
 
 ## 5. 常用依赖包
@@ -305,14 +305,14 @@ bash deploy/status.sh
 bash deploy/stop.sh
 ```
 
-访问地址：`http://10.181.9.172:8502/`。
+访问地址：`http://10.181.9.172:18502/`。
 
 ### 9.5 健康检查
 
 ```bash
-curl -fsS http://127.0.0.1:8503/health
-curl -fsS http://127.0.0.1:8503/api/backend/health
-curl -I http://127.0.0.1:8502/
+curl -fsS http://127.0.0.1:18503/health
+curl -fsS http://127.0.0.1:18503/api/backend/health
+curl -I http://127.0.0.1:18502/
 ```
 
 第二个接口会分别显示 SQL、Redis 和 Elasticsearch 的连接状态。

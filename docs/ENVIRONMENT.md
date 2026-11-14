@@ -89,11 +89,11 @@ cd /storage/main/users/zhangrongpeng/data/fmt/apps/WGS-FMT-Agent-v2
 bash deploy/start.sh
 bash deploy/status.sh
 
-curl -fsS http://127.0.0.1:8503/health
-curl -I http://127.0.0.1:8502/
+curl -fsS http://127.0.0.1:18503/health
+curl -I http://127.0.0.1:18502/
 ```
 
-当前服务端口：Next.js `8502`、FastAPI `8503`、可选 Agent daemon `7438`。
+当前服务端口：Next.js `18502`、FastAPI `18503`、可选 Agent daemon `7438`。
 # Environment and portable deployment
 
 > 本文中的示例路径均可替换。代码不能依赖特定用户名或 `/home/...` 绝对路径。

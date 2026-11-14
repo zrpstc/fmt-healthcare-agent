@@ -4,7 +4,7 @@ export async function proxySampleUpload(request: Request): Promise<Response> {
   if (!/^multipart\/form-data\s*;/i.test(contentType) || !request.body) {
     return Response.json({ detail: "请使用表单上传 FASTQ 文件。" }, { status: 415 });
   }
-  const port = Number(process.env.WGS_API_PORT || "8503");
+  const port = Number(process.env.WGS_API_PORT || "18503");
   const timeout = Number(process.env.WGS_WEB_PROXY_TIMEOUT_MS || "900000");
   if (!Number.isInteger(port) || port < 1 || port > 65535 ||
       !Number.isInteger(timeout) || timeout < 30000 || timeout > 1800000) {

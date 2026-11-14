@@ -4,8 +4,8 @@
 
 | 服务 | 目录 | 默认监听 | 用途 |
 |---|---|---|---|
-| workspace-web | `apps/workspace-web` | `0.0.0.0:8502` | 当前服务器 IP + 端口入口 |
-| workspace-api | `apps/workspace-api` | `127.0.0.1:8503` | Next.js `/backend/*` 转发 |
+| workspace-web | `apps/workspace-web` | `0.0.0.0:18502` | 当前服务器 IP + 端口入口 |
+| workspace-api | `apps/workspace-api` | `127.0.0.1:18503` | Next.js `/backend/*` 转发 |
 | agent-daemon | `src/wgs_agent` | `127.0.0.1:7438` | 可选 JSON-RPC 后台 |
 | elasticsearch | `scripts/manage_elasticsearch.py` / Docker | `127.0.0.1:9200` | 默认随项目启动的认证检索实例，可关闭自动托管 |
 

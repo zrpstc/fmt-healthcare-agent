@@ -58,7 +58,7 @@ POST /api/backend/knowledge/index
 POST /api/backend/knowledge/search
 ```
 
-The browser accesses these routes through `http://<server-ip>:8502/backend/api/backend/*`.
+The browser accesses these routes through `http://<server-ip>:18502/backend/api/backend/*`.
 
 ## Search flow
 

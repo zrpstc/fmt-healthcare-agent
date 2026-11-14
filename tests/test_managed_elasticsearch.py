@@ -206,7 +206,7 @@ class ManagedElasticsearchTests(unittest.TestCase):
         cases = [
             ("WGS_ELASTICSEARCH_URL", "http://10.0.0.2:9200"),
             ("WGS_ELASTICSEARCH_URL", "http://127.0.0.1:0"),
-            ("WGS_ELASTICSEARCH_URL", "http://127.0.0.1:8503"),
+            ("WGS_ELASTICSEARCH_URL", "http://127.0.0.1:18503"),
             ("WGS_ELASTICSEARCH_URL", "http://user:password@127.0.0.1:9200"),
             ("WGS_ELASTICSEARCH_MEMORY", "512m"),
             ("WGS_ELASTICSEARCH_HEAP", "2g"),

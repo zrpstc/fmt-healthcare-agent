@@ -45,7 +45,7 @@ def enable(base_url: str, backup_dir: Path) -> None:
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
-    parser.add_argument('--api-base-url',default='http://127.0.0.1:8503/api')
+    parser.add_argument('--api-base-url',default='http://127.0.0.1:18503/api')
     parser.add_argument('--backup-dir',type=Path,default=Path(__file__).resolve().parents[1]/'tmp/graphrag-20261024/catalog-backup')
     args=parser.parse_args()
     enable(args.api_base_url,args.backup_dir)
