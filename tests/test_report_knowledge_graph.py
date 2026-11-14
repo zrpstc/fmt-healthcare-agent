@@ -73,7 +73,8 @@ def test_graph_contains_only_relevant_actual_claims_and_valid_endpoints():
     node_ids = {n["id"] for n in graph["nodes"]}
     assert all(e["source"] in node_ids and e["target"] in node_ids for e in graph["edges"])
     markdown = render_markdown(doc)
-    assert "相关知识子图" in markdown
+    assert "### A4 知识子图" in markdown
+    assert topic(doc)["knowledge_subgraph"] == graph
     assert "CORRELATED_WITH" not in markdown
     assert "证据原句与出处" not in markdown
     assert "分模块参考文献" in markdown
@@ -116,7 +117,8 @@ def test_missing_results_and_title_only_references_do_not_create_edges():
     }
     row["allowed_narrative_ids"].append("B1")
     assert not build_topic_graph(no_claim, row)["edges"]
-    assert "未匹配到可展示的知识图谱关系" in render_markdown(no_claim)
+    assert not topic(no_claim)["knowledge_subgraph"]["edges"]
+    assert "### A4 知识子图" in render_markdown(no_claim)
 
 
 def test_entity_name_fragments_do_not_match_different_compounds_or_proteins():
@@ -256,7 +258,7 @@ async def test_malformed_service_payload_does_not_break_report(retrieval):
         transport=httpx.MockTransport(lambda _: httpx.Response(200, json={"claims": ["invalid"]})),
     )
     assert doc["audit"]["knowledge_graph_retrieval"]["status"] == "unavailable"
-    assert "相关知识子图" in render_markdown(doc)
+    assert "### A4 知识子图" in render_markdown(doc)
 
 
 @pytest.mark.asyncio

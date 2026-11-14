@@ -32,7 +32,8 @@ def fixture_handler(*, broken=False, foreign=False):
     return handler, calls, rows
 
 @pytest.mark.asyncio
-async def test_acquisition_drains_every_page_and_preserves_all_statuses_and_predicates(tmp_path):
+async def test_acquisition_drains_every_page_and_preserves_all_statuses_and_predicates(tmp_path, monkeypatch):
+    monkeypatch.setenv("WGS_KNOWLEDGE_USAGE_INCLUDE_PENDING", "false")
     handler, calls, rows = fixture_handler()
     path = tmp_path / 'snapshot.json'
     result = await acquire_knowledge_base(LitkgRetrievalConfig('http://kb', 30), transport=httpx.MockTransport(handler), cache_path=path)
@@ -44,6 +45,8 @@ async def test_acquisition_drains_every_page_and_preserves_all_statuses_and_pred
     assert all(r.method == 'GET' for r in calls)
     before = copy.deepcopy(result)
     assert eligible_for_use(result['claims'][0]) is False
+    monkeypatch.setenv('WGS_KNOWLEDGE_USAGE_INCLUDE_PENDING', 'true')
+    assert eligible_for_use(result['claims'][0]) is True
     assert result == before
 
 @pytest.mark.asyncio

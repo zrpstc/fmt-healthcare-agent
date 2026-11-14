@@ -35,8 +35,8 @@ def test_triplet_resources_follow_portable_root(
     monkeypatch.chdir(tmp_path)
     local = {
         "TRIPLET_MODEL_DIR": workspace / "model-training/fmt-triplet-v1",
-        "TRIPLET_BASELINE_SPECIES": workspace / "fmt/species_abundance_train.csv",
-        "TRIPLET_MATCH_FILE": workspace / "fmt/match.xlsx",
+        "TRIPLET_BASELINE_SPECIES": workspace / "data/fmt-matching/species_abundance_train.csv",
+        "TRIPLET_MATCH_FILE": workspace / "data/fmt-matching/match.xlsx",
     }
     portable = {
         "TRIPLET_MODEL_DIR": resources / "models/fmt-triplet-v1",
@@ -54,7 +54,10 @@ def test_triplet_resources_follow_portable_root(
     resolved = runpy.run_path(matching.__file__)
 
     assert resolved["_RESOURCE_ROOT"] == resources
-    for name, path in (portable if portable_exists else local).items():
+    expected = dict(portable if portable_exists else local)
+    # Explicit resource data roots never fall back to another directory.
+    expected.update({name: portable[name] for name in ("TRIPLET_BASELINE_SPECIES", "TRIPLET_MATCH_FILE")})
+    for name, path in expected.items():
         assert resolved[name] == path
     assert resolved["TRIPLET_POST_SPECIES"] == (
         workspace / "bioinformatics/matrices/species_relative_abundance_percent.tsv"
@@ -69,8 +72,8 @@ def test_triplet_resources_keep_fresh_workspace_defaults(clean_triplet_env, monk
     resolved = runpy.run_path(matching.__file__)
 
     assert resolved["TRIPLET_MODEL_DIR"] == workspace / "model-training/fmt-triplet-v1"
-    assert resolved["TRIPLET_BASELINE_SPECIES"] == workspace / "fmt/species_abundance_train.csv"
-    assert resolved["TRIPLET_MATCH_FILE"] == workspace / "fmt/match.xlsx"
+    assert resolved["TRIPLET_BASELINE_SPECIES"] == workspace / "data/fmt-matching/species_abundance_train.csv"
+    assert resolved["TRIPLET_MATCH_FILE"] == workspace / "data/fmt-matching/match.xlsx"
 
 
 def test_triplet_resource_overrides_take_precedence(clean_triplet_env, monkeypatch, tmp_path):

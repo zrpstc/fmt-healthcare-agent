@@ -46,7 +46,7 @@ def test_template_chapters_replace_the_old_body_and_keep_a_complete_toc():
     headings = re.findall(r"^## (\d+) (.+)$", md, re.M)
     assert [int(n) for n, _ in headings] == list(range(1, 14))
     assert headings[0][1] == "您的肠道里住着哪些菌"
-    assert headings[1][1] == "菌群多样性与生态功能结构"
+    assert headings[1][1] == "菌群的多样性与分工"
     assert headings[-1][1] == "综合解读与行动建议"
     assert "### 8.8 脂多糖与其他细胞组分合成特征" in md
     assert md.index("## 目录") < md.index("## 检测结果总览") < md.index("## 1 ")
@@ -247,9 +247,15 @@ def test_contribution_concentration_requires_complete_consistent_units():
             ]
         }
     )
-    assert "暂不计算" in block(render_markdown(doc), "2.3")
+    from wgs_agent.reporting.functional_metrics import aggregate_category
+    assert "本次检测未覆盖这部分内容。" in block(render_markdown(doc), "2.3")
+    doc["evidence"]["P1"]["unit"] = "relative_abundance"
+    partial = aggregate_category(doc, "丁酸合成")
+    assert partial["top_named_share"] == 80 and not partial["complete"]
     doc["evidence"]["P1"]["contributors_complete"] = True
-    assert "80%" in block(render_markdown(doc), "2.3")
+    assert aggregate_category(doc, "丁酸合成")["complete"]
+    body = block(render_markdown(doc), "2.3")
+    assert "主要依赖少数菌" in body and "80%" not in body
 
 
 def test_rendering_preserves_graph_objects_figures_and_bibliography_content():
@@ -265,13 +271,12 @@ def test_rendering_preserves_graph_objects_figures_and_bibliography_content():
     }
     refs = render_bibliographies(doc)
     md = render_markdown(doc)
-    assert md.endswith("\n\n".join(refs) + "\n")
+    assert all(part in md for part in refs)
+    assert md.endswith("\n\n".join(render_bibliographies(doc)) + "\n")
     for section in doc["sections"]:
         for topic in section["topics"]:
             assert topic["knowledge_subgraph"] == graphs[topic["id"]]
-            if topic["status"] != "missing":
-                for part in graph_markdown(topic):
-                    assert part in md
+    assert "### A4 知识子图" in md
     assert render_markdown(doc) == md
 
 

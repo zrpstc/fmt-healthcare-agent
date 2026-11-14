@@ -191,6 +191,8 @@ def test_concurrent_report_edit_aborts_before_publication(tmp_path, monkeypatch)
 
     module = _refresh_module()
     module.ROOT = tmp_path
+    monkeypatch.setenv("WGS_RESULTS_DIR", str(tmp_path))
+    monkeypatch.setattr(module.logging, "disable", lambda level: None)
     report = tmp_path / "CH7_TEST_report.json"
     report.write_text(json.dumps(document()))
     md = tmp_path / "CH7_TEST_health_report.md"

@@ -91,13 +91,15 @@ def test_translation_keeps_raw_graph_identity_qualifiers_and_negation():
     assert "否定" in relation_label(edge) and "推测" in relation_label(edge)
 
 
-def test_unknown_english_fallback_is_hidden_instead_of_leaking_to_image(tmp_path):
+def test_unknown_source_label_is_preserved_with_explicit_fallback_audit(tmp_path):
     doc = document([claim(object="unknown complex experimental outcome")])
     translate_graph_labels(doc, None)
-    assert topic(doc)["knowledge_subgraph"]["display_status"] == "unavailable"
-    assert not render_graph_figures(doc, tmp_path)
-    assert "unknown complex" not in render_markdown(doc)
-    assert "中文图谱暂不可用" in render_markdown(doc)
+    graph = topic(doc)["knowledge_subgraph"]
+    assert graph["display_status"] == "ready"
+    assert any("unknown complex" in node.get("display_label", "") for node in graph["nodes"])
+    assert doc["audit"]["graph_translation"]["raw_source_labels"] > 0
+    assert render_graph_figures(doc, tmp_path)
+    assert "知识图中部分术语沿用知识库原文" in render_markdown(doc)
 
 
 def test_invalid_english_and_unknown_ids_are_rejected_and_repaired_once():

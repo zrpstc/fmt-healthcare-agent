@@ -154,6 +154,14 @@ def test_cache_recovery_runs_all_supplements_without_base_pipeline(tmp_path):
     target = app / "runtime/scripts/postfmt_pipeline/process_postfmt_sample.sh"
     target.parent.mkdir(parents=True)
     target.write_text(source.read_text())
+    # Include the runtime path bridge introduced by the existing path migration.
+    import shutil
+    project = source.parents[3]
+    for relative in ("runtime/scripts/runtime_paths.sh", "scripts/runtime_paths.py",
+                     "src/wgs_fmt_platform/__init__.py", "src/wgs_fmt_platform/paths.py"):
+        destination = app / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(project / relative, destination)
     output = tmp_path / "bio"
     for rel in ("status/done/sample.done", "profiles/metaphlan/sample_profile.tsv",
                 "profiles/humann/sample_pathabundance_relab.tsv", "profiles/humann/sample_genefamilies_relab.tsv",
@@ -168,6 +176,7 @@ def test_cache_recovery_runs_all_supplements_without_base_pipeline(tmp_path):
     fake.chmod(0o755)
     events = tmp_path / "events"
     env = {**os.environ, "PYTHON": sys.executable, "PROBE_EVENTS": str(events),
+           "WGS_ENV_ROOT": str(Path(sys.executable).resolve().parents[1]),
            "WGS_HEALTHY_REFERENCE_PROVIDER": "", "WGS_CHAPTER4_PYTHON": str(fake),
            "WGS_CHAPTER5_PYTHON": str(fake), "WGS_CHAPTER6_PYTHON": str(fake),
            "WGS_FUNCTIONAL_PYTHON": str(fake), "WGS_CHAPTER4_ENABLED": "1",

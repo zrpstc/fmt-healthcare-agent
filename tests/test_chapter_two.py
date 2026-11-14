@@ -78,7 +78,9 @@ def test_diversity_figure_contains_both_profiles_and_true_reference_statistics()
     original=[["观测物种数","10"],["Shannon指数","2.1"],["cMD 独立谱 · Shannon指数","2"],["丰富度估计","未提供"]]
     assert filter_diversity_table(doc,original)==[["丰富度估计","未提供"]]
     md=render_markdown(doc);block=md.split("### 2.1 ",1)[1].split("### 2.2 ",1)[0]
-    assert "| 观测物种数 |" not in block and "| 丰富度估计 |" in block
+    assert "| 观测物种数 |" not in block and "| 丰富度估计 |" not in block
+    assert "菌种数（丰富度）" in block and "综合多样性（Shannon 指数）" in block
+    assert "Simpson" not in block and "Pielou" not in block
     assert "curatedMetagenomicData cMD 独立对照" not in block and "意义解读：" not in block
 
 

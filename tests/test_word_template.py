@@ -27,10 +27,10 @@ def test_complete_word_contract_without_example_measurements():
     c = contract()
     assert [ch["number"] for ch in c["chapters"]] == list(range(1, 15))
     assert len(blocks("heading")) == 58
-    assert len(blocks("table")) == 51
+    assert len(blocks("table")) == 52
     widgets = [v for b in blocks("visuals") for v in b["items"]]
-    assert sum(v["type"] == "chart" for v in widgets) == 20
-    assert sum(v["type"] == "flow" for v in widgets) == 12
+    assert sum(v["type"] == "chart" for v in widgets) == 28
+    assert sum(v["type"] == "flow" for v in widgets) == 9
     assert all(re.fullmatch(r"[a-f0-9]{64}", s["sha256"]) for s in c["sources"])
     assert '"values"' not in json.dumps(c)  # DOCX placeholder numbers never ship as results.
     assert c["style"]["chapter"] == "3465A4"
@@ -51,17 +51,20 @@ def test_complete_word_contract_without_example_measurements():
 def test_every_word_field_and_visual_has_a_missing_data_state(tmp_path):
     doc = build()
     names = render_word_figures(doc, tmp_path)
-    assert len(names) == 29  # 33 widgets, three pairs share one figure panel.
+    assert len(names) == 28  # Empty consumer panels are omitted; the source contract is unchanged.
+    assert not any(key.startswith(("1.", "2.")) for key in names)
     for b in blocks("table"):
         rows = bind_table(doc, b)
-        assert rows and all(len(r) == len(b["rows"][0]) for r in rows)
+        assert rows or b["id"] in {"3.1.t1", "3.2.t1", "3.3.t1"}
+        assert all(len(r) == len(b["rows"][0]) for r in rows)
         assert "【" not in str(rows)
     for b in blocks("visuals"):
         for v in b["items"]:
             if v["type"] == "chart":
                 assert chart_data(doc, v)["status"] == "missing"
     md = render_markdown(doc)
-    assert len(re.findall(r"!\[.*模板图示\]", md)) == 29
+    rendered = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", md)
+    assert rendered and set(rendered) <= set(names.values())
     assert "图形仅作占位" not in md and "【" not in md
     assert not re.search(r"第(?:0\d|15|16)章|^### (?:15|16)\.", md, re.M)
     assert all((tmp_path / name).is_file() for name in names.values())
@@ -118,10 +121,12 @@ def test_directions_and_contribution_denominators_remain_separate():
         }
     )
     row = next(r for r in bind_table(doc, table("8.5.t1")) if r[0] == "组胺")
-    assert "generation" in row[1] and "utilization" not in row[1]
-    assert "utilization" in row[2] and "generation" not in row[2]
+    assert "generation（合成）" in row[1]
+    assert "utilization（分解）" in row[1]
     assert chart_data(doc, visual("8.5.1"))["status"] == "missing"  # Abundance != percentile.
-    assert chart_data(doc, visual("2.3.1"))["status"] == "missing"  # Incomplete contributor list.
+    from wgs_agent.reporting.functional_metrics import aggregate_category
+    result = aggregate_category(doc, "丁酸合成")
+    assert result["top_named_share"] == 100 and not result["complete"]  # Descriptive partial scope is retained.
 
 
 def test_validated_score_ring_needs_explicit_scale_bounds():
@@ -248,5 +253,7 @@ def test_subunit_abundance_is_visible_and_labels_have_space():
         "status": "available",
     }
     im = draw_chart(visual("8.6.1"), payload, 1800)
-    teal = sum(count for count, rgb in im.getcolors(im.width * im.height) if rgb == (36, 106, 115))
-    assert teal > im.width * im.height * 0.05
+    color = visual("8.6.1")["series"][0]["color"]
+    expected = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
+    filled = sum(count for count, rgb in im.getcolors(im.width * im.height) if rgb == expected)
+    assert filled > im.width * im.height * 0.05
