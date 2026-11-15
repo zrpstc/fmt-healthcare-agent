@@ -1,5 +1,7 @@
 # Word报告正文模板 v4
 
+> AI 开发与维护入口：[消费者报告基础设施指南](CONSUMER_REPORTING_INFRASTRUCTURE.md)。公共接口、G1–G12、消费者章节接入与现行子图策略见该文档；本文历史的空图占位说明不应覆盖已改版消费者章节的显隐规则。
+
 报告版本health-report-v4，正文模板word-native-1-13-disease-v3。
 
 当前运行时正文为13章，版本word-native-1-13-disease-v3：原第11章症状/问卷已删除，原12–14章前移为11–13；原Word源合同仍保留历史索引。疾病空数据排查和新增流程见CHAPTER_ELEVEN_DISEASE_FEATURES.md。
