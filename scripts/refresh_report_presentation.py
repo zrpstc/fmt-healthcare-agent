@@ -72,6 +72,7 @@ def main():
             if key in document:
                 evidence[key] = document[key]
         evidence["knowledge_subgraphs"] = {t["id"]: t["knowledge_subgraph"] for s in document["sections"] for t in s["topics"]}
+        evidence["consumer_subsection_graphs"] = document.get("consumer", {}).get("subsection_graphs", {})
         (staging / names["evidence"]).write_text(json.dumps(evidence, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
         _generate_fpdf_report(markdown, sid, str(staging / names["pdf"]))
         if report.read_bytes() != original:

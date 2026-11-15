@@ -119,7 +119,11 @@ def test_consumer_body_has_no_forbidden_terms_or_raw_percentages(tmp_path):
     assert all(term not in body for term in FORBIDDEN)
     for match in re.findall(r'\d+(?:\.\d+)?%',body):
         assert len(Decimal(match[:-1]).normalize().as_tuple().digits)<=3
-    assert '### 1.3 ' not in body and '相关知识子图' not in body
+    assert '### 1.3 ' not in body
+    for sub in (1, 2, 4):
+        content = re.split(r'\n### ', body.split(f'### 1.{sub} ', 1)[1], maxsplit=1)[0]
+        graph = doc['consumer']['subsection_graphs'][f'1.{sub}']['graph']
+        assert content.count(f'![图 1-{sub}k  与本节相关的研究知识]') == (1 if graph and graph.get('figure') else 0)
     assert doc['evidence']==before
     assert sum(r['value'] for r in chart_data(doc,{'id':'1.2.1','kind':'barChart'})['rows'])==pytest.approx(100)
     phylum=chart_data(doc,{'id':'1.1.1','kind':'barChart'})

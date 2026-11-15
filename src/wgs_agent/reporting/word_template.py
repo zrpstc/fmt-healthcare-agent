@@ -1038,9 +1038,13 @@ def paragraph(document, block, chapter):
 
 def render_body(document):
     from .document import table
-    from .knowledge_graph import graph_markdown
+    from .knowledge_graph import graph_markdown, subsection_graph_markdown
+    from .consumer_copy import CONSUMER_CHAPTERS
 
     output = []
+    state = document.setdefault("consumer", {})
+    state["graph_reading_note_shown"] = False
+    state["displayed_subgraphs"] = []
     word_figures = document.get("word_figures", {})
     for chapter in contract()["chapters"]:
         n = chapter["number"]
@@ -1076,7 +1080,7 @@ def render_body(document):
         sub = 0
 
         def finish(index):
-            if n == 10:
+            if n == 10 and n not in CONSUMER_CHAPTERS:
                 return
             if not index:
                 return
@@ -1100,11 +1104,14 @@ def render_body(document):
             )
             if n != 3 and topic.get("interpretation") and not has_slot and (n, index) != (2, 3):
                 output.append("结果解读  " + topic["interpretation"])
+            if n in CONSUMER_CHAPTERS:
+                output.extend(subsection_graph_markdown(document, n, index))
+                return
             empty_graphs = set()
             for tid in CHAPTERS[n - 1][3][index - 1][1]:
                 topic = next(t for s in document["sections"] for t in s["topics"] if t["id"] == tid)
                 if topic["status"] != "missing":
-                    for part in graph_markdown(topic):
+                    for part in graph_markdown(topic, document=document):
                         if topic.get("knowledge_subgraph", {}).get("status") == "no_match":
                             if part in empty_graphs:
                                 continue

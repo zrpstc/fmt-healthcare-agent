@@ -170,9 +170,27 @@ def _name(document, member, registry):
     return registry.name({"species": latin, "name": latin, "display_label": display_name(document, member["taxon"])})
 
 
+def graph_seeds(document, subsection):
+    if subsection == 1:
+        return ["多样性", "丰富度", "均衡度", "diversity", "richness", "evenness", "Shannon index"]
+    if subsection == 2:
+        return ["组成典型度", "菌群组成", "健康人群", "多样性", "microbiota", "diversity"]
+    from .chapter_two import display_name
+    data = prepare(document)
+    seeds = []
+    products = {"丁酸合成": ["丁酸", "butyrate"], "乳酸利用": ["乳酸", "lactate"],
+                "复杂多糖降解": ["膳食纤维", "淀粉", "dietary fiber", "starch"]}
+    for stage in data["stages"]:
+        seeds.extend(products.get(stage["category"], []))
+        for member in stage["members"][:3]:
+            seeds.extend([taxon_name(member["taxon"]), display_name(document, member["taxon"])])
+    return sorted(set(seeds))
+
+
 def render(document):
     from .consumer_copy import CHAPTERS, EMPTY_SECTION
     from .consumer_basis import comparison_basis_note
+    from .knowledge_graph import subsection_graph_markdown
     data = prepare(document)
     copy = CHAPTERS[2]
     output = ["## 2 " + copy["title"], copy["intro"], "### 2.1 " + copy["subsections"][1]]
@@ -195,6 +213,7 @@ def render(document):
     summary = interpretation(document, 1)
     if summary:
         output.append(summary)
+    output.extend(subsection_graph_markdown(document, 2, 1, graph_seeds(document, 1)))
     output.append("### 2.2 " + copy["subsections"][2])
     if definitions["typicality"]:
         output.append("> 组成典型度：" + definitions["typicality"])
@@ -207,9 +226,11 @@ def render(document):
     summary = interpretation(document, 2)
     if summary:
         output.append(summary)
+    output.extend(subsection_graph_markdown(document, 2, 2, graph_seeds(document, 2)))
     output.append("### 2.3 " + copy["subsections"][3])
     if not data["stages"]:
         output.append(EMPTY_SECTION)
+        output.extend(subsection_graph_markdown(document, 2, 3, []))
         return output
     for key, title in [("functional_potential", "功能潜力"), ("functional_backup", "功能备份")]:
         if definitions[key]:
@@ -227,6 +248,7 @@ def render(document):
             output.append(stage["title"] + "：本样本中参与的菌有" + names +
                           ("，" + stage["backup"] if stage["backup"] else "") + "。" + stage["meaning"])
     output.extend(["> 以上为基因层面的功能潜力，不代表实际产量；箭头表示一般的代谢顺序。", interpretation(document, 3)])
+    output.extend(subsection_graph_markdown(document, 2, 3, graph_seeds(document, 3)))
     return [line for line in output if line]
 
 

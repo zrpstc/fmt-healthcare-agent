@@ -212,10 +212,18 @@ def interpretation(document,sub):
     return fallback(document,sub)
 
 
+def graph_seeds(document, sub):
+    data = _data(document)
+    rows = (data["species"] if sub == 1 else data["species"][:1] if sub == 2 else
+            [r for r in data["reference_rows"] if r["tier_label"] in {"明显偏高", "明显偏低"}] if sub == 4 else [])
+    return sorted({str(row[field]) for row in rows for field in ("display_label", "scientific_label") if row.get(field)})
+
+
 def render(document):
     from .consumer_state import table
     from .glossary import citation_numbers
     from .word_figures import chart_data
+    from .knowledge_graph import subsection_graph_markdown
     data=_data(document);state=consumer(document);names=NameRegistry(document)
     output=["## 1 "+CHAPTERS[1]["title"],CHAPTERS[1]["intro"]]
     for term in ["relative_abundance","taxonomic_ranks"]:
@@ -245,6 +253,7 @@ def render(document):
         output.append(table(["菌名","占比","它是做什么的"],rows))
     output.append(interpretation(document,1))
     if data["genera"]:output.append("丰度较高的菌属依次为"+"、".join(names.name(r) for r in data["genera"][:3])+"。")
+    output.extend(subsection_graph_markdown(document, 1, 1, graph_seeds(document, 1)))
     output.append("### 1.2 "+CHAPTERS[1]["subsections"][2])
     if data["species"]:
         first=data["species"][0]
@@ -274,6 +283,7 @@ def render(document):
                     output.append(table(["核心成员", "检出情况", "占比"], core_rows))
         output.append(interpretation(document,2))
     else:output.append(EMPTY_SECTION)
+    output.extend(subsection_graph_markdown(document, 1, 2, graph_seeds(document, 2)))
     output.append("### 1.4 "+CHAPTERS[1]["subsections"][4])
     audit=(document.get("template_inputs",{}).get("healthy_comparison") or {}).get("audit",{})
     if data["reference_rows"]:
@@ -314,5 +324,6 @@ def render(document):
             output.extend(["**绝对丰度补充结果**", table(["定量项目", "您的结果", "测量依据"], rows)])
     else:
         omit(document, 1, "绝对丰度补充结果", "validated_quantification_missing", "没有经验证的绝对数量测量")
+    output.extend(subsection_graph_markdown(document, 1, 4, graph_seeds(document, 4)))
     state["chapters"]["1"]["body_markdown"]="\n\n".join(output)
     return output

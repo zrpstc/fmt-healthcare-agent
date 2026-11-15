@@ -276,7 +276,7 @@ def test_rendering_preserves_graph_objects_figures_and_bibliography_content():
     for section in doc["sections"]:
         for topic in section["topics"]:
             assert topic["knowledge_subgraph"] == graphs[topic["id"]]
-    assert "### A4 知识子图" in md
+    assert "### A4 知识子图" not in md  # No ready image: omit the entire empty A4.
     assert render_markdown(doc) == md
 
 

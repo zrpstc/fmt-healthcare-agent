@@ -1,5 +1,11 @@
 """Presentation overrides; source Word contracts and evidence IDs stay immutable."""
 CONSUMER_CHAPTERS = {1, 2}
+# Extra evidence-topic placement only; original topic/evidence identities stay intact.
+GRAPH_TOPICS = {
+    (1, 4): ("composition.species", "composition.dominance"),
+    (2, 3): ("metabolites.scfa", "nutrient_metabolism.fiber", "metabolites.intermediates"),
+}
+GRAPH_HIDDEN_SUBSECTIONS = {(1, 3), (2, 4)}
 CHAPTERS = {1: {
     "title": "您的肠道里住着哪些菌",
     "intro": "肠道里生活着数百种微生物。本章告诉您：哪几大类菌占多数，哪几种菌最多，和健康人相比有哪些不同。",
