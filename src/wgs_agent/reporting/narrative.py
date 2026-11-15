@@ -248,10 +248,14 @@ def _text_error(item: dict, topic: dict, evidence: dict) -> str | None:
     names_removed = re.sub(r"B\s*\d{1,2}|5[-－]?HT|TMAO?|GLP[-－]?1|TGR5", "", prose, flags=re.I)
     consumer_topic = topic["id"].startswith("word.") and int(topic["id"].split(".")[1]) in CONSUMER_CHAPTERS
     if consumer_topic:
-        error = consumer_text_error(interpretation, topic.get("consumer_displayed_values", []))
+        consumer_prose=interpretation.replace('第4章','') if topic['id'].startswith('word.3.') else interpretation
+        error = consumer_text_error(consumer_prose, topic.get("consumer_displayed_values", []))
         if not error and topic["id"].startswith("word.2."):
             from .consumer_chapter_two import text_error
             error = text_error(interpretation, int(topic["id"].split(".")[-1]))
+        if not error and topic['id'].startswith('word.3.'):
+            from .consumer_chapter_three import text_error
+            error=text_error(interpretation,int(topic['id'].split('.')[-1]))
         if error:
             return error
     elif re.search(r"\d|[％%]|百分之|[一二三四五六七八九十百]+成", names_removed):
@@ -489,7 +493,7 @@ def generate_narrative(
 
     def run_batch(batch: list[dict]) -> tuple[dict, list[str]]:
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT + ("\n" + CONSUMER_RULES if any(s["id"] in {f"word.{n}" for n in CONSUMER_CHAPTERS} for s in batch) else "") + ("\n" + CHAPTER_RULES[2] if any(s["id"] == "word.2" for s in batch) else "")},
+            {"role": "system", "content": SYSTEM_PROMPT + ("\n" + CONSUMER_RULES if any(s["id"] in {f"word.{n}" for n in CONSUMER_CHAPTERS} for s in batch) else "") + ''.join('\n'+rules for chapter,rules in CHAPTER_RULES.items() if any(section['id']==f'word.{chapter}' for section in batch))},
             {"role": "user", "content": build_prompt(result, batch)},
         ]
         accepted, errors = {}, []

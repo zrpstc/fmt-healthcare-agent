@@ -18,4 +18,6 @@ def comparison_basis_note(document, chapter):
         return NOTE
     if chapter == 2 and (comparison.get("diversity") or comparison.get("typicality", {}).get("status") == "available"):
         return NOTE
+    if chapter == 3 and any(card.get('reference') for card in document.get('consumer', {}).get('chapter_three', {}).get('cards', [])):
+        return '卡片占比与第1章一致；为与健康人群同口径比较，人群位置经重新计算。'
     return None

@@ -317,7 +317,20 @@
       "review_status": "approved",
       "version": "consumer-glossary-v1",
       "generated_at": "2026-11-14T00:00:00Z",
-      "model": "curated-editorial"
+      "model": "curated-editorial",
+      "watch_note": "仅携带脆弱拟杆菌毒素基因的菌株与肠炎相关，请看第4章。",
+      "watch_sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "watch_evidence_scope": "strain",
+      "watch_review_status": "approved",
+      "watch_generated_at": "2026-11-15T00:00:00Z",
+      "watch_model": "curated-user-provided"
     },
     {
       "term_id": "faecalibacterium prausnitzii",
@@ -592,6 +605,218 @@
       "version": "consumer-glossary-v1",
       "generated_at": "2026-11-14T00:00:00Z",
       "model": "curated-editorial"
+    },
+    {
+      "term_id": "opportunists",
+      "kind": "concept",
+      "display_name": "条件致病菌",
+      "latin": "",
+      "one_liner": "健康人肠道中也常能检出、通常无害，特定条件下才可能引起问题。",
+      "detail": "健康人肠道中也常能检出、通常无害的菌；在免疫力下降、菌群失衡或进入肠道以外部位等条件下，才可能引起问题。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
+    },
+    {
+      "term_id": "butyrate_producers",
+      "kind": "concept",
+      "display_name": "产丁酸菌",
+      "latin": "",
+      "one_liner": "能把膳食纤维发酵成丁酸的菌。",
+      "detail": "能把膳食纤维发酵成丁酸的菌。丁酸是结肠上皮细胞的重要能量来源。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
+    },
+    {
+      "term_id": "bifidobacteria",
+      "kind": "concept",
+      "display_name": "双歧杆菌",
+      "latin": "",
+      "one_liner": "婴儿期常见，能发酵糖类产生乳酸和乙酸。",
+      "detail": "婴儿期肠道的主要菌群之一，成人体内含量通常较低，能发酵多种糖类产生乳酸和乙酸。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
+    },
+    {
+      "term_id": "lactobacilli",
+      "kind": "concept",
+      "display_name": "乳杆菌类",
+      "latin": "",
+      "one_liner": "能把糖发酵成乳酸，常见于发酵食品。",
+      "detail": "能把糖发酵成乳酸的一类菌，常见于发酵食品；在成人粪便中通常含量很低。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided",
+      "absence_note": "这类菌常见于发酵食品。",
+      "absence_review_status": "approved"
+    },
+    {
+      "term_id": "akkermansia",
+      "kind": "concept",
+      "display_name": "阿克曼菌",
+      "latin": "",
+      "one_liner": "生活在肠道黏液层、以黏液蛋白为食，研究中与代谢健康相关。",
+      "detail": "生活在肠道黏液层、以黏液蛋白为食的菌；研究中与代谢健康相关。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
+    },
+    {
+      "term_id": "detection_reliability",
+      "kind": "concept",
+      "display_name": "检出可靠度",
+      "latin": "",
+      "one_liner": "支持检出的测序读段越多，检出通常越可靠。",
+      "detail": "根据支持该菌的测序读段多少，判断这次检出有多可靠；读段越多越可靠。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
+    },
+    {
+      "term_id": "research_evidence_strength",
+      "kind": "concept",
+      "display_name": "研究证据强度",
+      "latin": "",
+      "one_liner": "菌的功能说明得到多少项研究支持。",
+      "detail": "这个菌的功能说明有多少项研究支持；只有同属研究时，说明可能不完全适用于该菌。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
+    },
+    {
+      "term_id": "inflammation_associated",
+      "kind": "concept",
+      "display_name": "炎症相关研究中的菌",
+      "latin": "",
+      "one_liner": "研究中与肠道炎症相关，检出不等于患病。",
+      "detail": "研究中与肠道炎症相关的一类菌；检出不等于患病，具体作用取决于菌株和身体状况。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
+    },
+    {
+      "term_id": "sulfide_related",
+      "kind": "concept",
+      "display_name": "产硫化氢相关菌",
+      "latin": "",
+      "one_liner": "具备产生硫化氢潜力的一类菌。",
+      "detail": "具备产生硫化氢潜力的一类菌。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
+    },
+    {
+      "term_id": "conditional_commensal",
+      "kind": "concept",
+      "display_name": "仅特定菌株需关注的常见菌",
+      "latin": "",
+      "one_liner": "肠道常见成员，是否需留意取决于特定菌株的基因。",
+      "detail": "肠道常见成员，是否需留意取决于特定菌株的基因；请看第4章。",
+      "evidence_scope": "curated",
+      "sources": [
+        {
+          "type": "curated",
+          "id_or_url": "consumer-ch3-editorial-v1",
+          "title": "第3章消费者概念说明（用户给定）",
+          "year": 2026
+        }
+      ],
+      "review_status": "approved",
+      "version": "consumer-glossary-v1",
+      "generated_at": "2026-11-15T00:00:00Z",
+      "model": "curated-user-provided"
     }
   ]
 }

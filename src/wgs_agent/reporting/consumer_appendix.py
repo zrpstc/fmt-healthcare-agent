@@ -39,6 +39,9 @@ def render_appendices(document):
     from .consumer_chapter_two import appendix as chapter_two_appendix
     if state.get("chapter_two"):
         output.extend(chapter_two_appendix(document))
+    if state.get('chapter_three'):
+        from .consumer_chapter_three import appendix as chapter_three_appendix
+        output.extend(chapter_three_appendix(document))
     graph_audits = list(state.get('graph_filter_audit', {}).values())
     if graph_audits:
         from collections import Counter

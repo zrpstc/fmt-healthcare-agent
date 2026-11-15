@@ -99,6 +99,16 @@ postfmt直接调用该入口。报告生成只读取本地参考与既有待测�
 
 ## 存量数据
 
+第3章G14类别参考沿用G10的离线派生包：
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/prepare_cmd_reference.py \
+  --derive-from /path/to/validated-cmd-reference \
+  --output /path/to/new-cmd-key-taxa-reference
+```
+
+`consumer_derived.json` 的既有 `cmd-consumer-derived-v1` 契约中新增可选 `key_taxa`，包含面板版本/SHA、同一批个体ID和各类别合计分布。旧字段保持兼容。若输入已有且通过SHA校验的G10距离矩阵，直接复用该矩阵，不重新计算两两距离。面板修改需新目录重新派生；运行时只读取与当前面板SHA相同的分布，继续沿用同层、排除本人、最低人数与bootstrap规则。资产构建不自动激活线上配置，不启动MetaPhlAn。
+
 本次不删除`var/`或外置工作区中的参考包、原始序列和样本结果。管理员确认不再需要后可手动归档旧`reference/mho`、`reference/healthy`、`reference-targets/mho`、`reference-sources/mho`、`reference-sources/healthy-ena-demo`及旧物种总体表；不要清理cMD、FMT配型数据、其他专项资源或患者原始数据。路径按实际配置的工作区解析。
 
 当前服务器旧cMD包有3537人、984物种，metadata中无reads/bases字段；不重建时仍能计算新置信区间、越界基线和批次摘要，但参考深度可比性会明确标为缺失。

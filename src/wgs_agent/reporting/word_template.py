@@ -810,11 +810,36 @@ def narrative_sections(document):
                 topic["consumer_displayed_values"] = displayed_values(document, min(index, 3))
                 if index in CONSUMER_COPY[2]["subsections"]:
                     topic["title"] = CONSUMER_COPY[2]["subsections"][index]
+        if chapter == 3:
+            from .consumer_chapter_three import prepare, displayed_values
+            from .consumer_key_taxa import canonical_taxon
+            from .consumer_copy import WRITING_FOCUS, CHAPTERS as CONSUMER_COPY
+            cards=prepare(document)['cards']
+            merged=next((topic for topic in topics if topic['id']=='word.3.2'),None)
+            support=next((topic for topic in topics if topic['id']=='word.3.3'),None)
+            if merged and support:
+                for field in ('evidence_ids','allowed_narrative_ids'):
+                    merged[field]=list(dict.fromkeys(merged.get(field,[])+support.get(field,[])))
+                merged['source_subsections']=['3.2','3.3']
+            for topic in topics:
+                sub=int(topic['id'].split('.')[-1]);topic['writing_focus']=[WRITING_FOCUS[topic['id']]]
+                topic['consumer_presentation_version']='consumer-ch3-v1'
+                topic['consumer_displayed_values']=displayed_values(document,sub) if sub<=2 else []
+                if sub>2:
+                    topic['consumer_hidden']=True;topic['consumer_merged_into']='word.3.2' if sub==3 else 'word.3';continue
+                topic['title']=CONSUMER_COPY[3]['subsections'][sub]
+                names={canonical_taxon(member['species']) for card in cards if card['section']==('helpful' if sub==1 else 'watch') for member in card['members']}
+                additional=[key for key,row in document['evidence'].items() if row.get('kind')=='species' and canonical_taxon(row.get('species') or row.get('name') or row.get('label')) in names]
+                for field in ('evidence_ids','allowed_narrative_ids'):
+                    topic[field]=list(dict.fromkeys(topic.get(field,[])+additional))
         sections.append({"id": f"word.{chapter}", "title": f"{display_number(chapter)} {title}", "topics": topics})
     return sections
 
 
 def _narrative(document, chapter, sub):
+    if chapter == 3:
+        from .consumer_chapter_three import interpretation
+        return interpretation(document,sub) if sub<=2 else ''
     if chapter == 2:
         from .consumer_chapter_two import interpretation
         return interpretation(document, sub) if sub <= 3 else ""
@@ -1056,6 +1081,10 @@ def render_body(document):
             continue
         if n == 2:
             from .consumer_chapter_two import render
+            output.extend(render(document))
+            continue
+        if n == 3:
+            from .consumer_chapter_three import render
             output.extend(render(document))
             continue
         if n == 5:

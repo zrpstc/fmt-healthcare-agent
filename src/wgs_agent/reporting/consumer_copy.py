@@ -1,11 +1,12 @@
 """Presentation overrides; source Word contracts and evidence IDs stay immutable."""
-CONSUMER_CHAPTERS = {1, 2}
+CONSUMER_CHAPTERS = {1, 2, 3}
 # Extra evidence-topic placement only; original topic/evidence identities stay intact.
 GRAPH_TOPICS = {
     (1, 4): ("composition.species", "composition.dominance"),
     (2, 3): ("metabolites.scfa", "nutrient_metabolism.fiber", "metabolites.intermediates"),
+    (3, 2): ('key_taxa.pathogens',),
 }
-GRAPH_HIDDEN_SUBSECTIONS = {(1, 3), (2, 4)}
+GRAPH_HIDDEN_SUBSECTIONS = {(1, 3), (2, 4), (3, 3), (3, 4)}
 CHAPTERS = {1: {
     "title": "您的肠道里住着哪些菌",
     "intro": "肠道里生活着数百种微生物。本章告诉您：哪几大类菌占多数，哪几种菌最多，和健康人相比有哪些不同。",
@@ -40,3 +41,15 @@ WRITING_FOCUS.update({
 })
 FUNCTION_BACKUP = {"top_share_percent": 60, "minimum_named_contributors": 3}
 CHAPTER_RULES = {2: "讲功能一律使用能够或具备潜力，不写产生了多少或功能强弱。不写肠道生态失衡、菌群紊乱，不写某功能只由一种菌完成。第2.1节最多引用一个数字。"}
+CHAPTERS[3] = {
+    'title':'值得关注的几类菌',
+    'intro':'有些菌在研究中常与健康相关，有些菌平时无害、但在特定条件下可能带来问题。本章按类别列出它们在您肠道中的情况；检出一种菌不等于有益或患病，具体作用还取决于菌株和身体状况。',
+    'subsections':{1:'与健康相关的几类菌',2:'需要留意的菌'},
+}
+WRITING_FOCUS.update({
+    'word.3.1':'概括已展示的健康相关菌类别合计与人群位置，最多点名两个类别；仅有完整分类谱和质控通过时可提未检出。',
+    'word.3.2':'概括需留意类别的人群位置，检出不等于感染；涉及菌株或毒素只说请看第4章，不预先写结论。',
+    'word.3.3':'信息已并入卡片，原证据保留，不单独生成正文。',
+    'word.3.4':'内容已并入导语，原证据保留，不单独生成正文。',
+})
+CHAPTER_RULES[3] = '只解释卡片已展示的类别结果，不写系统状态、分类编号或参考方法。不把检出解释成感染，不预先写第4章结论。第4章交叉引用只写请看第4章。'

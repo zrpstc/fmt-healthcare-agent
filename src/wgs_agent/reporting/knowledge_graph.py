@@ -408,6 +408,9 @@ def subsection_seeds(document: dict, chapter: int, sub: int) -> list[str]:
     if chapter == 2:
         from .consumer_chapter_two import graph_seeds
         return graph_seeds(document, sub)
+    if chapter == 3:
+        from .consumer_chapter_three import graph_seeds
+        return graph_seeds(document, sub)
     configured = document.get("consumer", {}).get("graph_seeds", {}).get(str(chapter), {}).get(str(sub))
     if configured is not None:
         return configured
@@ -461,14 +464,14 @@ def _display_from_candidates(graph: dict, candidates: list[dict], translations=N
         properties = _attributes(edge)
         if properties and "display_attributes" not in edge:
             attribute = translations.get(_id("attribute", json.dumps(properties, sort_keys=True, ensure_ascii=False)), {})
-            if not attribute:
-                return None
-            edge["display_attributes"] = attribute["label"]
-        if not edge.get("display_label"):
-            return None
-    if not _chinese_nodes(graph):
-        return None
-    graph["display_status"] = "ready"
+            if attribute:
+                edge["display_attributes"] = attribute["label"]
+            else:
+                edge['consumer_missing_attributes']=True
+    # Identifiers and research groups may be untranslated but removable by G13.
+    # Validate the surviving display only AFTER filtering, never discard a whole
+    # otherwise usable graph merely because a removable RiCBM/probe has no label.
+    graph["display_status"] = "pending_consumer_filter"
     return graph
 
 
@@ -488,7 +491,7 @@ def _bounded_candidate(topic: dict, seeds, evidence: dict) -> dict | None:
     graph.pop("figure", None)
     graph.pop("visual_style", None)
     graph.update(max_nodes=_body_node_limit(), max_edges=6, truncated=len(selected) < len(edges))
-    return graph if _chinese_nodes(graph) else None
+    return graph if graph['edges'] else None
 
 
 def subsection_graph(document: dict, chapter: int, sub: int, seeds) -> dict | None:
@@ -543,6 +546,9 @@ def subsection_graph(document: dict, chapter: int, sub: int, seeds) -> dict | No
     for source, graph in options:
         from .consumer_graph import consumer_graph_filter
         graph = consumer_graph_filter(graph, seeds)
+        if graph['display_status']=='ready' and (not _chinese_nodes(graph) or any(not edge.get('display_label') or edge.get('consumer_missing_attributes') for edge in graph['edges'])):
+            graph['display_status']='unavailable'
+            graph['filter_audit']['status']='unavailable'
         filter_attempts.append({'source': source, **graph['filter_audit']})
         if graph['display_status'] != 'ready':
             continue
@@ -574,7 +580,7 @@ def subsection_graph(document: dict, chapter: int, sub: int, seeds) -> dict | No
     selections[key] = entry
     item = f"{key} 知识子图"
     if selected is None:
-        sparse = bool(filter_attempts) and not any(attempt['status'] == 'ready' for attempt in filter_attempts)
+        sparse = bool(filter_attempts) and all(attempt['after_edges'] < 2 for attempt in filter_attempts)
         reason = 'subgraph_too_sparse' if sparse else 'no_ready_subgraph'
         document['consumer_omissions'] = [row for row in document.get('consumer_omissions', [])
             if not (row['chapter'] == chapter and row['item'] == item and row['reason_code'] != reason)]

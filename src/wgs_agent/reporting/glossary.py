@@ -173,6 +173,9 @@ class Glossary:
                     result = self.compress_watch(latin or term_id, evidence)
                     accepted = self._watch_entry(evidence, result)
                     if accepted:
+                        if not entry:
+                            entry={'one_liner':'','detail':'','evidence_scope':accepted['watch_evidence_scope'],'sources':[],
+                                   'review_status':'pending','generated_at':accepted['watch_generated_at'],'model':''}
                         entry.update(term_id=term_id,kind='taxon',display_name=display_name or entry.get('display_name',''),
                                      latin=latin or entry.get('latin',''),version=VERSION,**accepted)
                         _atomic(path,entry)

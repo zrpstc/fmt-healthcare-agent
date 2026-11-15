@@ -322,8 +322,13 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                     label = _wrap(draw, label, font(23), 360, 3)
                     box = draw.multiline_textbbox((0, 0), label, font=font(23), spacing=4)
                     label_y = min(by - h - 45, by - h - 12 - box[3])
+                    label_x = bx - (box[2] - box[0]) / 2
+                    if body:
+                        cx, cy = body_label_position(bx, label_y + (box[3] - box[1]) / 2, box)
+                        label_x = cx - (box[2] - box[0]) / 2 - box[0]
+                        label_y = cy - (box[3] - box[1]) / 2 - box[1]
                     draw.multiline_text(
-                        (bx - (box[2] - box[0]) / 2, label_y),
+                        (label_x, label_y),
                         label,
                         font=font(23),
                         spacing=4,
@@ -465,10 +470,11 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                 draw.text((cursor + 42, legend_y + 38), category, font=font(22), fill="#4a6174")
                 cursor += 62 + len(category) * 24
             if body and any(is_pending_review(edge) for edge in edges):
-                draw.text((45, height-28), '虚线：尚待人工核对的研究结论', font=font(24), fill='#4a6174')
+                draw.text((45, height-48), '虚线：尚待人工核对的研究结论', font=font(24), fill='#4a6174')
             graph["visual_style"] = {
                 "version": "chinese-network-v2",
                 **({"body_min_node_font_px": 36, "canvas_width": width, "canvas_height": height,
+                    "body_pending_legend_box": draw.textbbox((45, height-48), '虚线：尚待人工核对的研究结论', font=font(24)) if any(is_pending_review(edge) for edge in edges) else None,
                     "body_node_boxes": {key: [x-sizes[key][0]/2, y-sizes[key][1]/2,
                                               x+sizes[key][0]/2, y+sizes[key][1]/2] for key,(x,y) in positions.items()},
                     "body_relation_boxes": relation_boxes} if body else {}),
