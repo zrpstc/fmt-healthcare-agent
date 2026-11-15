@@ -85,6 +85,8 @@ def prepare(document):
     categories = {}
     stages = []
     glossary_entries = list(glossary.curated.values())
+    from .consumer_key_taxa import function_tag_entries
+    glossary_entries += function_tag_entries(document)
     for category_name, title, meaning_key in STAGES:
         aggregate = aggregate_category(document, category_name) if not qc_failed(document) else {
             "category": category_name, "status": "missing", "pathways": [], "per_pathway": [], "contributors": [], "named_count": 0,

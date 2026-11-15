@@ -56,11 +56,20 @@ def prepare_derived_reference(base, output, *, block_size=64):
         for name in ("metadata.tsv", "species_abundance.tsv"):
             shutil.copyfile(base / name, stage / name)
         n = len(labels)
-        distances = np.lib.format.open_memmap(stage / DISTANCES, mode="w+", dtype=np.float32, shape=(n, n))
-        for start in range(0, n, block_size):
-            stop = min(start + block_size, n)
-            distances[start:stop] = cdist(values[start:stop], values, metric="braycurtis").astype(np.float32)
-        distances.flush()
+        reused_distances = False
+        if manifest.get('consumer_derived', {}).get('schema_version') == VERSION:
+            previous, _ = load_derived(base, manifest, hashes)
+            if previous['ids'] != list(matrix.ids):
+                raise ValueError('derived_reference_identity_mismatch')
+            shutil.copyfile(base / DISTANCES, stage / DISTANCES)
+            distances = np.load(stage / DISTANCES, mmap_mode='r', allow_pickle=False)
+            reused_distances = True
+        else:
+            distances = np.lib.format.open_memmap(stage / DISTANCES, mode="w+", dtype=np.float32, shape=(n, n))
+            for start in range(0, n, block_size):
+                stop = min(start + block_size, n)
+                distances[start:stop] = cdist(values[start:stop], values, metric="braycurtis").astype(np.float32)
+            distances.flush()
         fields = manifest.get("stratify_by", [])
         bounds = manifest.get("age_band_boundaries", list(DEFAULT_AGE_BANDS))
         groups = {}
@@ -79,11 +88,21 @@ def prepare_derived_reference(base, output, *, block_size=64):
             strata[key] = {"ids": [matrix.ids[i] for i in indices], "typicality": medians,
                            "first_dominant_share": ordered[:, -1].tolist(),
                            "top5_share": ordered[:, -5:].sum(axis=1).tolist()}
+        from .consumer_key_taxa import load_panel, category_matches
+        panel = load_panel()
+        category_values = {}
+        for category in panel['categories']:
+            columns = [i for i, feature in enumerate(features) if category_matches(feature, category)]
+            category_values[category['id']] = values[:, columns].sum(axis=1).tolist() if columns else [0.0] * n
         payload = {"schema_version": VERSION, "source_sha256": {k: hashes[k] for k in ("metadata.tsv", "species_abundance.tsv")},
                    "ids": list(matrix.ids), "n_subjects": n, "n_features": len(features),
                    "distance_dtype": "float32", "distance_metric": "Bray-Curtis",
                    "typicality_method": "leave_one_person_out_median_within_stratum",
-                   "strata": strata, "build_seconds": round(time.monotonic() - started, 3)}
+                   "strata": strata,
+                   'key_taxa': {'schema_version': 'consumer-key-taxa-reference-v1', 'panel_version': panel['schema_version'],
+                                'panel_sha256': panel['sha256'], 'ids': list(matrix.ids), 'categories': category_values},
+                   'reused_verified_distances': reused_distances,
+                   "build_seconds": round(time.monotonic() - started, 3)}
         (stage / SUMMARY).write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n")
         manifest = {**manifest, "files": {**manifest["files"], SUMMARY: sha256(stage / SUMMARY), DISTANCES: sha256(stage / DISTANCES)},
                     "consumer_derived": {"schema_version": VERSION, "summary": SUMMARY, "distances": DISTANCES,

@@ -339,9 +339,7 @@
       "version": "consumer-glossary-v1",
       "generated_at": "2026-11-14T00:00:00Z",
       "model": "curated-editorial",
-      "tags": [
-        "butyrate_producer"
-      ]
+      "tags": []
     },
     {
       "term_id": "escherichia coli",
