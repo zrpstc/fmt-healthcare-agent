@@ -60,6 +60,16 @@ def topic(doc, id="key_taxa.bifidobacteria"):
     return next(t for s in doc["sections"] for t in s["topics"] if t["id"] == id)
 
 
+def published_topic(doc, markdown, id="key_taxa.bifidobacteria"):
+    """Equivalent raw topic figures are deduplicated once in A4."""
+    from wgs_agent.reporting.knowledge_graph import graph_claim_keys
+    claims = graph_claim_keys(topic(doc, id)["knowledge_subgraph"])
+    return next(t for section in doc['sections'] for t in section['topics']
+                if t.get('knowledge_subgraph', {}).get('figure')
+                and t['knowledge_subgraph']['figure'] in markdown
+                and graph_claim_keys(t['knowledge_subgraph']) == claims)
+
+
 def test_graph_contains_only_relevant_actual_claims_and_valid_endpoints():
     unrelated = claim(
         2,
@@ -266,7 +276,7 @@ def test_graph_modes_control_body_and_only_nonempty_appendix(mode, tmp_path, mon
     from wgs_agent.reporting.graph_labels import translate_graph_labels
     from wgs_agent.reporting.graph_visual import render_graph_figures
     monkeypatch.setenv('WGS_REPORT_KNOWLEDGE_GRAPHS', mode)
-    doc = document([claim()])
+    doc = document([claim(), claim(2, object="acetate", predicate="PRODUCES")])
     translate_graph_labels(doc, None)
     render_graph_figures(doc, tmp_path)
     md = render_markdown(doc)
@@ -329,12 +339,15 @@ def analysis_file(tmp_path):
 async def test_published_graph_is_shared_by_markdown_json_api_and_pdf(
     generator, tmp_path, monkeypatch
 ):
+    monkeypatch.setenv("WGS_REPORT_KNOWLEDGE_GRAPHS", "appendix")
     result = await generator.invoke(
         {"sample_id": "TEST__001", "analysis_json_path": str(analysis_file(tmp_path))}
     )
     assert not result.is_error, result.content
     doc = json.loads((tmp_path / "TEST__001_report.json").read_text())
-    graph = topic(doc)["knowledge_subgraph"]
+    markdown = (tmp_path / "TEST__001_health_report.md").read_text()
+    displayed = published_topic(doc, markdown)
+    graph = displayed["knowledge_subgraph"]
     filename = graph["figure"]
     image = tmp_path / filename
     assert image.read_bytes().startswith(b"\x89PNG")
@@ -345,7 +358,7 @@ async def test_published_graph_is_shared_by_markdown_json_api_and_pdf(
     pdf = (tmp_path / "TEST__001_health_report.pdf").read_bytes()
     assert b"/Subtype /Image" in pdf  # Embeds a figure, not an unavailable-image caption.
     evidence = json.loads((tmp_path / "TEST__001_report_evidence.json").read_text())
-    assert evidence["knowledge_subgraphs"][topic(doc)["id"]] == graph
+    assert evidence["knowledge_subgraphs"][displayed["id"]] == graph
     from app import main
 
     monkeypatch.setattr(main, "RESULTS_DIR", tmp_path)

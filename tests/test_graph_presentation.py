@@ -127,7 +127,8 @@ def test_invalid_english_and_unknown_ids_are_rejected_and_repaired_once():
     assert topic(doc)["knowledge_subgraph"]["display_status"] == "ready"
 
 
-def test_styling_uses_shared_nodes_variable_sizes_and_type_colors(tmp_path):
+def test_styling_uses_shared_nodes_variable_sizes_and_type_colors(tmp_path, monkeypatch):
+    monkeypatch.setenv("WGS_REPORT_KNOWLEDGE_GRAPHS", "appendix")
     doc = document([claim(1), claim(2, object="acetate", predicate="PRODUCES")])
     translate_graph_labels(doc, None)
     figures = render_graph_figures(doc, tmp_path)
@@ -142,7 +143,8 @@ def test_styling_uses_shared_nodes_variable_sizes_and_type_colors(tmp_path):
     attach_subgraphs(doc)
     assert graph == topic(doc)["knowledge_subgraph"] == saved
     markdown = render_markdown(doc)
-    assert graph["figure"] in markdown
+    from test_report_knowledge_graph import published_topic
+    assert published_topic(doc, markdown)["knowledge_subgraph"]["figure"] in markdown
     assert "证据原句" not in markdown and "参考依据：" not in markdown
     assert "CORRELATED_WITH" not in markdown and "document:" not in markdown
 
