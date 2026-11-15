@@ -39,6 +39,14 @@ def render_appendices(document):
     from .consumer_chapter_two import appendix as chapter_two_appendix
     if state.get("chapter_two"):
         output.extend(chapter_two_appendix(document))
+    graph_audits = list(state.get('graph_filter_audit', {}).values())
+    if graph_audits:
+        from collections import Counter
+        reasons = Counter()
+        for record in graph_audits: reasons.update(record.get('removed_reasons', {}))
+        output.append('正文知识子图清洗汇总：节点'+str(sum(row['before_nodes'] for row in graph_audits))+'→'+str(sum(row['after_nodes'] for row in graph_audits))+
+                      '，关系'+str(sum(row['before_edges'] for row in graph_audits))+'→'+str(sum(row['after_edges'] for row in graph_audits))+
+                      '；删除原因计数：'+str(dict(sorted(reasons.items())))+'。原始主题图及文献关系完整保留在结构化报告。')
     output.append("### A2 术语表")
     entries = list(state.get("glossary", {}).values())
     if entries:

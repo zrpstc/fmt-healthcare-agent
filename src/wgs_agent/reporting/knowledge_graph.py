@@ -539,7 +539,13 @@ def subsection_graph(document: dict, chapter: int, sub: int, seeds) -> dict | No
                                       -len(item[1]["edges"]), -_graph_metrics(item[1], seeds)["average_confidence"], item[0]))
         options.extend(fallback)
     selected = None
+    filter_attempts = []
     for source, graph in options:
+        from .consumer_graph import consumer_graph_filter
+        graph = consumer_graph_filter(graph, seeds)
+        filter_attempts.append({'source': source, **graph['filter_audit']})
+        if graph['display_status'] != 'ready':
+            continue
         signature = graph_signature(graph)
         metrics = _graph_metrics(graph, seeds)
         ranking_topic = pseudo if source == "merged" else topics[source]
@@ -561,10 +567,19 @@ def subsection_graph(document: dict, chapter: int, sub: int, seeds) -> dict | No
             entry["selected_source"] = source
             entry["selected_metrics"] = metrics
     entry["graph"] = selected
+    entry['graph_filter_attempts'] = filter_attempts
+    state.setdefault('graph_filter_audit', {})[key] = (
+        selected['filter_audit'] if selected else filter_attempts[0] if filter_attempts else
+        {'before_nodes': 0, 'before_edges': 0, 'after_nodes': 0, 'after_edges': 0, 'removed_reasons': {}, 'status': 'no_ready_subgraph'})
     selections[key] = entry
     item = f"{key} 知识子图"
     if selected is None:
-        omit(document, chapter, item, "no_ready_subgraph", "没有可用于正文且不重复的已就绪知识子图")
+        sparse = bool(filter_attempts) and not any(attempt['status'] == 'ready' for attempt in filter_attempts)
+        reason = 'subgraph_too_sparse' if sparse else 'no_ready_subgraph'
+        document['consumer_omissions'] = [row for row in document.get('consumer_omissions', [])
+            if not (row['chapter'] == chapter and row['item'] == item and row['reason_code'] != reason)]
+        omit(document, chapter, item, "subgraph_too_sparse" if sparse else "no_ready_subgraph",
+             "清洗后的知识子图不足两条关系" if sparse else "没有可用于正文且不重复的已就绪知识子图")
     elif selected.get("figure"):
         document["consumer_omissions"] = [r for r in document.get("consumer_omissions", [])
                                          if not (r["chapter"] == chapter and r["item"] == item)]
