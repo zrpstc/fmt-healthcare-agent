@@ -1,6 +1,5 @@
 """Shared consumer appendix; technical records retain their original precision."""
 from __future__ import annotations
-import os
 
 
 def render_appendices(document):
@@ -9,6 +8,11 @@ def render_appendices(document):
     state = document.get("consumer") or {}
     if not state:
         return []
+    from .knowledge_graph import graph_mode, graph_markdown, graph_signature, graph_claim_keys
+    mode = graph_mode()
+    if mode != "off":
+        from .glossary import Glossary
+        Glossary(document).get("knowledge_subgraph", kind="concept")
     inputs = document.get("template_inputs", {})
     audit = (inputs.get("healthy_comparison") or {}).get("audit", {})
     output = ["### A1 参考人群与方法说明", reference_labels.method(inputs) + "。",
@@ -45,17 +49,23 @@ def render_appendices(document):
     omissions = document.get("consumer_omissions", [])
     if omissions:
         output.append(table(["章节", "项目", "原因", "原因码"], [[r["chapter"], r["item"], r["reason_cn"], r["reason_code"]] for r in omissions]))
-    output.append("### A4 知识子图")
-    if os.environ.get("WGS_REPORT_KNOWLEDGE_GRAPHS", "appendix").lower() != "off":
-        from .knowledge_graph import graph_markdown
-        from .template_catalog import CHAPTERS
-        from .consumer_copy import CONSUMER_CHAPTERS
-        ids = {tid for n in CONSUMER_CHAPTERS for _, topics in CHAPTERS[n-1][3] for tid in topics}
+    graphs = []
+    if mode != "off":
+        shown = state.get("displayed_subgraphs", []) if mode == "inline" else []
+        seen = {row["signature"] for row in shown}
+        shown_claims = {claim for row in shown for claim in row["claims"]}
         for section in document.get("sections", []):
             for topic in section["topics"]:
-                if topic["id"] in ids:
-                    output.extend(graph_markdown(topic))
-    else:
-        output.append("知识子图已按配置隐藏，原始节点和关系保留在结构化报告。")
-    state["appendix_sections"] = ["A1", "A2", "A3", "A4"]
+                graph = topic.get("knowledge_subgraph", {})
+                signature = graph_signature(graph)
+                claims = graph_claim_keys(graph)
+                if signature in seen or claims and claims <= shown_claims:
+                    continue
+                parts = graph_markdown(topic, document=document, placement="appendix")
+                if parts:
+                    seen.add(signature)
+                    graphs.extend(parts)
+    if graphs:
+        output.extend(["### A4 知识子图", *( ["正文未展示的子图"] if mode == "inline" else []), *graphs])
+    state["appendix_sections"] = ["A1", "A2", "A3"] + (["A4"] if graphs else [])
     return output

@@ -1,17 +1,27 @@
 # 报告中的相关知识子图
 
-健康报告在每个有分析结果的细分主题下展示中文相关知识子图。正文不再列证据原句、技术 ID、来源表格或 REST 地址；报告末尾按 11 个一级模块汇总论文格式的参考文献。网页预览、Markdown 和 PDF 使用同一份内容；结构化报告保留原始证据与图谱事实。
+健康报告默认 inline 模式。已改版章节在每个小节末尾、小结之后展示最多一幅中文知识子图，原「全部移入A4」要求已废止。正文不列证据原句、技术 ID、来源表格或 REST 地址；报告末尾按一级模块汇总参考文献。网页预览、Markdown 和 PDF 使用同一份内容；结构化报告保留原始证据与图谱事实。
 
 ## 筛选范围
 
 - 优先使用模型解读实际引用的 Claim。没有文献引用的检测说明展示该主题的相关文献关系，并明确标为相关关系。
 - 匹配依据为该主题的检测实体、主题关键词与 Claim 的主客体，或者知识记录中明确填写的 `topic_ids`。文献标题、文件名和背景原句中的偶然提及不作为匹配依据。
-- 每个主题最多 6 条关系、12 个实体。仅保留原始 Claim 的直接主客体关系，不扩展邻居，不展示全库图谱，不生成推断边。
+- 原主题子图最多6条关系、12个实体；正文副本默认最多8个实体、6条边，可用 WGS_REPORT_GRAPH_BODY_MAX_NODES 调整节点上限，不裁剪附录和结构化原图。仅保留原始 Claim 的直接主客体关系，不扩展邻居，不生成推断边。
 - 图中合并同一实体，按连通分量排布。节点尺寸随连接度和中文标签长度变化，图幅随组件大小调整。
 - 不同实体类别使用不同节点颜色，关系类别使用不同边颜色，图底部提供中文图例。推测关系使用虚线。
 - 否定、推测、不显著、未报告效应等标记保留；复杂实体、关系和属性仅在展示层简写，不修改原始主客体、方向和证据。
 - 完整证据 ID、Claim ID、文档 ID、文件名、证据原句和页码保存在结构化报告及证据文件。
-- 没有匹配关系时显示“未匹配到可展示的知识图谱关系”；缺少检测结果或质控失败的主题不展示子图。
+- 只选 display_status=ready 的候选。没有可用且不重复的中文正文图时不输出占位字，在 consumer_omissions 中登记 reason_code=no_ready_subgraph；缺少检测结果或质控失败的主题不展示子图。
+
+## 小节选择与模式
+
+共享函数 `subsection_graph(document, chapter, sub, seeds) -> dict | None` 合并CHAPTERS映射及consumer_copy.GRAPH_TOPICS的候选。仅合并候选已有 allowed_narrative_ids / narrative_evidence_ids，以伪topic复用build_topic_graph；其证据资格约束保持不变。边排序沿用_score、_confidence，端点命中实际正文seeds加60分。合并不可展示或签名重复时，按命中seeds的边数、边数、平均置信度依次选择单图；同章和相邻小节不重复相同签名。
+
+无topic的1.4补充composition.species和composition.dominance；2.3补充metabolites.scfa（丁酸）、nutrient_metabolism.fiber（纤维/多糖底物）、metabolites.intermediates（乳酸）。补充ID均出自TOPIC_KEYWORDS，原因及每节候选/得分/seeds命中保存在变更说明和consumer.subsection_graphs。
+
+`WGS_REPORT_KNOWLEDGE_GRAPHS=inline|appendix|off`，默认inline。inline下A4只列正文尚未展示的完整主题图，若某主题图全部claim已展示则不重复；appendix下全报告图谱集中到A4；off下全报告不显示子图。A4为空时整节省略。模式切换不删除结构化图谱。
+
+图题使用「图 X-Yk  与本节相关的研究知识」。全报告首次出现时附G4已审核的「知识子图」说明：「圆圈是菌、物质或健康状态，连线是已发表研究报道过的关系；它帮助理解背景，不代表这些关系已在您体内发生。」正文图只用中文节点标签，节点文字在PDF中至少9pt。原关系语义、否定、推测和颜色不变；红橙色 #ca694f 对应「抑制与降低」，具体predicate由样本验收记录列明。
 
 ## 自动检索与回退
 

@@ -158,7 +158,9 @@ def _wrap(draw, text: str, font, width: float, maximum=3) -> str:
 
 
 def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
-    from .knowledge_graph import relation_label, _confidence
+    from .knowledge_graph import relation_label, _confidence, prepare_subsection_graphs, graph_mode
+
+    prepare_subsection_graphs(document)
 
     regular_path, bold_path = resolve_cjk_fonts()
 
@@ -167,19 +169,24 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
         return ImageFont.truetype(bold_path if bold else regular_path, size)
 
     figures = {}
-    for section in document["sections"]:
+    body_topics = [{"id": "consumer." + key, "title": record["graph"]["caption"],
+                    "knowledge_subgraph": record["graph"]}
+                   for key, record in document.get("consumer", {}).get("subsection_graphs", {}).items()
+                   if record.get("graph")] if graph_mode() == "inline" else []
+    for section in [*document["sections"], {"topics": body_topics}]:
         for topic in section["topics"]:
             graph = topic.get("knowledge_subgraph", {})
             nodes, edges = graph.get("nodes", []), graph.get("edges", [])
             if not edges or graph.get("display_status") != "ready":
                 continue
+            body = graph.get("body_presentation", False)
             degree = {n["id"]: 0 for n in nodes}
             for edge in edges:
                 degree[edge["source"]] += 1
                 degree[edge["target"]] += 1
             components = _components(nodes, edges)
-            columns = 2 if len(components) > 1 and max(map(len, components)) <= 4 else 1
-            cell_w = 880 if columns == 2 else 1680
+            columns = 1 if body else (2 if len(components) > 1 and max(map(len, components)) <= 4 else 1)
+            cell_w = (760 if columns == 2 else 1520) if body else (880 if columns == 2 else 1680)
 
             def caption_padding(component):
                 if any(
@@ -200,7 +207,7 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                 max(component_height(c) for c in components[i : i + columns])
                 for i in range(0, len(components), columns)
             ]
-            width, height = cell_w * columns + 80, sum(row_heights) + 250
+            width, height = cell_w * columns + 80, sum(row_heights) + (280 if body else 250)
             canvas = Image.new("RGB", (width, height), "#f7fafc")
             draw = ImageDraw.Draw(canvas)
             draw.text(
@@ -212,7 +219,7 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                 left = 40 + (index % columns) * cell_w
                 row_index = index // columns
                 padding = caption_padding(component)
-                top = 110 + sum(row_heights[:row_index]) + padding
+                top = (140 if body else 110) + sum(row_heights[:row_index]) + padding
                 cell_h = row_heights[row_index] - padding
                 ordered = sorted(component, key=lambda key: (-degree[key], key))
                 if len(ordered) == 1:
@@ -242,16 +249,42 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                     node = node_map[key]
                     importance = min(4, degree[key] - 1)
                     label = node["display_label"]
-                    label_font = font(30 + importance * 2, True)
+                    label_font = font((40 if body else 30) + importance * 2, True)
                     label_width = max(
-                        (draw.textlength(line[:9], font=label_font) for line in label.splitlines()),
+                        (draw.textlength(line[:12 if body else 9], font=label_font) for line in label.splitlines()),
                         default=0,
                     )
-                    box_w = min(344, max(190, label_width + 42)) + importance * 5
+                    type_width = draw.textlength(node["display_type"], font=font(36)) + 32 if body else 0
+                    box_w = min(460 if body else 344, max(220 if body else 190, label_width + 42, type_width)) + importance * 5
                     wrapped = _wrap(draw, label, label_font, box_w - 24, 3)
                     bounds = draw.multiline_textbbox((0, 0), wrapped, font=label_font, spacing=4)
-                    box_h = max(108, bounds[3] - bounds[1] + 68) + importance * 4
+                    box_h = max(108, bounds[3] - bounds[1] + (100 if body else 68)) + importance * 4
                     sizes[key] = (box_w, box_h)
+            relation_boxes = []
+
+            def body_label_position(x, y, box):
+                """Keep relation text clear of nodes and previously placed labels."""
+                if not body:
+                    return x, y
+                text_w, text_h = box[2] - box[0], box[3] - box[1]
+                offsets = sorted(((dx, dy) for dx in (0, -90, 90, -180, 180)
+                                  for dy in (0, -65, 65, -130, 130, -195, 195)),
+                                 key=lambda pair: pair[0] ** 2 + pair[1] ** 2)
+                for dx, dy in offsets:
+                    cx, cy = x + dx, y + dy
+                    rectangle = (cx - text_w / 2 - 8, cy - text_h / 2 - 5,
+                                 cx + text_w / 2 + 8, cy + text_h / 2 + 5)
+                    if rectangle[0] < 20 or rectangle[2] > width - 20 or rectangle[1] < 95 or rectangle[3] > height - 145:
+                        continue
+                    obstacles = [(px - sizes[key][0] / 2 - 8, py - sizes[key][1] / 2 - 8,
+                                  px + sizes[key][0] / 2 + 8, py + sizes[key][1] / 2 + 8)
+                                 for key, (px, py) in positions.items()] + relation_boxes
+                    if not any(rectangle[0] < other[2] and rectangle[2] > other[0]
+                               and rectangle[1] < other[3] and rectangle[3] > other[1] for other in obstacles):
+                        relation_boxes.append(rectangle)
+                        return cx, cy
+                raise ValueError("body graph labels do not fit without overlap")
+
             for edge_index, edge in enumerate(edges):
                 a, b = positions[edge["source"]], positions[edge["target"]]
                 if a == b:
@@ -308,7 +341,7 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                     for e in edges
                     if {e["source"], e["target"]} == {edge["source"], edge["target"]}
                 ]
-                curve = (peers.index(edge) - (len(peers) - 1) / 2) * 48
+                curve = (peers.index(edge) - (len(peers) - 1) / 2) * (160 if body else 48)
                 mid = ((start[0] + end[0]) / 2 - uy * curve, (start[1] + end[1]) / 2 + ux * curve)
                 points = []
                 for step in range(31):
@@ -354,6 +387,7 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                 box = draw.multiline_textbbox(
                     (0, 0), label, font=font(25), align="center", spacing=5
                 )
+                label_x, label_y = body_label_position(label_x, label_y, box)
                 text_x = label_x - (box[2] - box[0]) / 2 - box[0]
                 text_y = label_y - (box[3] - box[1]) / 2 - box[1]
                 draw.rounded_rectangle(
@@ -381,13 +415,13 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                     outline=border,
                     width=3,
                 )
-                label_font = font(30 + min(4, degree[node["id"]] - 1) * 2, True)
+                label_font = font((40 if body else 30) + min(4, degree[node["id"]] - 1) * 2, True)
                 label = _wrap(draw, node["display_label"], label_font, w - 24, 3)
                 bounds = draw.multiline_textbbox((0, 0), label, font=label_font, spacing=4)
                 label_height = bounds[3] - bounds[1]
                 label_width = bounds[2] - bounds[0]
                 draw.multiline_text(
-                    (x - label_width / 2 - bounds[0], y - label_height / 2 - bounds[1] - 18),
+                    (x - label_width / 2 - bounds[0], y - label_height / 2 - bounds[1] - (28 if body else 18)),
                     label,
                     font=label_font,
                     align="center",
@@ -397,7 +431,7 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                 draw.text(
                     (x, y + h / 2 - 25),
                     node["display_type"],
-                    font=font(20),
+                    font=font(36 if body else 20),
                     anchor="mm",
                     fill=border,
                 )
@@ -421,6 +455,10 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                 cursor += 62 + len(category) * 24
             graph["visual_style"] = {
                 "version": "chinese-network-v2",
+                **({"body_min_node_font_px": 36, "canvas_width": width, "canvas_height": height,
+                    "body_node_boxes": {key: [x-sizes[key][0]/2, y-sizes[key][1]/2,
+                                              x+sizes[key][0]/2, y+sizes[key][1]/2] for key,(x,y) in positions.items()},
+                    "body_relation_boxes": relation_boxes} if body else {}),
                 "node_colors": {n["id"]: NODE_COLORS[node_category(n["type"])][1] for n in nodes},
                 "node_sizes": {key: list(value) for key, value in sizes.items()},
                 "edge_colors": {e["id"]: EDGE_COLORS[edge_category(e["predicate"])] for e in edges},

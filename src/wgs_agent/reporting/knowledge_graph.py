@@ -51,7 +51,8 @@ def _score(row: dict, topic: dict, evidence: dict) -> int:
     ):
         return 0
     explicit = row.get("topic_ids")
-    if isinstance(explicit, list) and topic["id"] in explicit:
+    topic_ids = topic.get("graph_source_topic_ids", [topic["id"]])
+    if isinstance(explicit, list) and set(topic_ids).intersection(explicit):
         return 100
     score = 0
     for key in topic.get("evidence_ids", [])[:24]:
@@ -62,7 +63,7 @@ def _score(row: dict, topic: dict, evidence: dict) -> int:
                 score = max(score, 40)
     if any(
         _contains(word, endpoint)
-        for word in TOPIC_KEYWORDS.get(topic["id"], ())
+        for tid in topic_ids for word in TOPIC_KEYWORDS.get(tid, ())
         for endpoint in endpoints
     ):
         score = max(score, 20)
@@ -204,7 +205,8 @@ async def enrich_document(document: dict, *, transport=None) -> None:
         audit.update(status="unavailable", error_type=type(exc).__name__)
 
 
-def build_topic_graph(document: dict, topic: dict) -> dict:
+def build_topic_graph(document: dict, topic: dict, *, max_nodes=MAX_NODES,
+                      max_edges=MAX_EDGES, seeds=()) -> dict:
     """A one-hop evidence subgraph; no inferred edges or background expansion."""
     graph = {
         "status": "no_match",
@@ -212,8 +214,8 @@ def build_topic_graph(document: dict, topic: dict) -> dict:
         "edges": [],
         "candidate_count": 0,
         "truncated": False,
-        "max_edges": MAX_EDGES,
-        "max_nodes": MAX_NODES,
+        "max_edges": max_edges,
+        "max_nodes": max_nodes,
     }
     if topic["status"] == "missing":
         graph["status"] = "not_assessed"
@@ -237,9 +239,15 @@ def build_topic_graph(document: dict, topic: dict) -> dict:
             and (row.get("claim_id") or row.get("raw_claim_id"))
         ):
             candidates.append((key, row, score))
-    candidates.sort(
-        key=lambda item: (*_claim_quality(item[1]), item[0] not in cited, -item[2], item[0])
-    )
+    if seeds:
+        candidates.sort(key=lambda item: (
+            is_pending_review(item[1]),
+            -(item[2] + 60 * bool(_seed_matches(item[1], seeds)) + 10 * _confidence(item[1])),
+            item[0] not in cited, item[0]))
+    else:
+        candidates.sort(
+            key=lambda item: (*_claim_quality(item[1]), item[0] not in cited, -item[2], item[0])
+        )
     graph["candidate_count"] = len(candidates)
     nodes, seen = {}, set()
     for key, row, _ in candidates:
@@ -274,8 +282,8 @@ def build_topic_graph(document: dict, topic: dict) -> dict:
                 }
             )
         if (
-            len(graph["edges"]) >= MAX_EDGES
-            or len(set(nodes) | {n["id"] for n in pair}) > MAX_NODES
+            len(graph["edges"]) >= max_edges
+            or len(set(nodes) | {n["id"] for n in pair}) > max_nodes
         ):
             graph["truncated"] = True
             continue
@@ -361,9 +369,268 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
     return render(document, directory)
 
 
-def graph_markdown(topic: dict) -> list[str]:
+def graph_mode() -> str:
+    value = os.environ.get("WGS_REPORT_KNOWLEDGE_GRAPHS", "inline").strip().lower()
+    return value if value in {"inline", "appendix", "off"} else "inline"
+
+
+def graph_signature(graph: dict) -> str:
+    """Graph identity is independent of topic title, layout and image filename."""
+    rows = sorted((str(e.get("knowledge_base_id") or ""), str(e.get("claim_id") or ""),
+                   e["source"], e["target"], e["predicate"]) for e in graph.get("edges", []))
+    return hashlib.sha256(json.dumps(rows, ensure_ascii=False).encode()).hexdigest()
+
+
+def _seed_matches(row: dict, seeds, nodes=()) -> list[str]:
+    labels = [row.get("subject", ""), row.get("object", "")]
+    labels += [n.get("display_label", "") for n in nodes
+               if n["id"] in {row.get("source"), row.get("target")}]
+    return sorted({str(seed) for seed in seeds if seed and any(
+        _contains(seed, label) for label in labels if label)})
+
+
+def subsection_topics(chapter: int, sub: int) -> list[str]:
+    from .template_catalog import CHAPTERS
+    from .consumer_copy import GRAPH_TOPICS
+    mapped = CHAPTERS[chapter - 1][3][sub - 1][1] if 0 < chapter <= len(CHAPTERS) and 0 < sub <= len(CHAPTERS[chapter - 1][3]) else ()
+    return list(dict.fromkeys([*mapped, *GRAPH_TOPICS.get((chapter, sub), ())]))
+
+
+def subsection_seeds(document: dict, chapter: int, sub: int) -> list[str]:
+    """Custom consumer renderers expose the entities they actually show.
+
+    Future opt-in chapters can publish consumer.graph_seeds[chapter][sub];
+    ordinary Word sections default to their bound, displayed evidence names.
+    """
+    if chapter == 1:
+        from .consumer_chapter import graph_seeds
+        return graph_seeds(document, sub)
+    if chapter == 2:
+        from .consumer_chapter_two import graph_seeds
+        return graph_seeds(document, sub)
+    configured = document.get("consumer", {}).get("graph_seeds", {}).get(str(chapter), {}).get(str(sub))
+    if configured is not None:
+        return configured
+    ids = set(subsection_topics(chapter, sub))
+    return sorted({str(row[field]) for section in document.get("sections", []) for topic in section["topics"]
+                   if topic["id"] in ids for key in topic.get("evidence_ids", [])
+                   for row in [document.get("evidence", {}).get(key, {})]
+                   for field in ("species", "name", "label") if row.get(field)})
+
+
+def _body_node_limit() -> int:
+    try:
+        return max(2, min(MAX_NODES, int(os.environ.get("WGS_REPORT_GRAPH_BODY_MAX_NODES", "8"))))
+    except ValueError:
+        return 8
+
+
+def _chinese_nodes(graph: dict) -> bool:
+    return bool(graph.get("edges")) and all(
+        re.search(r"[\u4e00-\u9fff]", n.get("display_label", ""))
+        and not re.search(r"[A-Za-z]", n.get("display_label", "") + n.get("display_type", ""))
+        for n in graph.get("nodes", []))
+
+
+def _graph_metrics(graph: dict, seeds) -> dict:
+    edges = graph.get("edges", [])
+    matches = [_seed_matches(edge, seeds, graph.get("nodes", [])) for edge in edges]
+    return {"seed_hit_edges": sum(bool(hit) for hit in matches), "edge_count": len(edges),
+            "average_confidence": sum(_confidence(edge) for edge in edges) / max(1, len(edges)),
+            "matched_seeds": sorted({seed for hit in matches for seed in hit})}
+
+
+def _display_from_candidates(graph: dict, candidates: list[dict], translations=None) -> dict | None:
+    from .graph_labels import _id, _attributes, TYPE_LABELS, RELATION_LABELS, ENTITY_LABELS
+    translations = translations or {}
+    nodes = {n["id"]: n for t in candidates for n in t["knowledge_subgraph"].get("nodes", [])}
+    edges = {(e.get("knowledge_base_id"), e["claim_id"]): e for t in candidates
+             for e in t["knowledge_subgraph"].get("edges", [])}
+    for node in graph.get("nodes", []):
+        node.update({k: v for k, v in nodes.get(node["id"], {}).items() if k.startswith("display_")})
+        label = translations.get(_id("entity", json.dumps([node["label"], node["type"]], ensure_ascii=False)), {})
+        kind = translations.get(_id("type", node["type"]), {})
+        node.setdefault("display_label", label.get("label", node["label"]))
+        node.setdefault("display_type", kind.get("label", TYPE_LABELS.get(node["type"], "其他")))
+        if re.search(r"[A-Za-z]", node["display_label"]) and node["label"] in ENTITY_LABELS:
+            node["display_label"] = ENTITY_LABELS[node["label"]]
+    for edge in graph.get("edges", []):
+        edge.update({k: v for k, v in edges.get((edge.get("knowledge_base_id"), edge["claim_id"]), {}).items() if k.startswith("display_")})
+        label = translations.get(_id("relation", edge["predicate"]), {})
+        edge.setdefault("display_label", label.get("label", RELATION_LABELS.get(edge["predicate"], "")))
+        properties = _attributes(edge)
+        if properties and "display_attributes" not in edge:
+            attribute = translations.get(_id("attribute", json.dumps(properties, sort_keys=True, ensure_ascii=False)), {})
+            if not attribute:
+                return None
+            edge["display_attributes"] = attribute["label"]
+        if not edge.get("display_label"):
+            return None
+    if not _chinese_nodes(graph):
+        return None
+    graph["display_status"] = "ready"
+    return graph
+
+
+def _bounded_candidate(topic: dict, seeds, evidence: dict) -> dict | None:
+    graph = copy.deepcopy(topic["knowledge_subgraph"])
+    edges = sorted(graph["edges"], key=lambda edge: (
+        is_pending_review(edge), -(_score(evidence.get(edge["evidence_id"], {}), topic, evidence)
+        + 60 * bool(_seed_matches(edge, seeds, graph["nodes"])) + 10 * _confidence(edge)), edge["evidence_id"]))
+    selected, node_ids = [], set()
+    for edge in edges:
+        pair = {edge["source"], edge["target"]}
+        if len(selected) < 6 and len(node_ids | pair) <= _body_node_limit():
+            selected.append(edge)
+            node_ids.update(pair)
+    graph["edges"] = selected
+    graph["nodes"] = [n for n in graph["nodes"] if n["id"] in node_ids]
+    graph.pop("figure", None)
+    graph.pop("visual_style", None)
+    graph.update(max_nodes=_body_node_limit(), max_edges=6, truncated=len(selected) < len(edges))
+    return graph if _chinese_nodes(graph) else None
+
+
+def subsection_graph(document: dict, chapter: int, sub: int, seeds) -> dict | None:
+    """Select one Chinese, citation-bound body graph without modifying topic graphs.
+
+    Eligible topics must already be display-ready. Their allowed/cited claim IDs
+    are unioned into a display-only pseudo topic. Relevance, confidence and a
+    60-point endpoint seed bonus rank its edges; evidence eligibility is unchanged.
+    A duplicate merged graph falls back to individual candidates, ordered by
+    seed-hit edge count, edge count, then mean confidence. Selection and omissions
+    are report-scoped and deterministic across preparation and repeated rendering.
+    """
+    from .consumer_state import consumer, omit
+    state = consumer(document)
+    selections = state.setdefault("subsection_graphs", {})
+    key = f"{chapter}.{sub}"
+    previous = selections.get(key, {}).get("graph") or {}
+    seeds = sorted({str(seed) for seed in seeds if seed})
+    ids = subsection_topics(chapter, sub)
+    topics = {t["id"]: t for s in document.get("sections", []) for t in s["topics"]}
+    candidates = [topics[tid] for tid in ids if tid in topics and topics[tid].get("status") != "missing"
+                  and topics[tid].get("knowledge_subgraph", {}).get("display_status") == "ready"
+                  and topics[tid]["knowledge_subgraph"].get("edges")]
+    entry = {"chapter": chapter, "subsection": sub, "seeds": seeds, "candidate_topics": ids,
+             "ready_topics": [t["id"] for t in candidates], "candidates": [], "graph": None}
+    entry["topic_candidates"] = [{"id": tid, "status": topics.get(tid, {}).get("status", "absent"),
+        "display_status": topics.get(tid, {}).get("knowledge_subgraph", {}).get("display_status"),
+        "edge_count": len(topics.get(tid, {}).get("knowledge_subgraph", {}).get("edges", []))} for tid in ids]
+    earlier = [(tuple(map(int, k.split('.'))), record) for k, record in selections.items()
+               if tuple(map(int, k.split('.'))) < (chapter, sub)]
+    forbidden = {record["graph"]["signature"] for position, record in earlier if position[0] == chapter and record.get("graph")}
+    if earlier:
+        adjacent = max(earlier, key=lambda item: item[0])[1].get("graph")
+        if adjacent:
+            forbidden.add(adjacent["signature"])
+    options = []
+    if candidates:
+        pseudo = {"id": f"consumer.{key}", "status": "available", "graph_source_topic_ids": [t["id"] for t in candidates],
+                  "evidence_ids": sorted({i for t in candidates for i in t.get("evidence_ids", [])}),
+                  "allowed_narrative_ids": sorted({i for t in candidates for i in t.get("allowed_narrative_ids", [])}),
+                  "narrative_evidence_ids": sorted({i for t in candidates for i in t.get("narrative_evidence_ids", [])})}
+        merged = _display_from_candidates(build_topic_graph(document, pseudo, max_nodes=_body_node_limit(), max_edges=6, seeds=seeds), candidates, document.get("graph_label_translations"))
+        entry["merge_status"] = "ready" if merged else "no_complete_chinese_display"
+        if merged:
+            options.append(("merged", merged))
+        fallback = [(t["id"], g) for t in candidates if (g := _bounded_candidate(t, seeds, document["evidence"]))]
+        fallback.sort(key=lambda item: (-_graph_metrics(item[1], seeds)["seed_hit_edges"],
+                                      -len(item[1]["edges"]), -_graph_metrics(item[1], seeds)["average_confidence"], item[0]))
+        options.extend(fallback)
+    selected = None
+    for source, graph in options:
+        signature = graph_signature(graph)
+        metrics = _graph_metrics(graph, seeds)
+        ranking_topic = pseudo if source == "merged" else topics[source]
+        metrics["edge_scores"] = [{"evidence_id": edge["evidence_id"],
+            "relevance": _score(document["evidence"].get(edge["evidence_id"], {}), ranking_topic, document["evidence"]),
+            "confidence": _confidence(edge), "matched_seeds": _seed_matches(edge, seeds, graph["nodes"])} for edge in graph["edges"]]
+        for row in metrics["edge_scores"]:
+            row["score"] = row["relevance"] + 60 * bool(row["matched_seeds"]) + 10 * row["confidence"]
+        metrics["score"] = sum(row["score"] for row in metrics["edge_scores"])
+        entry["candidates"].append({"source": source, "signature": signature, "duplicate": signature in forbidden, **metrics})
+        if selected is None and signature not in forbidden:
+            graph.update(signature=signature, body_presentation=True, source_topic_ids=entry["ready_topics"] if source == "merged" else [source],
+                         caption=f"图 {chapter}-{sub}k  与本节相关的研究知识")
+            if previous.get("signature") == signature and previous.get("figure"):
+                graph["figure"] = previous["figure"]
+                if previous.get("visual_style"):
+                    graph["visual_style"] = previous["visual_style"]
+            selected = graph
+            entry["selected_source"] = source
+            entry["selected_metrics"] = metrics
+    entry["graph"] = selected
+    selections[key] = entry
+    item = f"{key} 知识子图"
+    if selected is None:
+        omit(document, chapter, item, "no_ready_subgraph", "没有可用于正文且不重复的已就绪知识子图")
+    elif selected.get("figure"):
+        document["consumer_omissions"] = [r for r in document.get("consumer_omissions", [])
+                                         if not (r["chapter"] == chapter and r["item"] == item)]
+    return selected
+
+
+def prepare_subsection_graphs(document: dict) -> None:
+    from .consumer_copy import CONSUMER_CHAPTERS, CHAPTERS as COPY, GRAPH_HIDDEN_SUBSECTIONS
+    from .template_catalog import CHAPTERS
+    if graph_mode() != "inline":
+        return
+    for chapter in sorted(CONSUMER_CHAPTERS):
+        subs = COPY.get(chapter, {}).get("subsections", {}) or range(1, len(CHAPTERS[chapter - 1][3]) + 1)
+        presentation = next((c for c in document.get("presentation", {}).get("chapters", [])
+                             if c["number"] == chapter), {})
+        visible = [int(match.group(1)) for title in presentation.get("subsections", [])
+                   if (match := re.match(rf"^{chapter}\.(\d+)\s", title))]
+        if visible:
+            subs = visible
+        for sub in subs:
+            if (chapter, sub) not in GRAPH_HIDDEN_SUBSECTIONS:
+                subsection_graph(document, chapter, sub, subsection_seeds(document, chapter, sub))
+
+
+def _reading_note(document: dict) -> list[str]:
+    state = document.setdefault("consumer", {})
+    if state.get("graph_reading_note_shown"):
+        return []
+    from .glossary import Glossary
+    entry = Glossary(document).get("knowledge_subgraph", kind="concept")
+    if entry and entry["review_status"] == "approved":
+        state["graph_reading_note_shown"] = True
+        return ["> " + entry["detail"]]
+    return []
+
+
+def _mark_displayed(document: dict, graph: dict) -> None:
+    state = document.setdefault("consumer", {})
+    rows = state.setdefault("displayed_subgraphs", [])
+    signature = graph_signature(graph)
+    if not any(row["signature"] == signature for row in rows):
+        rows.append({"signature": signature, "claims": sorted(graph_claim_keys(graph))})
+
+
+def graph_claim_keys(graph: dict) -> set[str]:
+    return {json.dumps([e.get("knowledge_base_id"), str(e["claim_id"])]) for e in graph.get("edges", [])}
+
+
+def subsection_graph_markdown(document: dict, chapter: int, sub: int, seeds=None) -> list[str]:
+    if graph_mode() != "inline":
+        return []
+    graph = subsection_graph(document, chapter, sub, seeds if seeds is not None else subsection_seeds(document, chapter, sub))
+    if not graph or not graph.get("figure"):
+        if graph:
+            from .consumer_state import omit
+            omit(document, chapter, f"{chapter}.{sub} 知识子图", "no_ready_subgraph", "正文知识子图尚无可用的已渲染图片")
+        return []
+    _mark_displayed(document, graph)
+    return [graph["caption"], f"![{graph['caption']}]({graph['figure']})", *_reading_note(document)]
+
+
+def graph_markdown(topic: dict, *, document=None, placement="inline") -> list[str]:
     from .document import text
 
+    if graph_mode() == "off" or placement == "inline" and graph_mode() != "inline":
+        return []
     graph = topic.get("knowledge_subgraph", {})
     if not graph.get("edges"):
         return []
@@ -372,4 +639,10 @@ def graph_markdown(topic: dict) -> list[str]:
     output = ["**相关知识子图**"]
     if graph.get("figure"):
         output.append(f"![{text(topic['title'])}相关知识子图]({graph['figure']})")
+        if document is not None:
+            if placement == "inline":
+                _mark_displayed(document, graph)
+            output.extend(_reading_note(document))
+    else:
+        return []
     return output

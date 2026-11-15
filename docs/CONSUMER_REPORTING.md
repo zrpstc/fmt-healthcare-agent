@@ -1,6 +1,6 @@
-# 消费者报告展示层（第1章）
+# 消费者报告展示层（第1、2章）
 
-消费者正文由 `consumer_copy.py` 和 `consumer_chapter.py` 覆盖；Word 原稿、word_contract.json、小节编号和证据主题 ID 不变。完整13章仍然保留。当前 `CONSUMER_CHAPTERS={1}`，未改版章节的文案、图谱和配色继续使用原实现。
+消费者正文由 `consumer_copy.py`、`consumer_chapter.py` 和 `consumer_chapter_two.py` 覆盖；Word 原稿、word_contract.json、小节编号和证据主题 ID 不变。完整13章仍然保留。当前 `CONSUMER_CHAPTERS={1,2}`。
 
 原始检测值、参考统计及旧模型文案保留在原结构化字段。消费者数据另存 `document.consumer`；缺失项目按任务契约另外登记在 `document.consumer_omissions`。旧第1章图片载荷保留在 `consumer.raw_chapter_one.source_word_figures`。
 
@@ -23,7 +23,8 @@
 | WGS_GLOSSARY_REQUIRE_REVIEW | 1 | pending 不进正文，进入运行时待审队列 |
 | WGS_WEB_SEARCH_PROVIDER | 空 | 网页检索关闭；searxng 才启用 |
 | WGS_SEARXNG_URL | 空 | 仅从环境读取，不能写入报告或代码 |
-| WGS_REPORT_KNOWLEDGE_GRAPHS | appendix | 当前已改版章节的图谱移至A4；off 隐藏这些图谱 |
+| WGS_REPORT_KNOWLEDGE_GRAPHS | inline | inline：已改版章节逐小节最多一幅，A4只收正文未展示的图；appendix：全部放A4；off：全报告隐藏子图 |
+| WGS_REPORT_GRAPH_BODY_MAX_NODES | 8 | 正文图节点上限，最少2，最多12；边上限6；不影响原始主题图和附录 |
 
 缓存为工作区 `runtime/glossary/` 下的 term_id+version 内容键；待审队列为 `runtime/glossary_review_queue.jsonl`。不同报告复用同一缓存，避免同菌解释漂移。队列使用文件锁去重，缓存原子替换。审核通过后，把完整条目加入人工词典并标记 approved；修改解释时同步提升词典/服务版本。只改队列状态不会绕过正文审核闸门。
 
@@ -46,7 +47,19 @@ search:
 
 ## 附录与兼容范围
 
-A1保留参考方法、归一化、局限、bootstrap、批次和逐研究明细，以及原始丰度和参考文字；A2汇总词典条目；A3集中登记省略原因；A4放置第1章原有知识子图。节点、关系和配色实现未修改。引用通过现有 bibliography 出口追加，消费者来源从1001编号，避免改变既有模块编号。
+A1保留参考方法、归一化、局限、bootstrap、批次和逐研究明细，以及原始丰度和参考文字；A2汇总词典条目；A3集中登记省略原因。A4按知识子图模式收图，内容为空时整节省略。引用通过现有 bibliography 出口追加，消费者来源从1001编号，避免改变既有模块编号。
+
+## 逐小节知识子图
+
+原「正文不插图、统一移入A4」要求已废止。`knowledge_graph.subsection_graph(document, chapter, sub, seeds)` 只从 display_status=ready 的主题候选中选图，先合并允许/已引用的文献 claim；失败或重复时按 seeds 命中边数、边数、平均置信度选单图。边排序复用相关度和置信度，并给端点命中正文实体的边增加60分。同章或相邻小节签名重复时改选下一候选，无替代时不显示占位字，并登记 `no_ready_subgraph`。
+
+1.1以菌种小档案的菌为seeds；1.2以第一优势菌为seeds；1.4只用明显偏离常见范围的菌。2.1/2.2使用正文的多样性与组成概念；2.3使用三栏实际展示的前三名贡献菌及相应产物。中文名和学名均参与匹配，图中标签只用中文。隐藏的1.3不参与选图；原2.4仍合并至2.3。
+
+`GRAPH_TOPICS[(1,4)]` 补充 composition.species、composition.dominance。`GRAPH_TOPICS[(2,3)]` 采用 metabolites.scfa（butyrate/丁酸）、nutrient_metabolism.fiber（纤维、抗性淀粉及多糖底物）、metabolites.intermediates（lactate/乳酸）；三者均来自既有TOPIC_KEYWORDS，不创建topic或证据ID。乳酸topic也包含琥珀酸，只作为原有候选范围，seeds加权不新增乳酸利用关系。
+
+每图位于小结之后、下一标题之前，图题为「图 X-Yk  与本节相关的研究知识」。首次子图后显示G4已审核条目「知识子图」的完整读图说明，全报告只出现一次。正文节点字号和节点类型字号单独放大，结合PDF实际图片缩放验证至少9pt。正文图在 `consumer.subsection_graphs` 中另存候选、得分、命中的seeds和最终图，原 `sections[].topics[].knowledge_subgraph` 不裁剪。后续加入CONSUMER_CHAPTERS的普通章节自动走共享出口，自定义渲染器复用 subsection_graph_markdown 并提供实际展示的 graph_seeds。
+
+配色保持既有语义不变：关系「抑制与降低」沿用红橙色 #ca694f；「疾病与结局」节点沿用粉红填充和红色边框。实际样本涉及的关系类型见本次变更说明，留待人工决定。
 
 “全报告消费者规则”与“不改第2–13章输出”发生范围冲突时，当前只对已启用的章节应用消费者规则。其余章节的旧空状态、方法段及图谱位置暂保留，后续逐章迁移。旧章节规则兜底保持兼容；第1章不再使用原始行拼接兜底。
 

@@ -221,6 +221,7 @@ P5、P95和目标百分位附固定种子1000次bootstrap的95%置信区间；�
 
 当前 gpu02 复用现有 Elasticsearch。应用重启前会检查认证连接；应用停止和重启不会操作外部依赖的容器、数据卷或密码。排错统一使用 `bash deploy/status.sh`，详细行为及旧脚本处置见 [部署说明](deploy/README.md)。
 
+- [消费者报告基础设施与 AI 接入指南](docs/CONSUMER_REPORTING_INFRASTRUCTURE.md)
 - [项目架构](docs/PROJECT_ARCHITECTURE_GUIDE.md)
 - [报告相关知识子图](docs/REPORT_KNOWLEDGE_SUBGRAPHS.md)
 - [环境说明](docs/ENVIRONMENT.md)
