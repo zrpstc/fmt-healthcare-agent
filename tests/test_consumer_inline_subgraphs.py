@@ -8,6 +8,10 @@ from wgs_agent.reporting import knowledge_graph as kg
 from wgs_agent.reporting.consumer_copy import GRAPH_TOPICS
 
 
+def pair(number, subject, first='丁酸', second='乳酸', confidence=.8):
+    return [(number, subject, first, confidence), (number + 100, subject, second, confidence)]
+
+
 def graph_document(topic_claims):
     doc = {"sample_id": "INLINE_TEST", "sections": [{"topics": []}], "evidence": {}, "consumer": {}}
     for tid, claims in topic_claims.items():
@@ -60,11 +64,11 @@ def test_seed_bonus_changes_bounded_edge_selection_without_changing_evidence():
 
 
 def test_merge_uses_union_of_allowed_claims_and_preserves_original_graphs():
-    doc = graph_document({"composition.species": [(1, "展示菌", "丁酸", .8)],
-                          "composition.dominance": [(2, "其他菌", "乳酸", .9)]})
+    doc = graph_document({"composition.species": pair(1, "展示菌"),
+                          "composition.dominance": pair(2, "展示菌", '乙酸', '丙酸', .9)})
     original = copy.deepcopy(doc["sections"])
     graph = kg.subsection_graph(doc, 1, 4, ["展示菌"])
-    assert {e["claim_id"] for e in graph["edges"]} == {"claim:1", "claim:2"}
+    assert {e["claim_id"] for e in graph["edges"]} == {"claim:1", "claim:101", "claim:2", "claim:102"}
     assert doc["consumer"]["subsection_graphs"]["1.4"]["selected_source"] == "merged"
     assert doc["sections"] == original
     assert graph["edges"][0]["subject"] == "展示菌"
@@ -72,7 +76,7 @@ def test_merge_uses_union_of_allowed_claims_and_preserves_original_graphs():
 
 
 def test_ready_gate_and_chinese_gate_and_no_placeholder():
-    doc = graph_document({"composition.species": [(1, "展示菌", "丁酸", .8)]})
+    doc = graph_document({"composition.species": pair(1, "展示菌")})
     topic = doc["sections"][0]["topics"][0]
     topic["knowledge_subgraph"]["display_status"] = "unavailable"
     assert kg.subsection_graph_markdown(doc, 1, 1, ["展示菌"]) == []
@@ -84,13 +88,13 @@ def test_ready_gate_and_chinese_gate_and_no_placeholder():
 
 
 def test_duplicate_merged_graph_chooses_next_candidate_then_omits():
-    doc = graph_document({"composition.phyla": [(1, "甲菌", "丁酸", .8)],
-                          "composition.genera": [(2, "乙菌", "乳酸", .9)],
-                          "composition.species": [(1, "甲菌", "丁酸", .8)],
-                          "composition.dominance": [(2, "乙菌", "乳酸", .9)]})
-    first = kg.subsection_graph(doc, 1, 1, ["甲菌"])
+    doc = graph_document({"composition.phyla": pair(1, "甲菌"),
+                          "composition.genera": pair(2, "乙菌", '乙酸', '丙酸', .9),
+                          "composition.species": pair(1, "甲菌"),
+                          "composition.dominance": pair(2, "乙菌", '乙酸', '丙酸', .9)})
+    first = kg.subsection_graph(doc, 1, 1, ["甲菌", "乙菌"])
     second = kg.subsection_graph(doc, 1, 2, ["乙菌"])
-    third = kg.subsection_graph(doc, 1, 4, ["甲菌"])
+    third = kg.subsection_graph(doc, 1, 4, ["甲菌", "乙菌"])
     assert len({g["signature"] for g in [first, second, third]}) == 3
     assert doc["consumer"]["subsection_graphs"]["1.4"]["selected_source"] == "composition.species"
     # A later section with only an already used graph has no replacement.
@@ -99,8 +103,8 @@ def test_duplicate_merged_graph_chooses_next_candidate_then_omits():
 
 
 def test_adjacent_chapters_do_not_repeat_the_same_graph():
-    doc = graph_document({"composition.species": [(1, "甲菌", "丁酸", .8)],
-                          "diversity.richness": [(1, "甲菌", "丁酸", .8)]})
+    doc = graph_document({"composition.species": pair(1, "甲菌"),
+                          "diversity.richness": pair(1, "甲菌")})
     assert kg.subsection_graph(doc, 1, 4, ["甲菌"])
     assert kg.subsection_graph(doc, 2, 1, ["甲菌"]) is None
 
@@ -110,7 +114,7 @@ def test_genus_endpoint_does_not_count_as_displayed_species():
 
 
 def test_existing_analyte_names_rescue_seed_weighted_merged_claims():
-    doc = graph_document({'composition.species': [(1, '展示菌', 'acetylcholine', .9)]})
+    doc = graph_document({'composition.species': pair(1, '展示菌', 'acetylcholine', '丁酸', .9)})
     topic = doc['sections'][0]['topics'][0]
     for node in topic['knowledge_subgraph']['nodes']:
         if node['label'] == 'acetylcholine':
@@ -126,18 +130,20 @@ def test_new_consumer_chapter_automatically_uses_shared_subsection_outlet(tmp_pa
     from wgs_agent.reporting.graph_labels import translate_graph_labels
     from wgs_agent.reporting.graph_visual import render_graph_figures
     from test_report_knowledge_graph import document, claim
-    monkeypatch.setattr(consumer_copy, 'CONSUMER_CHAPTERS', {1, 2, 3})
-    doc = document([claim()])
+    monkeypatch.setattr(consumer_copy, 'CONSUMER_CHAPTERS', {1, 2, 3, 4})
+    monkeypatch.setitem(consumer_copy.GRAPH_TOPICS, (4, 1), ('composition.species',))
+    doc = document([claim(), claim(2, object='acetate', predicate='PRODUCES')])
+    doc.setdefault('consumer', {}).setdefault('graph_seeds', {})['4'] = {'1': ['Bifidobacterium longum']}
     translate_graph_labels(doc, None)
     render_graph_figures(doc, tmp_path)
     md = render_markdown(doc)
-    # Chapter three uses the ordinary Word renderer, without a new chapter hook.
-    section = re.split(r'\n#{2,3} ', md.split('### 3.1 ', 1)[1], maxsplit=1)[0]
-    assert section.count('![图 3-1k  与本节相关的研究知识]') == 1
+    # A future chapter uses the ordinary Word renderer and explicit displayed seeds.
+    section = re.split(r'\n#{2,3} ', md.split('### 4.1 ', 1)[1], maxsplit=1)[0]
+    assert section.count('![图 4-1k  与本节相关的研究知识]') == 1
 
 
 def test_fallback_ranks_seed_hit_edges_before_edge_count_and_confidence(monkeypatch):
-    doc = graph_document({"metabolites.scfa": [(1, "展示菌", "丁酸", .5)],
+    doc = graph_document({"metabolites.scfa": pair(1, "展示菌", confidence=.5),
                           "metabolites.intermediates": [(2, "甲菌", "乳酸", .99), (3, "乙菌", "乳酸", .99)]})
     monkeypatch.setattr(kg, "_display_from_candidates", lambda *a: None)
     graph = kg.subsection_graph(doc, 2, 3, ["展示菌"])
@@ -146,10 +152,10 @@ def test_fallback_ranks_seed_hit_edges_before_edge_count_and_confidence(monkeypa
 
 
 def test_body_node_setting_does_not_limit_topic_json(monkeypatch):
-    doc = graph_document({"composition.species": [(i, "菌" + str(i), "物质" + str(i), .9) for i in range(1, 7)]})
+    doc = graph_document({"composition.species": [(i, "菌种" + str(i), "物质" + str(i), .9) for i in range(1, 7)]})
     original = copy.deepcopy(doc["sections"][0]["topics"][0]["knowledge_subgraph"])
     monkeypatch.setenv("WGS_REPORT_GRAPH_BODY_MAX_NODES", "4")
-    graph = kg.subsection_graph(doc, 1, 1, ["菌1"])
+    graph = kg.subsection_graph(doc, 1, 1, ["菌种1", "菌种2"])
     assert len(graph["nodes"]) <= 4
     assert doc["sections"][0]["topics"][0]["knowledge_subgraph"] == original
     assert len(original["nodes"]) == 12
@@ -161,11 +167,11 @@ def test_inline_placement_first_note_once_and_repeat_render_is_stable(tmp_path):
     from wgs_agent.reporting.graph_visual import render_graph_figures
     from wgs_agent.reporting.glossary import Glossary
     doc = build(healthy=True)
-    fixture = graph_document({"composition.species": [(1, "展示菌", "丁酸", .8)],
-                              "composition.dominance": [(2, "优势菌", "乳酸", .9)],
-                              "diversity.richness": [(3, "多样性", "研究结果", .8)],
-                              "diversity.reference": [(4, "菌群组成", "健康人群", .8)],
-                              "metabolites.scfa": [(5, "参与菌", "丁酸", .8)]})
+    fixture = graph_document({"composition.species": pair(1, "展示菌"),
+                              "composition.dominance": pair(2, "优势菌"),
+                              "diversity.richness": pair(3, "多样性", '丰富度', '均衡度'),
+                              "diversity.reference": pair(4, "菌群组成", '多样性', '丰富度'),
+                              "metabolites.scfa": pair(5, "参与菌")})
     by_id = {t["id"]: t for t in fixture["sections"][0]["topics"]}
     doc["evidence"].update(fixture["evidence"])
     for section in doc["sections"]:

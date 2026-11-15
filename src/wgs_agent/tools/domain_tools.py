@@ -917,6 +917,8 @@ class ReportGeneratorTool(BaseTool):
             prepare_chapter_one(document, resolve_report_model() or resolve_graph_model())
             from wgs_agent.reporting.chapter_two import prepare_chapter_two
             prepare_chapter_two(document, resolve_report_model() or resolve_graph_model())
+            from wgs_agent.reporting.consumer_chapter_three import prepare as prepare_consumer_three
+            prepare_consumer_three(document,config=resolve_report_model() or resolve_graph_model(),force=True)
             document["audit"]["generation_id"] = uuid.uuid4().hex
             context["report_document"] = document
             evidence_manifest = {
@@ -952,6 +954,9 @@ class ReportGeneratorTool(BaseTool):
                 evidence_manifest["chapter_three_backgrounds"] = document.get("chapter_three_backgrounds", {})
                 evidence_manifest["chapter_two_taxon_labels"] = document.get("chapter_two_taxon_labels", {})
                 evidence_manifest["word_sections"] = document.get("word_sections", [])
+                evidence_manifest['consumer_chapter_three']=document.get('consumer',{}).get('chapter_three',{})
+                evidence_manifest['consumer_subsection_graphs']=document.get('consumer',{}).get('subsection_graphs',{})
+                evidence_manifest['consumer_graph_filter_audit']=document.get('consumer',{}).get('graph_filter_audit',{})
                 (staging / filenames["markdown"]).write_text(markdown, encoding="utf-8")
                 (staging / filenames["structured"]).write_text(json.dumps(document, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
                 (staging / filenames["evidence"]).write_text(json.dumps(evidence_manifest, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")

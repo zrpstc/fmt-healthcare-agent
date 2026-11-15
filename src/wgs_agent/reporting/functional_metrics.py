@@ -247,7 +247,9 @@ def record_function_consistency(document, category_name, aggregate, glossary_ent
     (latin_name/name/species and tags). Existing gaps for this category are replaced
     deterministically; other categories and raw inputs are preserved.
     """
-    from .reference import species_key
+    from .consumer_key_taxa import canonical_taxon, load_panel
+    panel = load_panel()
+    species_key = lambda value: canonical_taxon(value, panel)
     tag = {"丁酸合成": "butyrate_producer", "乳酸利用": "lactate_utilizer",
            "复杂多糖降解": "polysaccharide_degrader"}.get(category_name)
     tagged = {species_key(r.get("latin_name") or r.get("latin") or r.get("species") or r.get("name"))

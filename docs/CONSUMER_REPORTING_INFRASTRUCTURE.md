@@ -46,7 +46,7 @@
 
 上图是职责分工；具体调用顺序以 `scripts/refresh_report_presentation.py` 和原报告生成入口为准。准备数据、生成图片和渲染正文可能在同一报告上调用多次：实现必须可重复，不能靠上一次调用留下的“已输出”布尔值永久跳过正文。
 
-消费者章节当前有两种状态位置：第1章用 `consumer.chapters["1"]`，第2章用 `consumer.chapter_two`。这不是统一的自动章节注册框架。不要新增一份第三种全局状态结构；扩展前先确认入口实际消费哪一个字段。
+消费者章节状态位置：第1章用 `consumer.chapters["1"]`，第2章用 `consumer.chapter_two`，第3章用任务指定的 `consumer.chapter_three`。这不是统一的自动章节注册框架；扩展前先确认入口实际消费哪一个字段。
 
 ## 4. G1–G9 公共能力速查
 
@@ -64,7 +64,7 @@
 
 ### G1：正文与专业附录分开
 
-当前消费者章节在 `consumer_copy.CONSUMER_CHAPTERS`，核对时为 `{1, 2}`。`CHAPTERS` 定义展示标题和导语，`WRITING_FOCUS` 定义每个稳定小节 ID 的解读焦点，`CHAPTER_RULES` 保存额外章级约束。
+当前消费者章节在 `consumer_copy.CONSUMER_CHAPTERS`，核对时为 `{1, 2, 3}`。`CHAPTERS` 定义展示标题和导语，`WRITING_FOCUS` 定义每个稳定小节 ID 的解读焦点，`CHAPTER_RULES` 保存额外章级约束。
 
 共享禁用词以 `consumer_copy.FORBIDDEN` 为准：包括“未提供”“未启用”“暂无法判断”“已记录”“本节”“本次结果按”“如图所示”等套话，以及 `g__`、`s__`、`k__`、SGB、P5/P95、bootstrap、软件和数据库版本等技术标识。不要在另一处维护一套独立清单。
 
@@ -281,7 +281,7 @@ record_function_consistency(document, category_name, aggregate, glossary_entries
 
 `consumer_basis.comparison_basis_note(document, chapter)` 返回提示字符串或None。它是纯函数，不负责永久登记“已输出”。调用者在该章实际展示独立对照结果时放置一次，保持重复渲染一致。
 
-当前实现显式支持第1、2章；扩展第3章前需补上该章“何时确实显示了独立比较”的判断。不能仅因为 `healthy_comparison.audit.status=available` 就在所有章节附一段口径提示。
+当前显式支持第1–3章。第3章仅在至少一张卡片实际显示类别参考位置时输出一次：“卡片占比与第1章一致；为与健康人群同口径比较，人群位置经重新计算。”不能仅因为 `healthy_comparison.audit.status=available` 就在所有章节附一段口径提示。
 
 ## 6. 正文知识子图：共享接口
 
@@ -300,13 +300,32 @@ seeds应来自正文真的显示的菌或概念，同时可带中文名和学名
 
 正文图目前默认最多8节点、6条边；节点上限可由 `WGS_REPORT_GRAPH_BODY_MAX_NODES` 调整，范围2–12。选择过程优先合并允许/已引用的声明，按正文实体命中增加权重；遇到同章或相邻小节的重复签名时改选候选，无可用图时登记 `no_ready_subgraph`，不写占位段落。
 
-审计位于 `consumer.subsection_graphs["章.小节"]`：保存seeds、候选主题、就绪状态、得分、重复判定和最终图。原始主题图不裁剪。`inline`下A4只收正文未展示的图；`appendix`下正文不出图；`off`下不显示子图。节点/关系配色不能为消费者新图擅自改义；现有红橙关系与粉红结局节点的保留政策见子图文档。
+审计位于 `consumer.subsection_graphs["章.小节"]`：保存seeds、候选主题、就绪状态、得分、重复判定和最终图。原始主题图不裁剪。`inline`下A4只收正文未展示的图；`appendix`下正文不出图；`off`下不显示子图。第3章任务明确要求全报告不用红色，图谱抑制关系改为琥珀色、疾病结局节点改为灰色；节点/关系语义不变，见子图文档。
 
 `prepare_subsection_graphs()` 按实际可见小节预选，`graph_visual` 生成正文副本；加入CONSUMER_CHAPTERS的普通Word章节自动复用finish出口。自定义章节调用共享Markdown出口，并通过graph_seeds提供实际展示的实体。候选只接受display_status=ready；中文标签不完整时复用既有标签字典，仍不完整则不进入正文。
 
 边的排序值为 `_score + 60×端点命中 + 10×_confidence`，保留待审状态的既有优先级；不把属名端点误记为已展示菌种的命中。合并使用候选允许/已引用claim的并集，不增添推断或背景事实。合并不可展示或签名重复时，单图依次按命中边数、边数、平均置信度排序。签名包含知识库范围及原claim身份，与布局和文件名无关。
 
 正文副本的visual_style保存画布大小、节点字号、节点框及关系标签框；正文布局使用单列连通分量并避让标签，PDF验收按实际图片缩放核算节点至少9pt。无图省略记录在重复渲染时保持顺序稳定。模式切换不删除原主题图；空A4整节省略。
+
+### G13–G15 与第3章接入
+
+| 能力 | 稳定入口与契约 |
+| --- | --- |
+| G13清洗 | `consumer_graph.consumer_graph_filter(graph,seeds)` 返回深拷贝，删除分组/编号/结构边、远端Other及无seeds分量，最多两分量，至少两边；不新增事实 |
+| G13审核样式 | pending虚线、approved实线；“待审核”不进正文标签，图例统一说明；自环和普通标签均检查碰撞，图例检查画布边界 |
+| G13审计 | `consumer.graph_filter_audit` 逐节数量/删除原因，A1汇总；`subsection_graphs` 另存所有候选尝试 |
+| G14面板 | `consumer_key_taxa.load_panel()` / `build_panel()`，唯一版本源 `knowledge_base/consumer_key_taxa.yaml`，不改catalog与旧selected_rows |
+| G14参考 | `cmd_derived.prepare_derived_reference()` 离线增加key_taxa分布；`consumer_reference.key_taxa_reference()` 校验面板SHA、原参考SHA、同层和排除本人后读取，运行时不拟合 |
+| G14未检出 | QC明确passed/pass/通过/合格，完整谱complete必须为布尔True，且没有任何成员记录；否则隐藏并登记G6 |
+| G14可靠度 | 仅estimated reads字段；高≥1000、中≥100、低<100，可在面板中配置。普通reads/coverage不代替估算字段 |
+| G15证据 | `consumer_badges.research_badge()` 按DOI/PMID/论文身份去重；没有已审核one_liner就不出徽标，菌株不升级为物种 |
+| G4关注说明 | `Glossary.get_watch_note()` 与one_liner共用来源/缓存，独立 `watch_review_status` 和队列review_kind，生成永远pending |
+| 第3章 | `consumer_chapter_three.prepare/render/render_figures/appendix`；实际展示成员同时提供seeds；3.3并入3.2，3.4隐藏，旧ID/表/support保留 |
+
+先清洗候选再检查留下节点的中文标签，避免即将删除的编号使整幅图被拒绝。更改面板必须生成新参考资产目录；旧G10距离矩阵在SHA验证后可复用，不重算距离，也不自动切换线上配置。G11产丁酸标签由同一面板的 `function_tags` 解析实际成员，不能另加词典名单。
+
+第3章刷新调用 `refresh_word_section()` 时仅替换word.3展示视图，其他word_sections保持原值。普通报告生成入口也准备第3章G4与面板数据；报告和证据文件均保存chapter_three、subsection_graphs和graph_filter_audit。验收细节见 [CONSUMER_CH3_CHANGELOG.md](CONSUMER_CH3_CHANGELOG.md)。
 
 ## 7. JSON状态速查
 

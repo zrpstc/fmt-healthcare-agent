@@ -15,7 +15,7 @@ from .fonts import resolve_cjk_fonts
 NODE_COLORS = {
     "菌群": ("#d9f1e9", "#22846c"),
     "代谢物": ("#fff0ce", "#b18426"),
-    "疾病与结局": ("#fce0e4", "#bd5367"),
+    "疾病与结局": ("#e4e9ef", "#637b94"),
     "基因与蛋白": ("#e4def7", "#7f62aa"),
     "生理过程": ("#dcecfb", "#387fb3"),
     "研究对象": ("#e4e9ef", "#637b94"),
@@ -25,7 +25,7 @@ NODE_COLORS = {
 EDGE_COLORS = {
     "关联": "#8661ad",
     "促进与产生": "#298d68",
-    "抑制与降低": "#ca694f",
+    "抑制与降低": "#b47a24",
     "组间差异": "#3989bc",
     "研究描述": "#7c8e9d",
     "干预": "#c18b30",
@@ -92,7 +92,7 @@ def _components(nodes: list[dict], edges: list[dict]) -> list[list[str]]:
     return sorted(result, key=lambda c: (-len(c), c[0]))
 
 
-def property_caption(edge: dict) -> str:
+def property_caption(edge: dict, *, show_review=True) -> str:
     """Compact display of declared study qualifiers; the full translation is retained."""
     qualifiers = edge.get("qualifiers") or {}
     process = edge.get("process") or {}
@@ -116,7 +116,7 @@ def property_caption(edge: dict) -> str:
         "unknown": "方向未明确",
     }
     parts = []
-    if edge.get("review_status") == "pending" or edge.get("semantic_status") == "pending" or edge.get("audit_pending"):
+    if show_review and (edge.get("review_status") == "pending" or edge.get("semantic_status") == "pending" or edge.get("audit_pending")):
         parts.append("待审核")
     if metric in metrics and direction in directions:
         parts.append(metrics[metric] + directions[direction])
@@ -161,6 +161,7 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
     from .knowledge_graph import relation_label, _confidence, prepare_subsection_graphs, graph_mode
 
     prepare_subsection_graphs(document)
+    from wgs_fmt_platform.knowledge.knowledge_settings import is_pending_review
 
     regular_path, bold_path = resolve_cjk_fonts()
 
@@ -291,7 +292,12 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                     # Self relations retain an explicit loop, rather than a zero-length arrow.
                     bx, by = a
                     w, h = sizes[edge["source"]]
-                    draw.arc(
+                    arc_bounds = (bx - w / 2, by - h, bx + w / 2, by)
+                    if body and is_pending_review(edge):
+                        for angle in range(190, 530, 20):
+                            draw.arc(arc_bounds, angle, angle+10, fill=EDGE_COLORS[edge_category(edge['predicate'])], width=4)
+                    else:
+                        draw.arc(
                         (bx - w / 2, by - h, bx + w / 2, by),
                         190,
                         530,
@@ -308,13 +314,21 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                         fill=color,
                     )
                     label = relation_label(edge)
-                    if edge.get("display_attributes"):
-                        label += "\n" + edge["display_attributes"]
+                    attributes = property_caption(edge, show_review=False) if body else edge.get('display_attributes')
+                    if attributes:
+                        label += "\n" + attributes
+                    if body:
+                        label = label.replace('待审核', '').strip(' ·，；\n')
                     label = _wrap(draw, label, font(23), 360, 3)
                     box = draw.multiline_textbbox((0, 0), label, font=font(23), spacing=4)
                     label_y = min(by - h - 45, by - h - 12 - box[3])
+                    label_x = bx - (box[2] - box[0]) / 2
+                    if body:
+                        cx, cy = body_label_position(bx, label_y + (box[3] - box[1]) / 2, box)
+                        label_x = cx - (box[2] - box[0]) / 2 - box[0]
+                        label_y = cy - (box[3] - box[1]) / 2 - box[1]
                     draw.multiline_text(
-                        (bx - (box[2] - box[0]) / 2, label_y),
+                        (label_x, label_y),
                         label,
                         font=font(23),
                         spacing=4,
@@ -352,7 +366,7 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                             (1 - t) ** 2 * start[1] + 2 * (1 - t) * t * mid[1] + t * t * end[1],
                         )
                     )
-                if edge.get("speculative"):
+                if is_pending_review(edge) if body else edge.get("speculative"):
                     for i in range(0, len(points) - 1, 3):
                         draw.line(points[i : i + 2], fill=color, width=line_w)
                 else:
@@ -374,8 +388,10 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                     .replace("与…相关", "相关")
                     .replace("与...相关", "相关")
                 )
-                if property_caption(edge):
-                    label += "\n" + property_caption(edge)
+                if property_caption(edge, show_review=not body):
+                    label += "\n" + property_caption(edge, show_review=not body)
+                if body:
+                    label = label.replace('待审核', '').strip(' ·，；\n')
                 label = "\n".join(
                     _wrap(draw, s, font(25), max(230, min(350, distance * 0.7)), 4)
                     for s in label.splitlines()
@@ -453,15 +469,21 @@ def render_graph_figures(document: dict, directory: Path) -> dict[str, str]:
                 )
                 draw.text((cursor + 42, legend_y + 38), category, font=font(22), fill="#4a6174")
                 cursor += 62 + len(category) * 24
+            if body and any(is_pending_review(edge) for edge in edges):
+                draw.text((45, height-48), '虚线：尚待人工核对的研究结论', font=font(24), fill='#4a6174')
             graph["visual_style"] = {
                 "version": "chinese-network-v2",
                 **({"body_min_node_font_px": 36, "canvas_width": width, "canvas_height": height,
+                    "body_pending_legend_box": draw.textbbox((45, height-48), '虚线：尚待人工核对的研究结论', font=font(24)) if any(is_pending_review(edge) for edge in edges) else None,
                     "body_node_boxes": {key: [x-sizes[key][0]/2, y-sizes[key][1]/2,
                                               x+sizes[key][0]/2, y+sizes[key][1]/2] for key,(x,y) in positions.items()},
                     "body_relation_boxes": relation_boxes} if body else {}),
                 "node_colors": {n["id"]: NODE_COLORS[node_category(n["type"])][1] for n in nodes},
                 "node_sizes": {key: list(value) for key, value in sizes.items()},
                 "edge_colors": {e["id"]: EDGE_COLORS[edge_category(e["predicate"])] for e in edges},
+                **({'pending_edge_ids': [e['id'] for e in edges if is_pending_review(e)],
+                    'pending_style': 'dashed',
+                    'edge_line_styles': {e['id']: 'dashed' if is_pending_review(e) else 'solid' for e in edges}} if body else {}),
             }
             digest = hashlib.sha256(
                 json.dumps(

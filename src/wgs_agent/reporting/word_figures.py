@@ -426,12 +426,12 @@ def _text(draw, xy, text, font, fill="#30343A", width=None, anchor="la", max_lin
         draw.text((xy[0], xy[1] + i * step), line, font=font, fill=fill, anchor=anchor)
 
 
-def draw_tier_scale(rows, width=1800):
+def draw_tier_scale(rows, width=1800, *, compact=False):
     """Shared percentile scale; abundance never determines the dot position."""
     from .consumer_format import pct, percentile_phrase, tier
     image = Image.new("RGB", (width, max(160, 35 + 104 * len(rows))), "white")
     draw = ImageDraw.Draw(image)
-    left, right = int(width * .43), width - 54
+    left, right = (24, width-24) if compact else (int(width * .43), width - 54)
     for index, row in enumerate(rows):
         y = 14 + index * 104
         p = finite(row.get("percentile"))
@@ -439,16 +439,22 @@ def draw_tier_scale(rows, width=1800):
             continue
         label = row.get("tier_label") or tier(p, row.get("borderline", False))
         color = row.get("color") or ("#4F7C80" if label == "常见" else "#B47A24")
-        _text(draw, (24, y), row.get("display_label", ""), _font(30), width=left - 45, max_lines=1)
-        _text(draw, (24, y + 45), (row.get("formatted_value") or pct(row["value"])) + "  " + label, _font(27), fill=color)
-        draw.rounded_rectangle((left, y + 13, right, y + 37), radius=10, fill="#E9EDEF")
+        if compact:
+            _text(draw,(24,y),label,_font(32),fill=color)
+            _text(draw,(220,y),percentile_phrase(p),_font(30),width=width-244,max_lines=1)
+        else:
+            _text(draw, (24, y), row.get("display_label", ""), _font(30), width=left - 45, max_lines=1)
+            _text(draw, (24, y + 45), (row.get("formatted_value") or pct(row["value"])) + "  " + label, _font(27), fill=color)
+        bar_y = y + (65 if compact else 13)
+        draw.rounded_rectangle((left, bar_y, right, bar_y+24), radius=10, fill="#E9EDEF")
         span = right - left
-        draw.rectangle((left + span*.25, y+13, left + span*.75, y+37), fill="#C5DEDA")
+        draw.rectangle((left + span*.25, bar_y, left + span*.75, bar_y+24), fill="#C5DEDA")
         x = left + span*p/100
-        draw.ellipse((x-11, y+14, x+11, y+36), fill=color, outline=color, width=5 if label.startswith("明显") else 1)
+        draw.ellipse((x-11, bar_y+1, x+11, bar_y+23), fill=color, outline=color, width=5 if label.startswith("明显") else 1)
         if label.startswith("明显"):
-            draw.ellipse((x-15, y+10, x+15, y+40), outline=color, width=3)
-        _text(draw, (left, y+54), percentile_phrase(p), _font(26), fill="#46565B", width=span, max_lines=1)
+            draw.ellipse((x-15, bar_y-3, x+15, bar_y+27), outline=color, width=3)
+        if not compact:
+            _text(draw, (left, y+54), percentile_phrase(p), _font(26), fill="#46565B", width=span, max_lines=1)
     return image
 
 
@@ -855,6 +861,7 @@ def draw_flow(spec, labels, width):
 def render_word_figures(document, output_dir, *, preserve_existing_from=None):
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
+    document.setdefault('consumer', {})['names_seen'] = []
     # Overview is needed by the action diagram, and is kept traceable in the JSON.
     from .template_body import prepare_presentation
 
@@ -882,6 +889,10 @@ def render_word_figures(document, output_dir, *, preserve_existing_from=None):
             continue
         if chapter["number"] == 2:
             from .consumer_chapter_two import render_figures
+            figures.update(render_figures(document, output, manifest))
+            continue
+        if chapter['number'] == 3:
+            from .consumer_chapter_three import render_figures
             figures.update(render_figures(document, output, manifest))
             continue
         for block in chapter["blocks"]:

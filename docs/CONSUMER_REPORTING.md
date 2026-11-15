@@ -1,6 +1,6 @@
-# 消费者报告展示层（第1、2章）
+# 消费者报告展示层（第1–3章）
 
-消费者正文由 `consumer_copy.py`、`consumer_chapter.py` 和 `consumer_chapter_two.py` 覆盖；Word 原稿、word_contract.json、小节编号和证据主题 ID 不变。完整13章仍然保留。当前 `CONSUMER_CHAPTERS={1,2}`。
+消费者正文由 `consumer_copy.py`、`consumer_chapter.py`、`consumer_chapter_two.py` 和 `consumer_chapter_three.py` 覆盖；Word 原稿、word_contract.json 和证据主题 ID 不变。完整13章仍然保留。当前 `CONSUMER_CHAPTERS={1,2,3}`。第3章只显示3.1、3.2，原3.3证据并入3.2，原始解读ID继续保留。
 
 原始检测值、参考统计及旧模型文案保留在原结构化字段。消费者数据另存 `document.consumer`；缺失项目按任务契约另外登记在 `document.consumer_omissions`。旧第1章图片载荷保留在 `consumer.raw_chapter_one.source_word_figures`。
 
@@ -59,7 +59,21 @@ A1保留参考方法、归一化、局限、bootstrap、批次和逐研究明细
 
 每图位于小结之后、下一标题之前，图题为「图 X-Yk  与本节相关的研究知识」。首次子图后显示G4已审核条目「知识子图」的完整读图说明，全报告只出现一次。正文节点字号和节点类型字号单独放大，结合PDF实际图片缩放验证至少9pt。正文图在 `consumer.subsection_graphs` 中另存候选、得分、命中的seeds和最终图，原 `sections[].topics[].knowledge_subgraph` 不裁剪。后续加入CONSUMER_CHAPTERS的普通章节自动走共享出口，自定义渲染器复用 subsection_graph_markdown 并提供实际展示的 graph_seeds。
 
-配色保持既有语义不变：关系「抑制与降低」沿用红橙色 #ca694f；「疾病与结局」节点沿用粉红填充和红色边框。实际样本涉及的关系类型见本次变更说明，留待人工决定。
+第3章任务已覆盖此前保留红色的约定：全报告图谱的「抑制与降低」改用琥珀色 #b47a24，「疾病与结局」节点改用灰色。关系和节点语义保持不变。
+
+## 第3章与 G13–G15
+
+`consumer_chapter_three.prepare()` 把展示副本写入 `consumer.chapter_three`；旧表和支持记录完整保留于 `raw_legacy_tables`，A1分列两套丰度、参考人数、百分位和检出证据。`refresh_word_section()` 只更新旧报告的第3章解读视图，不覆盖其他章节的既有解读。
+
+G13 `consumer_graph.consumer_graph_filter(graph,seeds)` 只删减正文副本。删除研究分组、探针/编号、结构性关系、远离seeds的Other节点及无seeds分量，最多保留两个分量；不足两条边隐藏并登记 `subgraph_too_sparse`。先清洗再校验剩余中文标签，避免被即将删除的RiCBM等编号阻断。pending边用虚线，approved边用实线，正文不写“待审核”。节点、关系标签和图例进行边界/碰撞检查；审计在 `consumer.graph_filter_audit` 和A1。
+
+G14 唯一面板 `knowledge_base/consumer_key_taxa.yaml` 是版本化JSON兼容YAML。它同时提供G11的 `butyrate_producer` 名单，不再从词典另维护该标签。消费者层按完整主分析种谱匹配属/种和明确别名；`catalog.py`、`chapter_three.selected_rows()` 和旧路径不变。参考位置只读取G10预计算类别分布，按同一已校验、排除本人的参考层选择，面板SHA过期则隐藏参考位置，不在运行时重拟合。
+
+“本次未检出”必须同时满足：QC明确通过、`taxonomy.complete is True`、完整谱没有任何该类成员。未知QC、残缺分类谱或零值成员记录均不发布未检出。估算reads徽标仅接受专用estimated字段；面板默认阈值为高≥1000、中≥100、低<100。缺字段隐藏并登记G6；后续流程若需徽标，应开启MetaPhlAn `rel_ab_w_read_stats`，本任务不重跑。
+
+G15 `consumer_badges.research_badge()` 按独立论文去重，物种级≥3为“多项研究”、1–2为“少量研究”、只有属级为“同属研究推断”。编辑来源不计研究，菌株证据不升级为物种证据，没有可见one_liner不显示徽标。
+
+`Glossary.get_watch_note()` 复用检索顺序和缓存，但用 `watch_review_status` 独立审核；新生成的watch_note始终pending，不随one_liner已审核而自动通过。正文只发布已审核字段，空值静默隐藏并登记G6；B.fragilis使用用户提供的固定说明，指向“请看第4章”，不预判检测结论。样本验收、分类名核对和待审草稿见 [CONSUMER_CH3_CHANGELOG.md](CONSUMER_CH3_CHANGELOG.md)。
 
 “全报告消费者规则”与“不改第2–13章输出”发生范围冲突时，当前只对已启用的章节应用消费者规则。其余章节的旧空状态、方法段及图谱位置暂保留，后续逐章迁移。旧章节规则兜底保持兼容；第1章不再使用原始行拼接兜底。
 

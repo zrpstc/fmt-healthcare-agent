@@ -51,7 +51,7 @@ def test_complete_word_contract_without_example_measurements():
 def test_every_word_field_and_visual_has_a_missing_data_state(tmp_path):
     doc = build()
     names = render_word_figures(doc, tmp_path)
-    assert len(names) == 28  # Empty consumer panels are omitted; the source contract is unchanged.
+    assert len(names) == 26  # Empty chapter-three cards replace its two legacy charts.
     assert not any(key.startswith(("1.", "2.")) for key in names)
     for b in blocks("table"):
         rows = bind_table(doc, b)

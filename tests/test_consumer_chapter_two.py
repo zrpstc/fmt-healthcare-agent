@@ -76,7 +76,7 @@ def test_G12_is_pure_and_requires_an_independent_profile():
 
 def test_coverage_gap_is_visible_only_in_appendix_and_raw_fields_remain():
  doc=build([path('P163-PWY','L-lysine fermentation to acetate and butanoate',1,[member('Fusobacterium nucleatum',1)])])
- doc['template_inputs']['taxonomy']={'ranks':{'species':[{'name':'Faecalibacterium prausnitzii','abundance':13.3}]}}
+ doc['template_inputs']['taxonomy']={'unit':'%','ranks':{'species':[{'name':'Faecalibacterium prausnitzii','abundance':13.3}]}}
  body='\n'.join(render(doc));details='\n'.join(appendix(doc))
  assert 'coverage_gap' not in body and 'coverage_gap' in details
  assert '基因注释可能遗漏部分菌。' in details

@@ -57,6 +57,10 @@ def main():
     with tempfile.TemporaryDirectory(prefix=f".{sid}_presentation_", dir=output) as folder:
         staging = Path(folder)
         attach_subgraphs(document)
+        from wgs_agent.reporting.consumer_chapter_three import prepare as prepare_consumer_three
+        prepare_consumer_three(document,force=True)
+        from wgs_agent.reporting.consumer_chapter_three import refresh_word_section
+        refresh_word_section(document)
         figures = render_graph_figures(document, staging)
         figures.update(render_word_figures(document, staging, preserve_existing_from=output if args.preserve_other_chapters else None))
         figures.update(render_overview_figure(document, staging))
@@ -73,6 +77,8 @@ def main():
                 evidence[key] = document[key]
         evidence["knowledge_subgraphs"] = {t["id"]: t["knowledge_subgraph"] for s in document["sections"] for t in s["topics"]}
         evidence["consumer_subsection_graphs"] = document.get("consumer", {}).get("subsection_graphs", {})
+        evidence['consumer_chapter_three']=document.get('consumer',{}).get('chapter_three',{})
+        evidence['consumer_graph_filter_audit']=document.get('consumer',{}).get('graph_filter_audit',{})
         (staging / names["evidence"]).write_text(json.dumps(evidence, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
         _generate_fpdf_report(markdown, sid, str(staging / names["pdf"]))
         if report.read_bytes() != original:

@@ -336,7 +336,7 @@ def fake_response(payload):
                 {
                     "id": t["id"],
                     "mode": "observation",
-                    "interpretation": ("您的菌群中包含这些检出的成员。" if t["id"].startswith(("word.1.", "word.2.")) else "本项已记录对应的检测线索，可与本次同类结果一起阅读。后续比较时请保持采样背景和分析方法一致。"),
+                    "interpretation": ("您的菌群中包含这些检出的成员。" if t["id"].startswith(("word.1.", "word.2.", "word.3.")) else "本项已记录对应的检测线索，可与本次同类结果一起阅读。后续比较时请保持采样背景和分析方法一致。"),
                     "advice": "",
                     "evidence_ids": [key],
                     "support_quotes": [

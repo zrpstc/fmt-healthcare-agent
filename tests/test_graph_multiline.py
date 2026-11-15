@@ -48,6 +48,7 @@ def test_multiline_node_relation_and_attributes_render_without_changing_evidence
 
 @pytest.mark.asyncio
 async def test_self_loop_with_attribute_caption_publishes_complete_report(tmp_path, monkeypatch):
+    monkeypatch.setenv("WGS_REPORT_KNOWLEDGE_GRAPHS", "appendix")
     from wgs_agent.reporting import graph_labels, inputs
     from wgs_agent.tools import detailed_report
     from wgs_agent.tools.domain_tools import ReportGeneratorTool
@@ -91,7 +92,9 @@ async def test_self_loop_with_attribute_caption_publishes_complete_report(tmp_pa
     )
     assert not result.is_error, result.content
     doc = json.loads((tmp_path / "TEST__001_report.json").read_text())
-    figure = topic(doc)["knowledge_subgraph"]["figure"]
+    from test_report_knowledge_graph import published_topic
+    markdown = (tmp_path / "TEST__001_health_report.md").read_text()
+    figure = published_topic(doc, markdown)["knowledge_subgraph"]["figure"]
     assert (tmp_path / figure).read_bytes().startswith(b"\x89PNG")
     assert figure in (tmp_path / "TEST__001_health_report.md").read_text()
     pdf = (tmp_path / "TEST__001_health_report.pdf").read_bytes()
