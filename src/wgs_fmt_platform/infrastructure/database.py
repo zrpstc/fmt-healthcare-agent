@@ -8,7 +8,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Iterator
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, JSON, String, Text, create_engine
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, JSON, String, Text, UniqueConstraint, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 
 from wgs_fmt_platform.config import get_settings
@@ -92,6 +92,30 @@ class AuditRecord(Base):
     event: Mapped[str] = mapped_column(String(100), index=True)
     payload: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True)
+
+
+class ConsumerShareLink(Base):
+    __tablename__ = "consumer_share_links"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    sample_id: Mapped[str] = mapped_column(String(128), index=True)
+    token_sha256: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    created_by: Mapped[str] = mapped_column(String(36), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_accessed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class ConsumerGlossaryReview(Base):
+    __tablename__ = "consumer_glossary_reviews"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    term_id: Mapped[str] = mapped_column(String(120), index=True)
+    field: Mapped[str] = mapped_column(String(40), default="one_liner")
+    status: Mapped[str] = mapped_column(String(30), default="pending", index=True)
+    text: Mapped[str] = mapped_column(Text, default="")
+    reviewer: Mapped[str] = mapped_column(String(120), default="")
+    reviewed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    __table_args__ = (UniqueConstraint("term_id", "field", name="uq_consumer_glossary_term_field"),)
 
 
 def hash_password(password: str) -> str:
