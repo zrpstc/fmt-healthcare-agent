@@ -1,0 +1,84 @@
+{
+  "schema_version": "consumer-vitamin-v1",
+  "vitamins": [
+    {
+      "id": "vitamin_b1", "name": "维生素B1", "term_id": "vitamin_b1",
+      "role": "参与能量代谢。",
+      "pathways": [
+        {"id": "THISYN-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-6895", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-6897", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-6892", "verified": true, "verification": "observed in HUMAnN pathabundance output"}
+      ]
+    },
+    {
+      "id": "vitamin_b2", "name": "维生素B2", "term_id": "vitamin_b2",
+      "role": "参与能量代谢和氧化还原反应。",
+      "pathways": [
+        {"id": "RIBOSYN2-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"}
+      ]
+    },
+    {
+      "id": "vitamin_b3", "name": "维生素B3", "term_id": "vitamin_b3",
+      "role": "参与能量代谢。",
+      "pathways": [
+        {"id": "PYRIDNUCSYN-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PYRIDNUCSAL-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-7761", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "NAD-BIOSYNTHESIS-II", "verified": true, "verification": "observed in HUMAnN pathabundance output"}
+      ]
+    },
+    {
+      "id": "vitamin_b5", "name": "维生素B5", "term_id": "vitamin_b5",
+      "role": "参与能量代谢和辅酶合成。",
+      "pathways": [
+        {"id": "PANTO-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PANTOSYN-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"}
+      ]
+    },
+    {
+      "id": "vitamin_b6", "name": "维生素B6", "term_id": "vitamin_b6",
+      "role": "参与氨基酸代谢。",
+      "pathways": [
+        {"id": "PYRIDOXSYN-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY0-845", "verified": true, "verification": "observed in HUMAnN pathabundance output"}
+      ]
+    },
+    {
+      "id": "vitamin_b7", "name": "维生素B7", "term_id": "vitamin_b7",
+      "role": "参与代谢和皮肤、头发健康。",
+      "pathways": [
+        {"id": "BIOTIN-BIOSYNTHESIS-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-5005", "verified": true, "verification": "observed in HUMAnN pathabundance output"}
+      ]
+    },
+    {
+      "id": "vitamin_b9", "name": "维生素B9", "term_id": "vitamin_b9",
+      "role": "参与细胞分裂和DNA合成。",
+      "pathways": [
+        {"id": "FOLSYN-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-6612", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "1CMET2-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-3841", "verified": true, "verification": "observed in HUMAnN pathabundance output"}
+      ]
+    },
+    {
+      "id": "vitamin_b12", "name": "维生素B12", "term_id": "vitamin_b12",
+      "role": "参与神经和血液相关功能。",
+      "pathways": [
+        {"id": "COBALSYN-PWY", "verified": true, "verification": "observed in HUMAnN pathabundance output; salvage route"}
+      ]
+    },
+    {
+      "id": "vitamin_k2", "name": "维生素K2", "term_id": "vitamin_k2",
+      "role": "参与凝血和骨骼相关功能。",
+      "pathways": [
+        {"id": "PWY-5838", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-5840", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-5845", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-5850", "verified": true, "verification": "observed in HUMAnN pathabundance output"},
+        {"id": "PWY-5896", "verified": true, "verification": "observed in HUMAnN pathabundance output"}
+      ]
+    }
+  ]
+}

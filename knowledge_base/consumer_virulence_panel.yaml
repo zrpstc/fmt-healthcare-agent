@@ -1,0 +1,101 @@
+{
+  "schema_version": "consumer-virulence-panel-v1",
+  "markers": [
+    {
+      "name": "志贺毒素",
+      "genes": ["stx1", "stx2"],
+      "aliases": ["stx1A", "stx1B", "stx2A", "stx2B", "stxA", "stxB"],
+      "level": "high",
+      "term_id": "shiga_toxin",
+      "meaning": "检出提示样本中存在编码志贺毒素的参考序列，不等于正在产生毒素。"
+    },
+    {
+      "name": "紧密黏附素",
+      "genes": ["eae"],
+      "aliases": ["eae"],
+      "level": "moderate",
+      "term_id": "intimin",
+      "meaning": "这类基因帮助细菌贴附肠道细胞，检出不等于一定引起问题。"
+    },
+    {
+      "name": "脆弱拟杆菌毒素",
+      "genes": ["bft"],
+      "aliases": ["bft-1"],
+      "level": "high",
+      "term_id": "bft",
+      "meaning": "部分脆弱拟杆菌菌株携带该毒素基因；检出不等于正在致病。"
+    },
+    {
+      "name": "艰难梭菌毒素A/B",
+      "genes": ["tcdA", "tcdB"],
+      "aliases": ["toxA", "toxB", "tcdA", "tcdB"],
+      "level": "high",
+      "term_id": "tcd",
+      "meaning": "艰难梭菌的部分菌株可产生这类毒素；检出不等于正在发生感染。"
+    },
+    {
+      "name": "艰难梭菌二元毒素",
+      "genes": ["cdtA", "cdtB"],
+      "aliases": ["cdtA", "cdtB"],
+      "level": "moderate",
+      "term_id": "cdt",
+      "meaning": "这类毒素由部分艰难梭菌菌株产生，研究中的临床意义仍在发展。"
+    },
+    {
+      "name": "colibactin",
+      "genes": ["clb"],
+      "aliases": ["clbA", "clbB", "clbC", "clbD", "clbE", "clbF", "clbG", "clbH", "clbI", "clbJ", "clbK", "clbL", "clbM", "clbN", "clbO", "clbP", "clbQ", "clbS"],
+      "level": "high",
+      "term_id": "colibactin",
+      "meaning": "部分大肠埃希菌等菌株携带colibactin相关基因簇；检出不等于正在产生。"
+    },
+    {
+      "name": "细胞毒性坏死因子",
+      "genes": ["cnf1"],
+      "aliases": ["cnf1"],
+      "level": "moderate",
+      "term_id": "cnf",
+      "meaning": "部分大肠埃希菌菌株携带该基因；检出不等于正在致病。"
+    },
+    {
+      "name": "α-溶血素",
+      "genes": ["hlyA"],
+      "aliases": ["hlyA"],
+      "level": "moderate",
+      "term_id": "hly",
+      "meaning": "部分菌株能产生溶血素；检出不等于已经造成细胞损伤。"
+    },
+    {
+      "name": "侵袭质粒抗原",
+      "genes": ["ipaH"],
+      "aliases": ["ipaH", "ipaH1.4", "ipaH2.5", "ipaH4.5", "ipaH7.8", "ipaH9.8", "ipaH0722"],
+      "level": "high",
+      "term_id": "ipah",
+      "meaning": "这类基因与部分细菌侵入宿主细胞的能力有关；检出不等于正在感染。"
+    },
+    {
+      "name": "肠毒素LT",
+      "genes": ["eltA"],
+      "aliases": ["eltA"],
+      "level": "high",
+      "term_id": "lt",
+      "meaning": "部分大肠埃希菌菌株携带不耐热肠毒素基因；检出不等于正在腹泻。"
+    },
+    {
+      "name": "肠毒素ST",
+      "genes": ["estA"],
+      "aliases": ["estA"],
+      "level": "high",
+      "term_id": "st",
+      "meaning": "部分菌株携带耐热肠毒素基因；检出不等同于症状。"
+    },
+    {
+      "name": "产气荚膜梭菌肠毒素",
+      "genes": ["cpe"],
+      "aliases": ["cpe"],
+      "level": "high",
+      "term_id": "cpe",
+      "meaning": "部分产气荚膜梭菌菌株携带该毒素基因；检出不等于正在发生食物中毒。"
+    }
+  ]
+}
