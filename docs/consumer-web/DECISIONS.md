@@ -27,3 +27,5 @@
 13. **截图环境**：Node 18 + Playwright browser 下载被网络阻断（ECONNREFUSED 443），无法按 Playwright 生成 PDF。使用 OpenCode 内置 Chromium 生成网页截图；打印 PDF 提供人工验收清单。
 
 14. **千分位计数例外**：产品明确要求参考人数写 `3,537`，因此正文有效数字扫描把千分位整数计数排除；百分比和测量值仍执行最多 3 位有效数字。
+
+15. **全量 pytest 基线状态**：本任务新增的 23 个消费者测试全部通过；仓库 main 的既有测试中有若干失败和 3 个文件在 30 秒内未结束（例如 `test_word_template`、`test_chapter_two`、`test_health_report`），与本任务改动无关。未为这些基线问题修改专业版代码或既有测试。
