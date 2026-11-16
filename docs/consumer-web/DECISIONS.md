@@ -29,3 +29,23 @@
 14. **千分位计数例外**：产品明确要求参考人数写 `3,537`，因此正文有效数字扫描把千分位整数计数排除；百分比和测量值仍执行最多 3 位有效数字。
 
 15. **全量 pytest 基线状态**：本任务新增的 23 个消费者测试全部通过；仓库 main 的既有测试中有若干失败和 3 个文件在 30 秒内未结束（例如 `test_word_template`、`test_chapter_two`、`test_health_report`），与本任务改动无关。未为这些基线问题修改专业版代码或既有测试。
+
+16. **术语按字段合并、按学名解析**：解释文字按 `(term_id, field)` 合并，来源优先级为人工词条 < 机器草稿 < 人工审核。菌的解释按拉丁学名或别名查找，删除各部分硬编码的中文名映射。这样修正了属级面板成员错挂种级解释的问题（例如双歧杆菌属下任何种都显示青春双歧杆菌的解释）。只有 `watch_note` 可以回退到属级词条；`one_liner` 描述的是具体菌，回退会造成张冠李戴，因此不回退。
+
+17. **机器草稿永远是 pending**：`consumer_glossary_candidates` 中的草稿和 `consumer_glossary.yaml` v2 中重写的 14 条菌种解释、新增的 12 条需留意说明，状态都是 pending。曾尝试直接标为 approved，但这会绕过人工审核，因此撤回。这些条目需要在 `/reports/review` 批准后才进入正文；批准前，正文中相应的菌没有说明文字（符合空状态策略）。
+
+18. **审核闸门统一用 `is_publishable`**：各部分改用 `GlossaryService.is_publishable` 判断能否展示；`nutrition.py` 原先直接读取 `one_liner` 而不检查审核状态，已修复。
+
+19. **被拒绝条目默认不回队列**：拒绝是一种明确的审核结论，默认从队列中隐藏，避免反复出现；审核台可勾选「显示已拒绝」重新处理。接口 `include_rejected` 默认为 0。
+
+20. **通过时必须有文字**：原逻辑在文字为空时悄悄把「通过」降为 pending，审核人看不到原因。改为直接返回 422，并由前端提示。
+
+21. **草稿生成的保守约束**：模型输出必须引用证据编号；属级证据必须以「同属研究提示」开头；禁用「有益菌、有害菌、致病、导致、治疗、益生菌」等措辞，也不允许英文。未通过校验的草稿不保存文字，只保存证据和失败原因，由人撰写。已有文字的候选条目不会被新一轮生成覆盖。PubMed 与 SearXNG 默认关闭，需显式开启。
+
+22. **菌名误译修正**：Roseburia 为「罗斯氏菌属」（R. hominis 人罗斯氏菌，R. intestinalis 肠道罗斯氏菌），「罗氏菌」留给 *Rothia*；Methanobrevibacter smithii 为「史氏甲烷短杆菌」；Clostridioides 为「拟梭菌属」；Limosilactobacillus 为「黏液乳杆菌属」，Ligilactobacillus 为「联合乳杆菌属」。有正式种名但没有中文名的写「XX菌属的一种」。
+
+23. **测试环境与 `uv.lock`**：`uv.lock` 与 `pyproject.toml` 不同步，核心依赖中缺少 numpy；消费者版和其他测试还会导入 pandas 等 `legacy` 依赖。本次没有改动锁文件（锁文件属于全仓库的环境契约，不在消费者版范围内），测试环境用 `uv pip install -e ".[dev,infra,legacy]"` 搭建。建议后续单独重新生成锁文件。
+
+24. **保留逐章改写 PDF 的成果**：提交 `b10a36e`（逐章改写专业版 PDF 的第 1–3 章）已不在任何分支上，推送为 `archive/consumer-pdf-v1` 分支保留，便于以后取回。
+
+25. **本次验证基线（2026-11-16）**：消费者版 pytest 35 项全部通过；全量 pytest 661 项通过、22 项失败、2 项跳过。这 22 项（`test_word_template`、`test_health_report`、`test_report_knowledge_graph`、`test_fmt_triplet_online` 等）在未应用本次改动的 `c38b66a` 上同样失败，与消费者版无关，未修改。前端 `tsc --noEmit` 通过；`next lint` 无错误，只有既有的 `<img>` 与 hook 依赖警告；`npm run build` 通过，`/share/[token]` 首屏 JS 为 125 kB；`node --test tests/*.mjs` 18 项通过。消费者版相关 Python 文件已通过 ruff 检查（清理了未使用的 import 与一处变量遮蔽）。
