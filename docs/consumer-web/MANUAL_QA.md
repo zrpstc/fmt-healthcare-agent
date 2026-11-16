@@ -1,6 +1,6 @@
 # 消费者版人工验收清单
 
-Playwright 浏览器下载在当前 gpu02 环境被阻断（Node 18 低于 20；Chromium 下载连接 ECONNREFUSED 443）。因此打印 PDF 采用人工验收；网页截图使用 OpenCode 内置 Chromium 生成，路径见 `docs/consumer-web/screenshots/`。
+Playwright 浏览器下载在当前 gpu02 环境被阻断（Node 18 低于 20；Chromium 下载连接 ECONNREFUSED 443）。因此浏览器打印预览采用人工验收；网页截图使用 OpenCode 内置 Chromium 生成，路径见 `docs/consumer-web/screenshots/`。另生成了静态打印 PDF `docs/consumer-web/screenshots/consumer-report-print.pdf`（用 ReportView 静态 HTML + WeasyPrint，28 页），用于核对打印 CSS，不等同于浏览器 `window.print()` 的逐页效果。
 
 ## 1. 响应式
 

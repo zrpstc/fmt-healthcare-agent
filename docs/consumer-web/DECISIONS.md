@@ -24,7 +24,7 @@
 
 12. **公开下载不暴露样本 ID**：分享页的下载链接改写为 `/backend/api/share/{token}/downloads/{kind}`；公开 JSON 中 `sample.sample_id` 换成别名，且不含服务器路径或内部服务 URL。
 
-13. **截图环境**：Node 18 + Playwright browser 下载被网络阻断（ECONNREFUSED 443），无法按 Playwright 生成 PDF。使用 OpenCode 内置 Chromium 生成网页截图；打印 PDF 提供人工验收清单。
+13. **截图与打印环境**：Node 18 + Playwright browser 下载被网络阻断（ECONNREFUSED 443），无法按 Playwright 生成 PDF。使用 OpenCode 内置 Chromium 生成网页截图；另用 ReportView 静态 HTML + WeasyPrint 生成打印 PDF（28 页），用于核对打印 CSS；浏览器 `window.print()` 的逐页效果仍由人工验收清单覆盖。
 
 14. **千分位计数例外**：产品明确要求参考人数写 `3,537`，因此正文有效数字扫描把千分位整数计数排除；百分比和测量值仍执行最多 3 位有效数字。
 
