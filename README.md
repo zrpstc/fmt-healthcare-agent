@@ -6,6 +6,10 @@
 
 健康参考仅使用 curatedMetagenomicData（cMD3 / MetaPhlAn 3 / v30）。准备、分层及变量迁移见 [cMD指南](docs/CMD_REFERENCE.md)。
 
+## 消费者版网页报告
+
+专业版 PDF/Markdown 保持不变。平台另生成 `{sample}_consumer_report.json`（契约 `consumer-report/1`），并通过 `/r/{sample}` 内部预览、`/share/{token}` 公开只读页、`/reports` 分享入口和 `/reports/review` 术语审核台提供消费者版阅读体验。详见 [设计规范](docs/consumer-web/DESIGN.md)、[运维说明](docs/consumer-web/OPERATIONS.md) 和 [默认决策](docs/consumer-web/DECISIONS.md)。
+
 ## 1. 准备服务器
 
 需要安装：

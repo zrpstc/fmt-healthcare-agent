@@ -1,4 +1,5 @@
 import { uploadSampleFiles } from "./sample-upload";
+import type { ConsumerReport, ShareCreation, ShareLink, ReviewEntry } from "./consumer-report";
 export type { UploadProgress } from "./sample-upload";
 
 export type RiskLevel = "read" | "sensitive" | "confirm";
@@ -149,6 +150,13 @@ export const api = {
     return request<KnowledgeGraph>(`/knowledge/remote/graph?${query.toString()}`);
   },
   sampleKnowledgeGraph: (sampleId:string,limit=40) => request<KnowledgeGraph>(`/knowledge/samples/${encodeURIComponent(sampleId)}/graph?limit=${limit}`,{cache:"no-store"}),
+  consumerReport: (sampleId:string,refresh=false) => request<ConsumerReport>(`/reports/${encodeURIComponent(sampleId)}/consumer${refresh?"?refresh=1":""}`,{cache:"no-store"}),
+  shareReport: (token:string) => request<ConsumerReport>(`/share/${encodeURIComponent(token)}`,{cache:"no-store"}),
+  createConsumerShare: (sampleId:string,expiresDays=30) => request<ShareCreation>(`/reports/${encodeURIComponent(sampleId)}/consumer/share`,{method:"POST",body:JSON.stringify({expires_days:expiresDays})}),
+  consumerShares: (sampleId:string) => request<{sample_id:string;shares:ShareLink[]}>(`/reports/${encodeURIComponent(sampleId)}/consumer/shares`,{cache:"no-store"}),
+  revokeConsumerShare: (sampleId:string,shareId:string) => request<{status:string;id:string}>(`/reports/${encodeURIComponent(sampleId)}/consumer/shares/${encodeURIComponent(shareId)}`,{method:"DELETE"}),
+  glossaryReview: () => request<{count:number;entries:ReviewEntry[]}>("/consumer/glossary/review",{cache:"no-store"}),
+  reviewGlossary: (termId:string,field:"one_liner"|"watch_note",status:"approved"|"rejected",text:string) => request<{status:string;term_id:string;field:string;reviewer:string}>(`/consumer/glossary/review/${encodeURIComponent(termId)}`,{method:"POST",body:JSON.stringify({field,status,text})}),
 };
 
 export const backendUrl=(path:string)=>`/backend/api${path}`;

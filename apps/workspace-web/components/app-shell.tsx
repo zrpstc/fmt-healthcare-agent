@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(()=>{const requested=new URLSearchParams(window.location.search).get("auth");if(requested==="login"||requested==="register")setAuthOpen(requested)},[pathname]);
   useEffect(()=>{setSidebarCollapsed(window.localStorage.getItem("wgs-sidebar-collapsed")==="1")},[]);
   const toggleSidebar=()=>setSidebarCollapsed(value=>{const next=!value;window.localStorage.setItem("wgs-sidebar-collapsed",next?"1":"0");return next});
-  if(pathname==="/")return <>{children}</>;
+  if(pathname==="/"||pathname.startsWith("/r/")||pathname.startsWith("/share/"))return <>{children}</>;
   return (
     <div className={`app-frame ${sidebarCollapsed?"sidebar-is-collapsed":""}`}>
       <aside className="global-sidebar" aria-label="工作空间导航">
