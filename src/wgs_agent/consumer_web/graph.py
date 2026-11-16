@@ -7,11 +7,8 @@ nodes, 6 edges) and is rendered interactively by vis-network in the browser.
 
 from __future__ import annotations
 
-import copy
 import html
 import re
-from collections import deque
-from typing import Any
 
 from .schema import GraphBlock, GraphEdge, GraphEvidence, GraphNode, Reference
 

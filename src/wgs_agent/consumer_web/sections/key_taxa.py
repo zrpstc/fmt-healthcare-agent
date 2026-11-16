@@ -12,12 +12,16 @@ from .panel import category_rows, category_term, evidence_badge, load_panel, rel
 WATCH_CALLOUT = "无症状人群中也可检出这类菌；若有持续腹泻、发热或便血，请就医并带上本报告。"
 
 
-def _member_text(ctx: Context, member: dict, row_name: str) -> str | None:
-    term_id = str(member.get("term_id") or "")
-    if term_id and ctx.glossary.is_approved(term_id):
-        return ctx.glossary.one_liner(term_id)
-    note = str(member.get("watch_note") or member.get("note") or "").strip()
-    return note or None
+def _member_text(ctx: Context, row_name: str, section: str) -> str | None:
+    """Text for the *detected* taxon, never for the panel member it matched.
+
+    A genus-level panel member (e.g. ``Bifidobacterium``) matches many species;
+    using one species' text for all of them was wrong, so text is resolved from
+    the detected row's Latin name.  Watch cards prefer the reviewed ``watch_note``.
+    """
+    if section == "watch":
+        return ctx.taxon_text(row_name, "watch_note") or ctx.taxon_text(row_name, "one_liner")
+    return ctx.taxon_text(row_name, "one_liner")
 
 
 def _cards(ctx: Context, section: str) -> list[dict[str, Any]]:
@@ -29,7 +33,7 @@ def _cards(ctx: Context, section: str) -> list[dict[str, Any]]:
             continue
         rows = category_rows(ctx, category)
         term_id = category_term(category)
-        text = ctx.glossary.one_liner(term_id) if term_id and ctx.glossary.is_approved(term_id) else ""
+        text = ctx.glossary.one_liner(term_id) if term_id and ctx.glossary.is_publishable(term_id) else ""
         members = []
         member_defs = []
         for member in category.get("members", []):
@@ -46,7 +50,7 @@ def _cards(ctx: Context, section: str) -> list[dict[str, Any]]:
             members.append(ctx.taxon_card(
                 row["name"],
                 row["value"],
-                text=_member_text(ctx, member, row["name"]),
+                text=_member_text(ctx, row["name"], section),
                 evidence_badge=evidence_badge(ctx, row["name"]),
                 reliability_badge=reliability_badge(row, panel.get("reliability_thresholds")),
             ))

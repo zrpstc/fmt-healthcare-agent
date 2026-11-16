@@ -8,8 +8,8 @@ from ..format import count, pct, tier
 from ..narrative import headline
 from .context import Context
 from .panel import category_total, load_panel
-from .resistance import high_concern_resistance, resistance_genes
-from .virulence import high_concern_results, panel_results
+from .resistance import resistance_genes
+from .virulence import high_concern_results
 
 
 def _diversity_row(ctx: Context) -> dict | None:

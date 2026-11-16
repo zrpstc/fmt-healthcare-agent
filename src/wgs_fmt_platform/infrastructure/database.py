@@ -118,6 +118,28 @@ class ConsumerGlossaryReview(Base):
     __table_args__ = (UniqueConstraint("term_id", "field", name="uq_consumer_glossary_term_field"),)
 
 
+class ConsumerGlossaryCandidate(Base):
+    """Machine-drafted glossary text awaiting human review (never published unreviewed)."""
+
+    __tablename__ = "consumer_glossary_candidates"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    term_id: Mapped[str] = mapped_column(String(120), index=True)
+    field: Mapped[str] = mapped_column(String(40), default="one_liner")
+    kind: Mapped[str] = mapped_column(String(40), default="species")
+    display_name: Mapped[str] = mapped_column(String(200), default="")
+    latin: Mapped[str] = mapped_column(String(200), default="")
+    text: Mapped[str] = mapped_column(Text, default="")
+    evidence_scope: Mapped[str] = mapped_column(String(40), default="")
+    evidence: Mapped[list] = mapped_column(JSON, default=list)
+    sources: Mapped[list] = mapped_column(JSON, default=list)
+    sample_ids: Mapped[list] = mapped_column(JSON, default=list)
+    model: Mapped[str] = mapped_column(String(120), default="")
+    draft_status: Mapped[str] = mapped_column(String(40), default="drafted")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    __table_args__ = (UniqueConstraint("term_id", "field", name="uq_consumer_glossary_candidate_term_field"),)
+
+
 def hash_password(password: str) -> str:
     salt = secrets.token_bytes(16)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 310_000)

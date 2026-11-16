@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pytest
 
 from wgs_agent.consumer_web.format import (
     business_number_violations,

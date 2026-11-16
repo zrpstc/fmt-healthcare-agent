@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import json
 import shutil
 import tempfile
 from pathlib import Path
 
-import pytest
 
 from wgs_agent.consumer_web.builder import build_report
 from wgs_agent.consumer_web.format import business_number_violations, text_violations

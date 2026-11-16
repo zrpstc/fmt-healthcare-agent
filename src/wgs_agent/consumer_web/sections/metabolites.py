@@ -25,7 +25,7 @@ def _card(ctx: Context, title: str, term_id: str, pathway_ids: list[str], ecs: l
     if not item["has_signal"]:
         return None
     members = [ctx.names.plain(row["name"]) for row in item["named"][:5]]
-    text = ctx.glossary.one_liner(term_id) if ctx.glossary.is_approved(term_id) else "相关功能基因被检出。"
+    text = ctx.glossary.one_liner(term_id) if ctx.glossary.is_publishable(term_id) else "相关功能基因被检出。"
     if not members:
         text += " 分层注释不足以确定具体菌。"
     return {

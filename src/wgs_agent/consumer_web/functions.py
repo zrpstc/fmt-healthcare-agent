@@ -14,7 +14,6 @@ from __future__ import annotations
 import gzip
 import json
 import math
-import os
 import re
 from collections import defaultdict
 from pathlib import Path

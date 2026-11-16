@@ -107,8 +107,17 @@ export interface ShareLink {
   id: string; created_at: string; expires_at: string; revoked_at: string | null; last_accessed_at: string | null;
 }
 export interface ShareCreation { token: string; url: string; expires_at: string; id: string }
+export interface ReviewEvidence {
+  id?: string; scope?: string; sentence?: string; title?: string; year?: number | null; url?: string; source?: string;
+}
 export interface ReviewEntry {
-  term_id: string; field: "one_liner" | "watch_note"; generated_text: string; name: string;
-  status: string; sources: Array<{ title?: string; id_or_url?: string; year?: number | null }>;
+  term_id: string; field: "one_liner" | "watch_note"; kind: string; generated_text: string; needs_writing: boolean;
+  name: string; latin: string; status: "pending" | "rejected" | string; origin: "curated" | "candidate" | string;
+  sources: Array<{ title?: string; id_or_url?: string; year?: number | null; type?: string }>;
+  evidence: ReviewEvidence[]; evidence_scope: string;
   model: string; version: string; samples_used: string[];
+}
+export interface GlossaryGenerateResult {
+  sample_id: string; needs: number; processed: number; skipped_reviewed: number; model: string;
+  outcomes: Record<string, number>; draft_status: Record<string, number>;
 }

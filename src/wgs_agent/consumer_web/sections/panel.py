@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 from pathlib import Path
 from typing import Any
 
@@ -102,11 +101,9 @@ def reliability_badge(row: dict, thresholds: dict | None = None) -> str | None:
 
 
 def member_text(ctx: Context, member: dict, category: dict, row_name: str) -> str | None:
-    """Approved one-liner for the member, falling back to a category-level note."""
-    term_id = str(member.get("concept_term_id") or "")
-    if term_id and ctx.glossary.is_approved(term_id):
-        return ctx.glossary.one_liner(term_id)
-    return None
+    """Publishable text for the detected taxon (resolved by Latin name)."""
+    field = "watch_note" if category.get("section") == "watch" else "one_liner"
+    return ctx.taxon_text(row_name, field)
 
 
 def category_term(category: dict) -> str:

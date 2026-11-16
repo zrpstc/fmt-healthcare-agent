@@ -36,7 +36,7 @@ def build(ctx: Context) -> dict[str, Any]:
         members = _stratified_names(beta_glucosidase)
         cards.append({
             "title": "多酚与异黄酮转化",
-            "text": ctx.glossary.one_liner("polyphenol") if ctx.glossary.is_approved("polyphenol") else "检出与糖苷水解相关的基因家族。",
+            "text": ctx.glossary.one_liner("polyphenol") if ctx.glossary.is_publishable("polyphenol") else "检出与糖苷水解相关的基因家族。",
             "status": "检出相关基因",
             "tone": "neutral",
             "tier": None,
@@ -53,7 +53,7 @@ def build(ctx: Context) -> dict[str, Any]:
                 members.extend(_stratified_names(row))
         cards.append({
             "title": "药物与化学物转化",
-            "text": ctx.glossary.one_liner("drug_transformation") if ctx.glossary.is_approved("drug_transformation") else "检出与药物或化学物转化相关的基因家族。",
+            "text": ctx.glossary.one_liner("drug_transformation") if ctx.glossary.is_publishable("drug_transformation") else "检出与药物或化学物转化相关的基因家族。",
             "status": "检出相关基因",
             "tone": "neutral",
             "tier": None,
@@ -64,7 +64,7 @@ def build(ctx: Context) -> dict[str, Any]:
     if gaba["has_signal"]:
         cards.append({
             "title": "γ-氨基丁酸相关代谢",
-            "text": ctx.glossary.one_liner("gaba") if ctx.glossary.is_approved("gaba") else "检出与GABA代谢相关的通路。",
+            "text": ctx.glossary.one_liner("gaba") if ctx.glossary.is_publishable("gaba") else "检出与GABA代谢相关的通路。",
             "status": "具备相关基因",
             "tone": "neutral",
             "tier": None,
@@ -75,7 +75,7 @@ def build(ctx: Context) -> dict[str, Any]:
     if mucin:
         cards.append({
             "title": "黏液糖链利用",
-            "text": ctx.glossary.one_liner("mucin_utilization") if ctx.glossary.is_approved("mucin_utilization") else "阿克曼菌能利用肠道黏液中的部分成分。",
+            "text": ctx.glossary.one_liner("mucin_utilization") if ctx.glossary.is_publishable("mucin_utilization") else "阿克曼菌能利用肠道黏液中的部分成分。",
             "status": "检出相关菌",
             "tone": "neutral",
             "tier": None,

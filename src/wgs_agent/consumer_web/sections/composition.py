@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import math
 from typing import Any
 
-from ..format import count, pct, tier, latin_for_display
+from ..format import pct, tier, latin_for_display
 from .context import Context
 from ..names import canonical
 
@@ -21,24 +20,8 @@ def _phylum_rows(ctx: Context) -> list[dict]:
 
 
 def _species_text(ctx: Context, name: str) -> str | None:
-    key = ctx.names.label_only(name)
-    # Glossary term ids are curated for the top species; use exact key lookup.
-    term_id = {
-        "罗氏韦荣球菌": "veillonella_rogosae",
-        "脆弱拟杆菌": "bacteroides_fragilis",
-        "普拉梭菌": "faecalibacterium_prausnitzii",
-        "大肠埃希菌": "escherichia_coli",
-        "人体普雷沃菌": "prevotella_corporis",
-        "青春双歧杆菌": "bifidobacterium_adolescentis",
-        "嗜黏蛋白阿克曼菌": "akkermansia_muciniphila",
-        "发酵乳杆菌": "limosilactobacillus_fermentum",
-        "艰难梭菌": "clostridioides_difficile",
-        "动物梭杆菌": "fusobacterium_animalis",
-        "人类罗氏菌": "roseburia_hominis",
-    }.get(key, "")
-    if term_id and ctx.glossary.is_approved(term_id):
-        return ctx.glossary.one_liner(term_id)
-    return None
+    # Resolved by Latin name; unexplained species are queued for drafting/review.
+    return ctx.taxon_text(name, "one_liner")
 
 
 def _comparison_rows(ctx: Context) -> list[dict]:
@@ -85,7 +68,7 @@ def build(ctx: Context) -> dict[str, Any]:
                 "梭杆菌门": "fusobacteriota", "疣微菌门": "verrucomicrobiota",
                 "放线菌门": "actinomycetota", "子囊菌门": "ascomycota", "甲烷杆菌门": "methanobacteriota",
             }.get(label)
-            note = ctx.glossary.one_liner(term_id) if term_id and ctx.glossary.is_approved(term_id) else None
+            note = ctx.glossary.one_liner(term_id) if term_id and ctx.glossary.is_publishable(term_id) else None
             segments.append({
                 "label": label,
                 "value": {"value": row["value"], "display": pct(row["value"]), "unit": "%"},

@@ -40,7 +40,7 @@ TAXON_CN: dict[str, str] = {
     "fusobacterium nucleatum": "具核梭杆菌",
     "limosilactobacillus fermentum": "发酵乳杆菌",
     "lactobacillus fermentum": "发酵乳杆菌",
-    "roseburia hominis": "人类罗氏菌",
+    "roseburia hominis": "人罗斯氏菌",
     "akkermansia muciniphila": "嗜黏蛋白阿克曼菌",
     "bifidobacterium adolescentis": "青春双歧杆菌",
     "clostridioides difficile": "艰难梭菌",
@@ -48,7 +48,7 @@ TAXON_CN: dict[str, str] = {
     "clostridium perfringens": "产气荚膜梭菌",
     "saccharomyces cerevisiae": "酿酒酵母",
     "candida albicans": "白色念珠菌",
-    "methanobrevibacter smithii": "史密斯甲烷杆菌",
+    "methanobrevibacter smithii": "史氏甲烷短杆菌",
     "sphingomonas melonis": "甜瓜鞘氨醇单胞菌",
     "salmonella enterica": "肠道沙门菌",
     "klebsiella pneumoniae": "肺炎克雷伯菌",
@@ -56,7 +56,7 @@ TAXON_CN: dict[str, str] = {
     "enterococcus faecalis": "粪肠球菌",
     "citrobacter freundii": "弗氏柠檬酸杆菌",
     "proteus mirabilis": "奇异变形杆菌",
-    "mediterraneibacter gnavus": "活泼地中海杆菌",
+    "mediterraneibacter gnavus": "活泼瘤胃球菌",
     "ruminococcus gnavus": "活泼瘤胃球菌",
     "ruminococcus torques": "扭曲瘤胃球菌",
     "agathobacter rectalis": "直肠阿加托杆菌",
@@ -64,7 +64,7 @@ TAXON_CN: dict[str, str] = {
     "anaerostipes hadrus": "霍氏厌氧棍状菌",
     "eubacterium hallii": "霍尔真杆菌",
     "blautia wexlerae": "韦氏布劳特菌",
-    "roseburia intestinalis": "肠道罗氏菌",
+    "roseburia intestinalis": "肠道罗斯氏菌",
     "butyricicoccus pullicaecorum": "鸡盲肠丁酸球菌",
     # genera
     "veillonella": "韦荣球菌属",
@@ -77,11 +77,11 @@ TAXON_CN: dict[str, str] = {
     "lactobacillus": "乳杆菌属",
     "lacticaseibacillus": "乳酪杆菌属",
     "lactiplantibacillus": "植物乳杆菌属",
-    "limosilactobacillus": "发酵乳杆菌属",
-    "ligilactobacillus": "黏液乳杆菌属",
-    "roseburia": "罗氏菌属",
+    "limosilactobacillus": "黏液乳杆菌属",
+    "ligilactobacillus": "联合乳杆菌属",
+    "roseburia": "罗斯氏菌属",
     "akkermansia": "阿克曼菌属",
-    "clostridioides": "梭菌属",
+    "clostridioides": "拟梭菌属",
     "clostridium": "梭菌属",
     "klebsiella": "克雷伯菌属",
     "enterobacter": "肠杆菌属",
@@ -90,7 +90,7 @@ TAXON_CN: dict[str, str] = {
     "proteus": "变形杆菌属",
     "bilophila": "嗜胆菌属",
     "desulfovibrio": "脱硫弧菌属",
-    "methanobrevibacter": "甲烷杆菌属",
+    "methanobrevibacter": "甲烷短杆菌属",
 }
 
 ALIASES: dict[str, str] = {
@@ -108,13 +108,13 @@ def canonical(name: str) -> str:
 
 
 def _label_from_report(document: dict, key: str) -> str:
-    for field in (
+    for label_key in (
         "chapter_one_taxon_labels",
         "chapter_two_taxon_labels",
         "chapter_three_taxon_labels",
         "overview_taxon_labels",
     ):
-        for lookup_key, item in document.get(field, {}).items():
+        for lookup_key, item in document.get(label_key, {}).items():
             if species_key(lookup_key) == key:
                 label = str(item.get("label") or "").strip()
                 if label and label not in {"菌种", "未定种"} and re.search(r"[\u4e00-\u9fff]", label):
@@ -150,7 +150,12 @@ class NameRegistry:
         if not label:
             genus = key.split(" ")[0] if key else ""
             genus_label = TAXON_CN.get(genus) or GENUS_FALLBACK.get(genus, "")
-            if genus_label:
+            epithet = key.split(" ")[1] if len(key.split(" ")) == 2 else ""
+            named = bool(re.fullmatch(r"[a-z]{3,}", epithet)) and epithet not in {"sp", "spp", "unclassified", "bacterium", "uncultured"}
+            if genus_label and named:
+                # A properly named species that simply lacks a Chinese name.
+                label = f"{genus_label}的一种"
+            elif genus_label:
                 label = f"未命名菌（{genus_label}相关）"
             else:
                 label = f"未命名菌（{clean_raw.split()[0] if clean_raw.split() else '未知'}菌属相关）"

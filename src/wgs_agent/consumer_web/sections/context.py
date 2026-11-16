@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from wgs_agent.reporting.functional_metrics import taxon_name
 from wgs_agent.reporting.inputs import finite
 
 from ..functions import load_substrate_map, load_vitamin_map
-from ..glossary import GlossaryService
+from ..glossary import GlossaryService, taxon_term_id
 from ..graph import GraphBuilder, ReferenceIndex
 from ..names import NameRegistry, canonical
 
@@ -24,6 +26,39 @@ class Context:
     omissions: list[dict] = field(default_factory=list)
     used_terms: set[str] = field(default_factory=set)
     first_graph_shown: bool = False
+    # (canonical latin, field) -> displayed taxon that has no reviewable text yet
+    glossary_needs: dict[tuple[str, str], dict] = field(default_factory=dict)
+
+    # -------------------------------------------------------- taxon texts
+    def taxon_text(self, raw: str, field: str = "one_liner") -> str | None:
+        """Publishable glossary text for a displayed taxon, or ``None``.
+
+        Resolution is by Latin name (never by a hand-kept Chinese-name map).  A
+        ``watch_note`` may fall back to the genus-level entry.  Any displayed taxon
+        without a text record for the field is recorded in ``glossary_needs`` so a
+        draft can be generated and queued for human review.
+        """
+        glossary = self.glossary
+        raw = taxon_name(str(raw or ""))
+        term_id = glossary.taxon_term(raw)
+        if term_id and glossary.is_publishable(term_id, field):
+            return glossary.field_text(term_id, field)
+        if field == "watch_note":
+            genus_id = glossary.genus_term(raw)
+            if genus_id and glossary.is_publishable(genus_id, field):
+                return glossary.field_text(genus_id, field)
+        if not (term_id and glossary.has_record(term_id, field)):
+            latin = re.sub(r"\s+", " ", str(raw or "").replace("_", " ")).strip()
+            key = canonical(latin)
+            if key and " " in key and not key.startswith("未分类"):
+                self.glossary_needs.setdefault((key, field), {
+                    "term_id": term_id or taxon_term_id(latin),
+                    "latin": latin,
+                    "display_name": self.names.label_only(latin),
+                    "field": field,
+                    "kind": "species",
+                })
+        return None
 
     # ------------------------------------------------------------------ data
     @property

@@ -1,5 +1,5 @@
 import { uploadSampleFiles } from "./sample-upload";
-import type { ConsumerReport, ShareCreation, ShareLink, ReviewEntry } from "./consumer-report";
+import type { ConsumerReport, ShareCreation, ShareLink, ReviewEntry, GlossaryGenerateResult } from "./consumer-report";
 export type { UploadProgress } from "./sample-upload";
 
 export type RiskLevel = "read" | "sensitive" | "confirm";
@@ -155,7 +155,8 @@ export const api = {
   createConsumerShare: (sampleId:string,expiresDays=30) => request<ShareCreation>(`/reports/${encodeURIComponent(sampleId)}/consumer/share`,{method:"POST",body:JSON.stringify({expires_days:expiresDays})}),
   consumerShares: (sampleId:string) => request<{sample_id:string;shares:ShareLink[]}>(`/reports/${encodeURIComponent(sampleId)}/consumer/shares`,{cache:"no-store"}),
   revokeConsumerShare: (sampleId:string,shareId:string) => request<{status:string;id:string}>(`/reports/${encodeURIComponent(sampleId)}/consumer/shares/${encodeURIComponent(shareId)}`,{method:"DELETE"}),
-  glossaryReview: () => request<{count:number;entries:ReviewEntry[]}>("/consumer/glossary/review",{cache:"no-store"}),
+  glossaryReview: (includeRejected=false) => request<{count:number;entries:ReviewEntry[]}>(`/consumer/glossary/review${includeRejected?"?include_rejected=1":""}`,{cache:"no-store"}),
+  generateGlossary: (sampleId:string,limit=20,useLlm=true) => request<GlossaryGenerateResult>("/consumer/glossary/generate",{method:"POST",body:JSON.stringify({sample_id:sampleId,limit,use_llm:useLlm})}),
   reviewGlossary: (termId:string,field:"one_liner"|"watch_note",status:"approved"|"rejected",text:string) => request<{status:string;term_id:string;field:string;reviewer:string}>(`/consumer/glossary/review/${encodeURIComponent(termId)}`,{method:"POST",body:JSON.stringify({field,status,text})}),
 };
 

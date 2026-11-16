@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..format import count, pct
+from ..format import count
 from .context import Context
 from .resistance import grouped_resistance, high_concern_resistance, mobile_elements, resistance_genes
 

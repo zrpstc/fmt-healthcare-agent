@@ -24,7 +24,7 @@ def main() -> int:
             results_dir=args.results_dir,
             refresh=args.refresh,
         )
-    except Exception as exc:
+    except Exception:
         print("CONSUMER_BUILD_FAILED")
         return 2
     print(json.dumps({

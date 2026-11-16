@@ -5,7 +5,6 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import pytest
 
 from wgs_agent.consumer_web.builder import build_report
 from wgs_agent.consumer_web.sections.panel import watch_species

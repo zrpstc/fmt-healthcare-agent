@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..format import count, number, pct, sig, tier
+from ..format import count, number, tier
 from ..functions import aggregate_category, fiber_union, taxonomy_fallback_contributors
 from ..names import canonical
 from .context import Context
@@ -179,7 +179,7 @@ def build(ctx: Context) -> dict[str, Any]:
         if not labels:
             ctx.omit("diversity", f"分工：{title}", "现有注释没有可用于该环节的菌种记录")
             continue
-        meaning = ctx.glossary.one_liner(meaning_key) if ctx.glossary.is_approved(meaning_key) else ""
+        meaning = ctx.glossary.one_liner(meaning_key) if ctx.glossary.is_publishable(meaning_key) else ""
         stages.append({
             "title": title,
             "members": labels,

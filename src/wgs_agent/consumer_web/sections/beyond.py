@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from typing import Any
 
 from ..format import count, pct, tier
@@ -61,7 +60,7 @@ def build(ctx: Context) -> dict[str, Any]:
             name = str(row.get("name") or "")
             value = float(row.get("abundance") or 0)
             rate = _detection_rate(ctx, name)
-            text = ctx.glossary.one_liner("archaea") if ctx.glossary.is_approved("archaea") else "肠道里常见的产甲烷微生物。"
+            text = ctx.taxon_text(name) or (ctx.glossary.one_liner("archaea") if ctx.glossary.is_publishable("archaea") else "肠道里常见的产甲烷微生物。")
             if rate is not None:
                 text += f"约{pct(rate)}的健康人可检出。"
             cards.append(ctx.taxon_card(name, value, text=text))
@@ -95,7 +94,7 @@ def build(ctx: Context) -> dict[str, Any]:
             name = str(row.get("name") or "")
             value = float(row.get("abundance") or 0)
             rate = _detection_rate(ctx, name)
-            text = ctx.glossary.one_liner("fungi") if ctx.glossary.is_approved("fungi") else "肠道真菌通常来自食物或环境。"
+            text = ctx.taxon_text(name) or (ctx.glossary.one_liner("fungi") if ctx.glossary.is_publishable("fungi") else "肠道真菌通常来自食物或环境。")
             if rate is not None:
                 text += f"约{pct(rate)}的健康人可检出。"
             cards.append(ctx.taxon_card(name, value, text=text))

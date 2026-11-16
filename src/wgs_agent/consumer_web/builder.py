@@ -34,7 +34,7 @@ from .sections import (
     virulence_section,
 )
 from .sections.context import Context
-from .sections.panel import load_panel, watch_species
+from .sections.panel import watch_species
 
 BUILDER_VERSION = "consumer-web-builder-v2"
 SCHEMA_VERSION = "consumer-report/1"
@@ -474,6 +474,12 @@ def build_report(
     report.sections.sort(key=lambda section: 0 if section.id != "learn" else 1)
     payload = report.model_dump(by_alias=True)
     _atomic_json(output_path, payload)
+    # Displayed taxa without any reviewable text: input for the drafting queue.
+    _atomic_json(results_dir / f"{sample_id}_consumer_glossary_needs.json", {
+        "sample_id": sample_id,
+        "generated_at": sample["generated_at"],
+        "needs": sorted(ctx.glossary_needs.values(), key=lambda row: (row["latin"], row["field"])),
+    })
     _atomic_json(cache_path, {"cache_key": cache_key, "builder_version": BUILDER_VERSION,
                               "source_report_sha256": source_hash,
                               "glossary_version": glossary.version,

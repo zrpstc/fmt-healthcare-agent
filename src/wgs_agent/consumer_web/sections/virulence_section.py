@@ -41,7 +41,7 @@ def _toxin_rows(ctx: Context) -> tuple[list[list[str]], list[str]]:
         if item["detected"]:
             source = "可能来自" + ctx.plain_name(item["source"]) if item.get("source") else "来源尚未用序列连接证实"
             term_id = str(item.get("term_id") or "")
-            meaning = ctx.glossary.one_liner(term_id) if term_id and ctx.glossary.is_approved(term_id) else str(item.get("meaning") or "检出相关基因，不等于正在致病")
+            meaning = ctx.glossary.one_liner(term_id) if term_id and ctx.glossary.is_publishable(term_id) else str(item.get("meaning") or "检出相关基因，不等于正在致病")
         elif item["result"] == "未检出":
             source = "本次筛查范围内"
             meaning = "未检出该基因；不代表细菌完全没有其他致病相关能力"

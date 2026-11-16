@@ -8,8 +8,7 @@ import secrets
 import threading
 import time
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
-from typing import Any, Literal
+from typing import Literal
 
 from fastapi import APIRouter, Header, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse
@@ -18,6 +17,7 @@ from sqlalchemy import select
 
 from wgs_agent.consumer_web.builder import build_report
 from wgs_agent.consumer_web.glossary import GlossaryService
+from wgs_agent.consumer_web.glossary_candidates import generate_for_sample, needs_path
 from wgs_fmt_platform.infrastructure.api import _authenticated_user
 from wgs_fmt_platform.infrastructure.database import (
     ConsumerGlossaryReview,
@@ -265,12 +265,13 @@ def consumer_download(sample_id: str, kind: str) -> FileResponse:
 
 
 @router.get("/consumer/glossary/review")
-def glossary_review(authorization: str | None = Header(default=None)) -> dict:
+def glossary_review(include_rejected: int = Query(default=0, ge=0, le=1),
+                    authorization: str | None = Header(default=None)) -> dict:
     _require_editor(authorization)
-    service = GlossaryService()
-    rows = service.review_queue()
+    service = GlossaryService(allow_pending=True)
+    rows = service.review_queue(include_rejected=bool(include_rejected))
     for row in rows:
-        row["samples_used"] = _samples_using(row["term_id"])
+        row["samples_used"] = sorted(set(row.pop("sample_ids", []) or []) | set(_samples_using(row["term_id"])))
     return {"count": len(rows), "entries": rows}
 
 
@@ -292,12 +293,14 @@ def _samples_using(term_id: str) -> list[str]:
 def review_term(term_id: str, payload: ReviewPayload,
                 authorization: str | None = Header(default=None)) -> dict:
     user = _require_editor(authorization)
-    service = GlossaryService()
-    if term_id not in service.entries:
-        raise HTTPException(404, "术语不存在。")
-    status = payload.status if payload.status != "approved" or payload.text.strip() else "pending"
+    service = GlossaryService(allow_pending=True)
+    if term_id not in service.entries or not service.has_record(term_id, payload.field):
+        raise HTTPException(404, "术语或字段不存在。")
     text = payload.text.strip()
-    if payload.status == "rejected":
+    if payload.status == "approved" and not text:
+        raise HTTPException(422, "通过前需要填写解释文字。")
+    status = payload.status
+    if status == "rejected":
         text = ""
     with SessionLocal() as session:
         row = session.scalar(
@@ -315,3 +318,22 @@ def review_term(term_id: str, payload: ReviewPayload,
         row.reviewed_at = datetime.now(UTC)
         session.commit()
     return {"status": status, "term_id": term_id, "field": payload.field, "reviewer": user.username}
+
+
+class GeneratePayload(BaseModel):
+    sample_id: str = Field(min_length=1, max_length=128)
+    limit: int = Field(default=20, ge=1, le=100)
+    use_llm: bool = True
+
+
+@router.post("/consumer/glossary/generate")
+def generate_glossary(payload: GeneratePayload, authorization: str | None = Header(default=None)) -> dict:
+    """Draft explanations for a sample's unexplained taxa; results stay pending."""
+    _require_editor(authorization)
+    sample_id = _sid(payload.sample_id)
+    try:
+        _report_for(sample_id, refresh=not needs_path(sample_id, RESULTS_DIR).is_file())
+    except ValueError as exc:
+        raise HTTPException(404 if str(exc) == "report_missing" else 422, "消费者版报告暂不可构建。") from exc
+    summary = generate_for_sample(sample_id, limit=payload.limit, use_llm=payload.use_llm, results_dir=RESULTS_DIR)
+    return summary

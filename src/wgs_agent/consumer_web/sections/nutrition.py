@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..format import count
-from ..functions import fiber_contributors, load_substrate_map, load_vitamin_map, vitamin_table
+from ..functions import fiber_contributors, load_substrate_map, vitamin_table
 from .context import Context
 
 
@@ -19,7 +18,9 @@ def _substrate_cards(ctx: Context) -> list[dict[str, Any]]:
         if item is None:
             continue
         sources = "、".join(substrate.get("food_sources", []))
-        meaning = ctx.glossary.one_liner(str(substrate.get("term_id") or ""))
+        term_id = str(substrate.get("term_id") or "")
+        # Approved-only gate: unreviewed text must never reach the body.
+        meaning = ctx.glossary.one_liner(term_id) if term_id and ctx.glossary.is_publishable(term_id) else ""
         status = item["conclusion"]
         tone = "good" if status == "多种菌具备" else "neutral"
         members = [ctx.names.plain(row["name"]) for row in item["named"][:5]]
