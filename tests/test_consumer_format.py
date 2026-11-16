@@ -19,6 +19,7 @@ def test_percentage_rules_are_exact():
     assert pct(0.075) == "0.075%"
     assert pct(0.105) == "0.11%"
     assert pct(0.196) == "0.20%"
+    assert pct(0.999) == "1.0%"
     assert pct(1) == "1.0%"
     assert pct(13.657) == "13.7%"
     assert pct(24.777) == "24.8%"

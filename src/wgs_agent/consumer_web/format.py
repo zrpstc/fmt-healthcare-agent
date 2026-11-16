@@ -67,6 +67,8 @@ def pct(value: object) -> str:
     rounded = _round_decimal(number, places)
     if rounded >= Decimal("100"):
         return "100%"
+    if number < 1 and rounded >= Decimal("1"):
+        return f"{rounded:.1f}%"
     return f"{rounded:.{places}f}%"
 
 
