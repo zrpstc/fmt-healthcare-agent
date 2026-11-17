@@ -41,3 +41,64 @@ bash deploy/restart-report-api.sh
 
 工作区 Web/API 的默认端口为 `18502` / `18503`。`8502` / `8503` 已停用；部署入口会拒绝任何服务使用这两个旧端口并返回 `RETIRED_WORKSPACE_PORT`，且在重启停服前完成校验。
 生产配置使用项目 `.env`；环境示例、前端 API 代理及辅助工具的默认值均使用新端口。历史备份与旧构建产物不作为当前部署配置，正常部署会按源代码指纹重新构建前端。
+
+
+## 上线人群模型与扩大健康参考（2026-11）
+
+以下在项目根目录、以应用账号执行；路径按实际部署替换。旧参考包不覆盖，全部写入新目录，回退只需改回 `.env`。
+
+```bash
+cd /home/zhanghaiyang/fmt-healthcare-agent
+git pull --ff-only origin main
+.venv/bin/python -m pip install -r requirements.txt   # 无新增依赖，scipy/scikit-learn 已在清单内
+```
+
+1. 导出 cMD 3.18.0 元数据（新目录），并解压同版本源码供建包读取资源清单：
+
+```bash
+SRC=/path/to/cmd-source-3.22            # 新目录
+Rscript scripts/export_cmd_metadata.R --output-dir "$SRC" --bioc-release 3.22
+mkdir -p "$SRC/package" && tar -xzf "$SRC/source/curatedMetagenomicData_3.18.0.tar.gz" -C "$SRC/package"
+```
+
+2. 建扩大后的健康参考（约7,000人，新目录）：
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/prepare_cmd_reference.py \
+  --package-dir "$SRC/package/curatedMetagenomicData" \
+  --metadata "$SRC/sample_metadata.tsv" \
+  --catalog /path/to/ExperimentHub.sqlite \
+  --source-dir /path/to/cmd-source-cache \
+  --output var/reference/cmd/native-v3-bioc322-wide \
+  --antibiotics-policy no_or_unrecorded
+```
+
+3. 建人群模型包（复用同一下载缓存）：
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/prepare_cmd_cohort_models.py \
+  --package-dir "$SRC/package/curatedMetagenomicData" \
+  --metadata "$SRC/sample_metadata.tsv" \
+  --catalog /path/to/ExperimentHub.sqlite \
+  --source-dir /path/to/cmd-source-cache \
+  --output var/reference/cmd/cohort-models-v1
+```
+
+4. 在 `.env` 中指向新包后重启：
+
+```dotenv
+WGS_CMD_REFERENCE_DIR=/home/zhanghaiyang/fmt-healthcare-agent/var/reference/cmd/native-v3-bioc322-wide
+WGS_CMD_COHORT_DIR=/home/zhanghaiyang/fmt-healthcare-agent/var/reference/cmd/cohort-models-v1
+```
+
+```bash
+bash deploy/restart.sh && bash deploy/status.sh
+```
+
+5. 刷新已有样本：专业版报告在下次生成时重算健康对照和人群模型；消费者版构建器版本已升级，打开即自动重建，也可手动：
+
+```bash
+.venv/bin/python scripts/build_consumer_report.py SAMPLE_ID --refresh
+```
+
+回退：把 `WGS_CMD_REFERENCE_DIR` 改回原目录、删除 `WGS_CMD_COHORT_DIR` 行，再 `bash deploy/restart.sh`；肠龄肠型和患病人群参考会自动隐藏。

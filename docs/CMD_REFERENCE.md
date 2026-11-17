@@ -72,6 +72,43 @@ PYTHONPATH=src .venv/bin/python -m wgs_agent.pipeline.cmd_workflow \
 
 postfmt直接调用该入口。报告生成只读取本地参考与既有待测谱，不启动profiling、下载或重建参考。
 
+## 扩大健康参考（抗生素口径）
+
+`prepare_cmd_reference.py --antibiotics-policy no_or_unrecorded` 在原有筛选之外，纳入原研究**未记录**当前抗生素使用的健康成人；明确记录为在用（yes）者仍排除。默认值`no`保持原严格契约，旧包继续有效；加载器同时接受两种口径，manifest的`selection_criteria.antibiotics_current_use`记录实际口径，报告局限性第一条随之改写。
+
+人数主要取决于两点：cMD元数据版本和抗生素口径。按官方sampleMetadata核查（2026-11，成人健康对照粪便独立个体，未扣除无效谱）：
+
+| 元数据版本 | `no` | `no_or_unrecorded` |
+|---|---|---|
+| Bioconductor 3.20 / cMD 3.14.0（原默认，服务器旧包3,537人） | 3,538 | 4,739 |
+| Bioconductor 3.22 / cMD 3.18.0（当前发行版） | 5,655 | 7,042 |
+
+两个版本的物种丰度资源完全相同（122个relative_abundance资源），3.18.0补全了年龄、抗生素等元数据。`scripts/export_cmd_metadata.R --bioc-release 3.22`导出3.18.0元数据（官方PACKAGES索引MD5 `717f3f71242bf3bf54b2997b6f88c0ee`），默认仍为3.20。建包时`--package-dir`须指向同版本解压源码。实际人数以建包输出为准。换包须写入**新目录**，再改`WGS_CMD_REFERENCE_DIR`。
+
+## 人群模型包（肠龄、肠型、健康指数、患病人群参考）
+
+`scripts/prepare_cmd_cohort_models.py`复用健康参考的官方源码包、元数据快照、ExperimentHub目录和下载/导出缓存（`--source-dir`），选取成人粪便谱中的健康对照（默认`no_or_unrecorded`口径）和10类成人疾病队列（CRC、adenoma、IBD、T2D、IGT、ACVD、CAD、cirrhosis、AS、schizophrenia；每类至少50人才建模）。每个(研究,个体,分组)保留最早有效谱。输出`manifest.json`与`models.json`，均为纯JSON（线性系数、聚类中心、分位数），不含pickle；manifest记录models.json的SHA256，加载时校验。
+
+| 模型 | 方法 | 交叉验证 |
+|---|---|---|
+| 肠道年龄 | 健康成人（18–90岁）物种log10(丰度%+0.001)标准化后岭回归；同龄比较用交叉验证预测值对实际年龄的线性关系校正回归均值效应 | 按研究分组K折，记录MAE与相关系数 |
+| 肠型 | 健康成人属水平Hellinger变换，k-means（k=3），按普雷沃菌属/拟杆菌属负荷命名；样本归最近中心，明确程度=1−最近/次近距离；PCA仅用于作图 | — |
+| 健康指数 | 健康 vs 合并疾病队列的类别平衡L2逻辑回归（C=0.05） | 按研究分组K折AUC |
+| 患病人群参考 | 每类疾病对比同研究健康对照（不足20人时用全部健康对照并标注），Mann-Whitney+BH（q<0.1）选富集/缺失各至多15种菌；特征分=富集均值−缺失均值 | 按研究分组K折、每折重选菌种的AUC；消费者版只展示AUC≥0.65的疾病 |
+
+运行时（`reporting/cohort_insights.py`）只读模型包和该样本已有的MetaPhlAn3/v30独立待测谱，校验provenance、版本和质控；缺包、校验和不符、版本不符均返回`audit.status=unavailable`及原因码，不回退。结果写入报告`template_inputs.cohort_insights`；旧报告在构建消费者版时现场计算。
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/prepare_cmd_cohort_models.py \
+  --package-dir /path/to/official/curatedMetagenomicData \
+  --metadata /path/to/cmd-source-snapshot/sample_metadata.tsv \
+  --catalog /path/to/ExperimentHub.sqlite \
+  --source-dir /path/to/cmd-source-cache \
+  --output /path/to/var/reference/cmd/cohort-models-v1
+```
+
+已存在的输出目录只报告`already_built`，不覆盖。患病人群参考描述的是菌群特征与公开患者群体的相似程度，不是患病概率或诊断。
+
 ## 环境变量迁移
 
 | 变量或参数 | 状态 | 行为/迁移 |
@@ -85,6 +122,9 @@ postfmt直接调用该入口。报告生成只读取本地参考与既有待测�
 | `WGS_REFERENCE_CACHE_DIR` | 保留，仅通路工具 | 既有公共HUMAnN通路缓存，不是健康物种来源 |
 | `WGS_CMD_REFERENCE_DIR` | 保留 | 默认工作区`reference/cmd/native-v3` |
 | `WGS_CMD_PROFILES_DIR` | 保留 | 默认工作区`reference-targets/cmd` |
+| `WGS_CMD_COHORT_DIR` | 新增 | 人群模型包，默认工作区`reference/cmd/cohort-models-v1` |
+| `--antibiotics-policy` | 新增CLI参数 | `no`（默认，原契约）或`no_or_unrecorded`（扩大健康参考） |
+| `export_cmd_metadata.R --bioc-release` | 新增CLI参数 | `3.20`（默认，cMD 3.14.0）或`3.22`（cMD 3.18.0，元数据更完整） |
 | `WGS_CMD_AUTO_PROFILE` | 保留 | 默认true；false/0/no/off关闭自动准备，报告仍可读既有谱 |
 | `WGS_CMD_PYTHON` | 保留 | 独立MetaPhlAn解释器；不是应用Python，shell应用使用`WGS_ENV_ROOT/bin/python` |
 | `WGS_CMD_VENDOR_DIR` | 保留 | 默认工作区`runtime/vendor/metaphlan-3.0.14` |

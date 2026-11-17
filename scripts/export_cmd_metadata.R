@@ -15,14 +15,28 @@ configured_cmd_source <- function() {
 # Export the official sampleMetadata data.frame with base R only.
 # No package installation, namespace loading, FASTQ download or healthy filtering.
 
+# Versions and checksums verified against the official Bioconductor source
+# PACKAGES indexes. 3.20 (cMD 3.14.0) is the original default; 3.22 (cMD 3.18.0)
+# carries the same abundance resources with more completely curated metadata
+# (age, antibiotics), which roughly doubles the eligible healthy adults.
+RELEASES <- list(
+    "3.20" = c(version="3.14.0", md5="efb481b40f689c417e9dbab4a98f71f1"),
+    "3.22" = c(version="3.18.0", md5="717f3f71242bf3bf54b2997b6f88c0ee")
+)
+
 main <- function() {
     args <- commandArgs(trailingOnly=TRUE)
-    output_dir <- configured_cmd_source()
-    if (length(args)) {
-        if (length(args) != 2L || args[[1L]] != "--output-dir")
-            stop("Usage: Rscript scripts/export_cmd_metadata.R [--output-dir DIRECTORY]")
-        output_dir <- args[[2L]]
+    usage <- "Usage: Rscript scripts/export_cmd_metadata.R [--output-dir DIRECTORY] [--bioc-release 3.20|3.22]"
+    output_dir <- NULL
+    release <- "3.20"
+    if (length(args) %% 2L) stop(usage)
+    for (i in seq(1L, length(args), by=2L)) {
+        if (args[[i]] == "--output-dir") output_dir <- args[[i + 1L]]
+        else if (args[[i]] == "--bioc-release") release <- args[[i + 1L]]
+        else stop(usage)
     }
+    if (!release %in% names(RELEASES)) stop(usage)
+    if (is.null(output_dir)) output_dir <- configured_cmd_source()
     options(timeout=max(180, getOption("timeout", 60)))
     dir.create(output_dir, recursive=TRUE, showWarnings=FALSE)
     if (file.access(output_dir, 2) != 0L) stop("Output directory is not writable")
@@ -30,12 +44,11 @@ main <- function() {
     cache <- file.path(output_dir, "source")
     dir.create(cache, showWarnings=FALSE)
 
-    # Version and checksum verified against the official Bioconductor 3.20
-    # source PACKAGES index. The data file is independent of package imports.
-    version <- "3.14.0"
-    expected_md5 <- "efb481b40f689c417e9dbab4a98f71f1"
+    # The data file is independent of package imports.
+    version <- unname(RELEASES[[release]]["version"])
+    expected_md5 <- unname(RELEASES[[release]]["md5"])
     url <- paste0(
-        "https://bioconductor.org/packages/3.20/data/experiment/src/contrib/",
+        "https://bioconductor.org/packages/", release, "/data/experiment/src/contrib/",
         "curatedMetagenomicData_", version, ".tar.gz"
     )
     archive <- file.path(cache, basename(url))
@@ -83,7 +96,7 @@ main <- function() {
     writeLines(version, file.path(temporary, "package_version.txt"))
     source <- data.frame(
         package="curatedMetagenomicData", source_version=version,
-        bioconductor_release="3.20", source_url=url, archive_md5=expected_md5,
+        bioconductor_release=release, source_url=url, archive_md5=expected_md5,
         metadata_md5=unname(tools::md5sum(staged)),
         rows=nrow(metadata), columns=ncol(metadata),
         extraction_method="base_R_load_from_official_source_data_only",

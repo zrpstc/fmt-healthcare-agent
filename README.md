@@ -221,6 +221,8 @@ P5、P95和目标百分位附固定种子1000次bootstrap的95%置信区间；�
 物种越界数另与参考者计数分布比较。支持country/sex/age_band分层、测序深度提示和研究批次摘要。
 建包参数、离线报告行为和迁移表见 [cMD指南](docs/CMD_REFERENCE.md)。不会自动重建或发布参考包。
 
+`export_cmd_metadata.R --bioc-release 3.22` 配合 `prepare_cmd_reference.py --antibiotics-policy no_or_unrecorded` 可把健康参考从3,537人扩大到约7,000人。`scripts/prepare_cmd_cohort_models.py` 用同一批cMD数据另建人群模型包（`WGS_CMD_COHORT_DIR`），提供肠道年龄、肠型、健康指数和10类疾病患者人群参考，供消费者版总体健康得分、肠龄肠型章节和致病基因章节使用；未配置时这些内容自动隐藏。
+
 ## 更多说明
 
 当前 gpu02 复用现有 Elasticsearch。应用重启前会检查认证连接；应用停止和重启不会操作外部依赖的容器、数据卷或密码。排错统一使用 `bash deploy/status.sh`，详细行为及旧脚本处置见 [部署说明](deploy/README.md)。

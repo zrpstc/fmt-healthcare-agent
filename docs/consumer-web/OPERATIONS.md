@@ -16,7 +16,9 @@ ${WGS_RESULTS_DIR:-var/results}/ZYMO_D6331_consumer_report.json
 ${WGS_RESULTS_DIR:-var/results}/ZYMO_D6331_consumer_report.cache.json
 ```
 
-缓存键包含：源 `{sample}_report.json` 的 SHA-256、构建器版本、术语库版本、数据库审核结果版本、是否允许 pending。任一变化会重建。
+缓存键包含：源 `{sample}_report.json` 的 SHA-256、构建器版本、术语库版本、数据库审核结果版本、是否允许 pending、人群模型包（`WGS_CMD_COHORT_DIR/manifest.json`）哈希。任一变化会重建。
+
+肠道年龄、肠型、总体健康得分中的“与健康人群相似度”和患病人群参考依赖人群模型包；未配置时这些内容隐藏并写入省略说明，其余部分照常生成。建包步骤见 `docs/CMD_REFERENCE.md`。
 
 ## 2. 后端接口
 
