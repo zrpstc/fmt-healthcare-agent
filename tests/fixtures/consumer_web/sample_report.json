@@ -1,0 +1,87 @@
+{
+  "schema_version": "health-report-v4",
+  "sample_id": "CONSUMER_TEST",
+  "generated_at": "2026-11-16T08:00:00+00:00",
+  "metadata": {"qc_status": "passed"},
+  "template_inputs": {
+    "taxonomy": {
+      "complete": true,
+      "unit": "%",
+      "ranks": {
+        "phylum": [
+          {"name": "Firmicutes", "abundance": 62.0, "lineage": "k__Bacteria|p__Firmicutes"},
+          {"name": "Bacteroidota", "abundance": 30.0, "lineage": "k__Bacteria|p__Bacteroidota"}
+        ],
+        "species": [
+          {"name": "Faecalibacterium prausnitzii", "abundance": 20.0, "lineage": "s__Faecalibacterium_prausnitzii"},
+          {"name": "Escherichia coli", "abundance": 15.0, "lineage": "s__Escherichia_coli"},
+          {"name": "Bacteroides fragilis", "abundance": 10.0, "lineage": "s__Bacteroides_fragilis"},
+          {"name": "Clostridioides difficile", "abundance": 2.0, "lineage": "s__Clostridioides_difficile"}
+        ]
+      }
+    },
+    "healthy_comparison": {
+      "audit": {"status": "available"},
+      "species": [
+        {"species": "Faecalibacterium prausnitzii", "abundance": 18.0, "percentile": 80.0, "status": "normal", "borderline": false, "p5": 1.0, "p95": 30.0},
+        {"species": "Escherichia coli", "abundance": 14.0, "percentile": 97.0, "status": "high", "borderline": false, "p5": 0.0, "p95": 5.0},
+        {"species": "Bacteroides fragilis", "abundance": 9.0, "percentile": 99.5, "status": "high", "borderline": false, "p5": 0.0, "p95": 1.7},
+        {"species": "Clostridioides difficile", "abundance": 1.0, "percentile": 70.0, "status": "normal", "borderline": false, "p5": 0.0, "p95": 2.5}
+      ],
+      "diversity": [
+        {"metric": "richness", "value": 18.0, "percentile": 0.2, "borderline": false},
+        {"metric": "shannon", "value": 2.2, "percentile": 10.5, "borderline": false},
+        {"metric": "evenness", "value": 0.75, "percentile": 95.5, "borderline": true}
+      ],
+      "typicality": {"status": "available", "percentile": 95.0, "borderline": true},
+      "ordination": {"status": "available", "points": [{"x": 0.0, "y": 0.0, "is_sample": true}, {"x": 0.1, "y": 0.2, "is_sample": false}]}
+    },
+    "virulence": {
+      "status": "completed",
+      "markers": [
+        {"gene": "VFG002287", "detected": true, "read_count": 100, "breadth": 90.0, "identity": 98.0}
+      ]
+    },
+    "resistance": {
+      "status": "completed",
+      "genes": [
+        {"gene": "tet(Q)", "drug_class": "Tetracycline", "mechanism": "Target protection", "detected": true}
+      ]
+    },
+    "mobile_elements": {
+      "status": "completed",
+      "results": [{"name": "ISVat1", "element_type": "is", "family": "IS256", "detected": true}]
+    },
+    "archaea": {"status": "detected", "records": [{"name": "Methanobrevibacter smithii", "abundance": 0.07}]},
+    "fungi": {"status": "detected", "records": [{"name": "Saccharomyces cerevisiae", "abundance": 0.1}]},
+    "dna_viruses": {"status": "detected", "records": [{"name": "MV1", "reference_genome": "NC_022750.1_Enterobacteria_phage_fiAA91-ss", "breadth_of_coverage": 0.9, "depth_of_coverage_mean": 200.0}]},
+    "strains": {
+      "status": "completed",
+      "strains": [
+        {"species": "Bacteroides fragilis", "evidence_status": "共识序列支持；具体菌株身份未确定"},
+        {"species": "Clostridioides difficile", "evidence_status": "共识序列支持；具体菌株身份未确定"},
+        {"species": "Escherichia coli", "evidence_status": "共识序列支持；具体菌株身份未确定"}
+      ]
+    },
+    "specialized_metabolism": {
+      "status": "partial",
+      "dietary": [{"id": "beta_glucosidase", "status": "annotation_detected", "stratified_contributions": [{"taxon": "g__Escherichia.s__Escherichia_coli"}]}],
+      "drugs": [{"id": "beta_glucuronidase", "status": "annotation_detected", "stratified_contributions": [{"taxon": "g__Faecalibacterium.s__Faecalibacterium_prausnitzii"}]}]
+    }
+  },
+  "evidence": {
+    "P1": {"id": "PWY-6731", "name": "starch degradation III", "kind": "pathway", "value": 0.1, "unit": "relative_abundance", "contributors": [{"taxon": "g__Escherichia.s__Escherichia_coli", "abundance": 0.05, "unit": "relative_abundance"}, {"taxon": "g__Faecalibacterium.s__Faecalibacterium_prausnitzii", "abundance": 0.05, "unit": "relative_abundance"}]},
+    "P2": {"id": "PWY-5676", "name": "acetyl-CoA fermentation to butanoate II", "kind": "pathway", "value": 0.1, "unit": "relative_abundance", "contributors": [{"taxon": "g__Faecalibacterium.s__Faecalibacterium_prausnitzii", "abundance": 0.04, "unit": "relative_abundance"}, {"taxon": "g__Escherichia.s__Escherichia_coli", "abundance": 0.06, "unit": "relative_abundance"}]},
+    "P3": {"id": "P163-PWY", "name": "L-lysine fermentation to acetate and butanoate", "kind": "pathway", "value": 0.1, "unit": "relative_abundance", "contributors": [{"taxon": "g__Escherichia.s__Escherichia_coli", "abundance": 0.1, "unit": "relative_abundance"}]},
+    "P4": {"id": "PWY-8086", "name": "(S)-lactate fermentation to propanoate, acetate and hydrogen", "kind": "pathway", "value": 0.1, "unit": "relative_abundance", "contributors": []},
+    "P5": {"id": "THISYN-PWY", "name": "superpathway of thiamine diphosphate biosynthesis I", "kind": "pathway", "value": 0.1, "unit": "relative_abundance", "contributors": [{"taxon": "g__Escherichia.s__Escherichia_coli", "abundance": 0.1, "unit": "relative_abundance"}]},
+    "K1": {"kind": "literature", "claim_id": "litkg:claim:1", "title": "Faecalibacterium prausnitzii produces butyrate", "doi": "10.1000/test", "subject": "Faecalibacterium prausnitzii", "object": "butyrate", "predicate": "PRODUCES", "subject_type": "MicrobialTaxon", "object_type": "Metabolite", "evidence_text": "F. prausnitzii produced butyrate in culture.", "document_id": 1}
+  },
+  "references": {"matched_docs": [{"claim_id": "litkg:claim:1", "title": "Faecalibacterium prausnitzii produces butyrate", "doi": "10.1000/test"}]},
+  "sections": [
+    {"id": "composition", "title": "composition", "status": "available", "topics": [
+      {"id": "composition.phyla", "status": "available", "evidence_ids": ["K1"], "knowledge_subgraph": {"nodes": [{"id": "a", "label": "Firmicutes", "display_label": "厚壁菌门", "type": "MicrobialTaxon"}], "edges": []}}
+    ]}
+  ],
+  "module_bibliographies": []
+}

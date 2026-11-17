@@ -21,6 +21,7 @@ button,input,textarea,select{font:inherit} button{cursor:pointer} a{color:inheri
 .main-nav{margin-top:22px}.nav-label{margin:0 10px 8px;color:#74939d;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
 .nav-item{position:relative;display:flex;align-items:center;gap:11px;min-height:43px;padding:0 12px;margin:4px 0;border-radius:11px;color:#bcd0d5;font-size:13px;font-weight:600;transition:.18s ease}
 .nav-item:hover{color:#fff;background:rgba(255,255,255,.07)}.nav-item.is-active{color:#fff;background:rgba(255,255,255,.12)}
+.nav-item-sub{min-height:36px;margin-left:16px;font-size:12px}.sidebar-is-collapsed .nav-item-sub{margin-left:0}
 .nav-item.is-active:before{content:"";position:absolute;left:-16px;width:3px;height:22px;border-radius:0 4px 4px 0;background:var(--coral)}
 .nav-item.is-disabled{opacity:.46;cursor:default}.nav-item small{margin-left:auto;font-size:8px;font-weight:500}
 .sidebar-status{margin-top:auto;display:flex;gap:10px;align-items:center;padding:13px;border:1px solid rgba(255,255,255,.12);border-radius:13px;background:rgba(255,255,255,.05)}
@@ -152,3 +153,17 @@ button,input,textarea,select{font:inherit} button{cursor:pointer} a{color:inheri
 .sample-graph-notice{margin-bottom:12px;border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:8px}
 @media(max-width:1150px){.evidence-graph-workbench{grid-template-columns:minmax(0,1fr) 280px}.sample-graph-controls{grid-template-columns:1fr 130px}.sample-graph-controls button{grid-column:1/-1;justify-self:start}}
 @media(max-width:760px){.app-frame,.app-frame.sidebar-is-collapsed{grid-template-columns:minmax(0,1fr)}.global-sidebar{min-width:0}.evidence-graph-workbench{display:block;height:auto}.evidence-network{height:560px}.evidence-inspector{height:360px}.sample-graph-controls{grid-template-columns:minmax(0,1fr)}.sample-graph-controls button{width:100%;justify-content:center}.evidence-graph-legend small{display:none}.evidence-graph-toolbar{padding:10px}.graph-caption{gap:12px;flex-wrap:wrap}}
+
+/* Glossary review console */
+.review-toolbar{margin-bottom:14px;padding:16px 18px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.review-toolbar>div:first-child{flex:1 1 320px;min-width:240px}.review-toolbar>div:first-child strong{display:block;font-size:13px}.review-toolbar>div:first-child span{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.55}
+.review-toolbar-field{display:grid;gap:5px;min-width:220px;font-size:11px;color:var(--body)}.review-toolbar-check{display:flex;align-items:center;gap:6px;height:38px;font-size:12px;color:var(--body)}
+.review-summary{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+.review-card{padding:18px}.review-card.is-rejected{opacity:.72}.review-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.review-card h2{margin:0;font-size:15px}.review-card h2 em{color:var(--muted);font-weight:500;font-size:13px}
+.review-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.review-tags .pill{font-size:10px;min-height:22px}
+.review-meta{margin:7px 0 0;color:var(--muted);font-size:11px;overflow-wrap:anywhere}.review-select{display:flex;gap:6px;align-items:center;font-size:12px;white-space:nowrap}
+.review-count{margin-top:4px;text-align:right;color:var(--muted);font-size:10px}
+.review-evidence{margin-top:8px;padding:10px 12px;border:1px solid var(--line-soft);border-radius:10px;background:#fbfcfc;font-size:12px}.review-evidence summary{cursor:pointer;font-weight:700;color:var(--ocean-800)}
+.review-evidence ol{margin:10px 0 0;padding-left:20px;display:grid;gap:8px}.review-evidence li span{display:block;line-height:1.6}.review-evidence li small{display:block;margin-top:2px;color:var(--muted);font-size:10px}.review-evidence a{display:inline-flex;align-items:center;gap:2px;color:var(--ocean-600)}
+.review-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}.review-source{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--ocean-600)}.review-source.muted{color:var(--muted)}

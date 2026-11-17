@@ -1,0 +1,58 @@
+{
+  "schema_version": "consumer-substrate-v1",
+  "substrates": [
+    {
+      "id": "resistant_starch",
+      "name": "抗性淀粉 / 淀粉",
+      "term_id": "resistant_starch",
+      "food_sources": ["放凉的米饭和土豆", "青香蕉", "豆类"],
+      "pathways": [
+        {"id": "PWY-6731", "name": "淀粉降解 III", "verified": true, "verification": "observed in HUMAnN sample output"},
+        {"id": "PWY-6737", "name": "淀粉降解 IV", "verified": false, "verification": "not observed in this sample; candidate only"}
+      ],
+      "enzymes": [
+        {"ec": "3.2.1.1", "verified": true, "verification": "HUMAnN utility_mapping EC->UniRef90"},
+        {"ec": "3.2.1.41", "verified": true, "verification": "HUMAnN utility_mapping EC->UniRef90"}
+      ]
+    },
+    {
+      "id": "pectin",
+      "name": "果胶",
+      "term_id": "pectin",
+      "food_sources": ["苹果", "柑橘", "胡萝卜"],
+      "pathways": [
+        {"id": "GALACTUROCAT-PWY", "name": "D-半乳糖醛酸降解 I", "verified": true, "verification": "observed in HUMAnN sample output"},
+        {"id": "PWY-6507", "name": "4-脱氧-L-苏式-己-4-烯吡喃糖醛酸降解", "verified": true, "verification": "observed in HUMAnN sample output"},
+        {"id": "GALACT-GLUCUROCAT-PWY", "name": "己糖醛酸与己糖醛酸内酯降解", "verified": true, "verification": "observed in HUMAnN sample output"}
+      ],
+      "enzymes": [
+        {"ec": "4.2.2.2", "verified": false, "verification": "no sample hit and not confirmed in the local reference set"},
+        {"ec": "3.2.1.15", "verified": false, "verification": "mapping exists but only a yeast hit; not used as pectin evidence"}
+      ]
+    },
+    {
+      "id": "inulin",
+      "name": "菊粉 / 果聚糖",
+      "term_id": "inulin",
+      "food_sources": ["洋葱", "大蒜", "芦笋", "菊苣"],
+      "pathways": [],
+      "enzymes": [
+        {"ec": "3.2.1.7", "verified": true, "verification": "HUMAnN utility_mapping EC->UniRef90; no sample hit"}
+      ]
+    },
+    {
+      "id": "xylan",
+      "name": "木聚糖",
+      "term_id": "xylan",
+      "food_sources": ["全谷物麸皮", "玉米"],
+      "pathways": [
+        {"id": "PWY-6901", "name": "葡萄糖与木糖降解超通路", "verified": true, "verification": "observed in HUMAnN sample output"},
+        {"id": "PWY-7294", "name": "D-木糖降解 IV", "verified": true, "verification": "observed in HUMAnN sample output"}
+      ],
+      "enzymes": [
+        {"ec": "3.2.1.8", "verified": true, "verification": "HUMAnN utility_mapping EC->UniRef90"},
+        {"ec": "3.2.1.37", "verified": true, "verification": "HUMAnN utility_mapping EC->UniRef90"}
+      ]
+    }
+  ]
+}

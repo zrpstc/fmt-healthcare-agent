@@ -31,6 +31,7 @@ from wgs_agent.pipeline.sample_registry import (
     update_metadata,
 )
 from app.agent_prompts import MAIN_AGENT_ID, EVIDENCE_AGENT_ID, MAIN_SYSTEM_PROMPT, EVIDENCE_SYSTEM_PROMPT, EVIDENCE_TOOL_NAMES, normalize_agents
+from app.consumer_api import router as consumer_router
 from app.local_chat import LocalChatError, list_models
 from app.sample_graph import build_sample_graph
 from wgs_agent.tools.knowledge_tools import claim_record_to_reference
@@ -308,6 +309,7 @@ def _valid_id(value: str) -> str:
 
 app = FastAPI(title="WGS-FMT Agent Workspace API", version="1.0.0")
 app.include_router(infrastructure_router, prefix="/api/backend")
+app.include_router(consumer_router, prefix="/api")
 cors_origins = [value.strip() for value in os.environ.get("WGS_CORS_ORIGINS", "").split(",") if value.strip()]
 if cors_origins:
     app.add_middleware(CORSMiddleware, allow_origins=cors_origins, allow_methods=["*"], allow_headers=["*"])
@@ -756,6 +758,7 @@ def _sample_artifacts(sample_id: str) -> dict[str, dict[str, Any]]:
         "fmt_plot": _fmt_plot_path(sample_id),
         "evidence": RESULTS_DIR / f"{sample_id}_report_evidence.json",
         "structured": RESULTS_DIR / f"{sample_id}_report.json",
+        "consumer": RESULTS_DIR / f"{sample_id}_consumer_report.json",
     }
     return {
         name: {
@@ -992,6 +995,7 @@ def report_file(sample_id: str, kind: str) -> FileResponse:
         "knowledge": (RESULTS_DIR / f"{sample_id}_knowledge.json", "application/json"),
         "evidence": (RESULTS_DIR / f"{sample_id}_report_evidence.json", "application/json"),
         "structured": (RESULTS_DIR / f"{sample_id}_report.json", "application/json"),
+        "consumer": (RESULTS_DIR / f"{sample_id}_consumer_report.json", "application/json"),
     }
     if kind not in mapping:
         raise HTTPException(404, "不支持的报告产物类型。")

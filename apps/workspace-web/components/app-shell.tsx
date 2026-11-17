@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Bot, Database, FileText, FlaskConical, LogIn, MessageSquare, PanelLeftClose, PanelLeftOpen, Settings2, UserCircle, UserPlus } from "lucide-react";
+import { Bot, Database, FileText, FlaskConical, LogIn, MessageSquare, PanelLeftClose, PanelLeftOpen, Settings2, ShieldCheck, UserCircle, UserPlus } from "lucide-react";
 import { api, AuthUser } from "@/lib/api";
 import { AuthAccess } from "@/components/auth-access";
 
@@ -12,8 +12,16 @@ const navigation = [
   { href: "/samples", label: "样本与分析", icon: FlaskConical },
   { href: "/knowledge", label: "证据知识库", icon: Database },
   { href: "/reports", label: "报告中心", icon: FileText },
+  // Shown only to admin/researcher accounts; the API enforces the same rule.
+  { href: "/reports/review", label: "术语审核", icon: ShieldCheck, editorOnly: true },
   { href: "/settings", label: "Agent 与 Skills", icon: Settings2 },
 ];
+
+/** The most specific nav entry wins, so /reports/review does not also light up /reports. */
+export function activeHref(pathname: string, hrefs: string[]): string | null {
+  const matches = hrefs.filter(href => pathname === href || pathname.startsWith(`${href}/`));
+  return matches.sort((a, b) => b.length - a.length)[0] ?? null;
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -24,7 +32,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(()=>{const requested=new URLSearchParams(window.location.search).get("auth");if(requested==="login"||requested==="register")setAuthOpen(requested)},[pathname]);
   useEffect(()=>{setSidebarCollapsed(window.localStorage.getItem("wgs-sidebar-collapsed")==="1")},[]);
   const toggleSidebar=()=>setSidebarCollapsed(value=>{const next=!value;window.localStorage.setItem("wgs-sidebar-collapsed",next?"1":"0");return next});
-  if(pathname==="/")return <>{children}</>;
+  if(pathname==="/"||pathname.startsWith("/r/")||pathname.startsWith("/share/"))return <>{children}</>;
+  const isEditor=user?.role==="admin"||user?.role==="researcher";
+  const visibleNav=navigation.filter(item=>!item.editorOnly||isEditor);
+  const active=activeHref(pathname,visibleNav.map(item=>item.href));
   return (
     <div className={`app-frame ${sidebarCollapsed?"sidebar-is-collapsed":""}`}>
       <aside className="global-sidebar" aria-label="工作空间导航">
@@ -35,8 +46,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
         <nav className="main-nav">
           <p className="nav-label">工作空间</p>
-          {navigation.map(({ href, label, icon: Icon }) => (
-            <Link className={`nav-item ${pathname === href || pathname.startsWith(`${href}/`) ? "is-active" : ""}`} href={href} key={href}>
+          {visibleNav.map(({ href, label, icon: Icon, editorOnly }) => (
+            <Link className={`nav-item ${editorOnly ? "nav-item-sub" : ""} ${active === href ? "is-active" : ""}`} href={href} key={href}>
               <Icon size={18}/><span>{label}</span>
             </Link>
           ))}

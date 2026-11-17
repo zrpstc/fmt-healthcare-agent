@@ -1,0 +1,1899 @@
+{
+  "$defs": {
+    "Action": {
+      "additionalProperties": false,
+      "properties": {
+        "finding_code": {
+          "title": "Finding Code",
+          "type": "string"
+        },
+        "because": {
+          "title": "Because",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "how": {
+          "title": "How",
+          "type": "string"
+        },
+        "examples": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Examples"
+        }
+      },
+      "required": [
+        "finding_code",
+        "because",
+        "title",
+        "how"
+      ],
+      "title": "Action",
+      "type": "object"
+    },
+    "Assessment": {
+      "additionalProperties": false,
+      "description": "Overall rule-based verdict shown on the overview (pathogen / nutrition).",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "verdict": {
+          "title": "Verdict",
+          "type": "string"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "anchor": {
+          "title": "Anchor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "verdict",
+        "tone",
+        "text",
+        "anchor"
+      ],
+      "title": "Assessment",
+      "type": "object"
+    },
+    "CalloutBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "callout",
+          "default": "callout",
+          "title": "Type",
+          "type": "string"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tone",
+        "text"
+      ],
+      "title": "CalloutBlock",
+      "type": "object"
+    },
+    "CardGridBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "card_grid",
+          "default": "card_grid",
+          "title": "Type",
+          "type": "string"
+        },
+        "cards": {
+          "items": {
+            "$ref": "#/$defs/MetaboliteCard"
+          },
+          "title": "Cards",
+          "type": "array"
+        }
+      },
+      "required": [
+        "cards"
+      ],
+      "title": "CardGridBlock",
+      "type": "object"
+    },
+    "CategoryCallout": {
+      "additionalProperties": false,
+      "properties": {
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tone",
+        "text"
+      ],
+      "title": "CategoryCallout",
+      "type": "object"
+    },
+    "CategoryCard": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "total": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Num"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "tier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Tier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "members": {
+          "items": {
+            "$ref": "#/$defs/TaxonCard"
+          },
+          "title": "Members",
+          "type": "array"
+        },
+        "absent_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Absent Text"
+        },
+        "callout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CategoryCallout"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "title",
+        "text"
+      ],
+      "title": "CategoryCard",
+      "type": "object"
+    },
+    "CategoryCardsBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "category_cards",
+          "default": "category_cards",
+          "title": "Type",
+          "type": "string"
+        },
+        "cards": {
+          "items": {
+            "$ref": "#/$defs/CategoryCard"
+          },
+          "title": "Cards",
+          "type": "array"
+        }
+      },
+      "required": [
+        "cards"
+      ],
+      "title": "CategoryCardsBlock",
+      "type": "object"
+    },
+    "ChartAxis": {
+      "additionalProperties": false,
+      "description": "Axis captions and preformatted tick labels for a bar chart.",
+      "properties": {
+        "category_label": {
+          "title": "Category Label",
+          "type": "string"
+        },
+        "value_label": {
+          "title": "Value Label",
+          "type": "string"
+        },
+        "ticks": {
+          "items": {
+            "$ref": "#/$defs/Num"
+          },
+          "title": "Ticks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "category_label",
+        "value_label"
+      ],
+      "title": "ChartAxis",
+      "type": "object"
+    },
+    "DetailRow": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "text"
+      ],
+      "title": "DetailRow",
+      "type": "object"
+    },
+    "DonutBlock": {
+      "additionalProperties": false,
+      "description": "Ring chart of parts of a whole; geometry is drawn by the frontend.",
+      "properties": {
+        "type": {
+          "const": "donut",
+          "default": "donut",
+          "title": "Type",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "caption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption"
+        },
+        "center_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Center Label"
+        },
+        "center_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Center Value"
+        },
+        "segments": {
+          "items": {
+            "$ref": "#/$defs/StackedSegment"
+          },
+          "title": "Segments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "segments"
+      ],
+      "title": "DonutBlock",
+      "type": "object"
+    },
+    "Download": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "href": {
+          "title": "Href",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "label",
+        "href"
+      ],
+      "title": "Download",
+      "type": "object"
+    },
+    "FindingCard": {
+      "additionalProperties": false,
+      "properties": {
+        "rank": {
+          "title": "Rank",
+          "type": "integer"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "big": {
+          "$ref": "#/$defs/Num"
+        },
+        "compare": {
+          "title": "Compare",
+          "type": "string"
+        },
+        "meaning": {
+          "title": "Meaning",
+          "type": "string"
+        },
+        "anchor": {
+          "title": "Anchor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rank",
+        "tone",
+        "title",
+        "big",
+        "compare",
+        "meaning",
+        "anchor"
+      ],
+      "title": "FindingCard",
+      "type": "object"
+    },
+    "GlossaryEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "term_id": {
+          "title": "Term Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "latin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latin"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "evidence_badge": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Badge"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "term_id",
+        "name",
+        "text"
+      ],
+      "title": "GlossaryEntry",
+      "type": "object"
+    },
+    "GraphBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/GraphNode"
+          },
+          "title": "Nodes",
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/GraphEdge"
+          },
+          "title": "Edges",
+          "type": "array"
+        },
+        "seeds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Seeds",
+          "type": "array"
+        },
+        "topic_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Topic Ids",
+          "type": "array"
+        },
+        "first_in_report": {
+          "default": false,
+          "title": "First In Report",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "nodes",
+        "edges",
+        "seeds",
+        "topic_ids"
+      ],
+      "title": "GraphBlock",
+      "type": "object"
+    },
+    "GraphEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "from": {
+          "title": "From",
+          "type": "string"
+        },
+        "to": {
+          "title": "To",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "approved",
+            "pending"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/GraphEvidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "from",
+        "to",
+        "label",
+        "status"
+      ],
+      "title": "GraphEdge",
+      "type": "object"
+    },
+    "GraphEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "sentence": {
+          "title": "Sentence",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sentence",
+        "ref_id"
+      ],
+      "title": "GraphEvidence",
+      "type": "object"
+    },
+    "GraphNode": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "type": {
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "type"
+      ],
+      "title": "GraphNode",
+      "type": "object"
+    },
+    "MetaboliteCard": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "tier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Tier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "members": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Members"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Num"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "score_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score Label"
+        },
+        "details": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/DetailRow"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Details"
+        }
+      },
+      "required": [
+        "title",
+        "text",
+        "status",
+        "tone"
+      ],
+      "title": "MetaboliteCard",
+      "type": "object"
+    },
+    "MethodNote": {
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "title": "Section",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "body": {
+          "title": "Body",
+          "type": "string"
+        }
+      },
+      "required": [
+        "section",
+        "title",
+        "body"
+      ],
+      "title": "MethodNote",
+      "type": "object"
+    },
+    "Num": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "display": {
+          "title": "Display",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "value",
+        "display"
+      ],
+      "title": "Num",
+      "type": "object"
+    },
+    "Omission": {
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "title": "Section",
+          "type": "string"
+        },
+        "item": {
+          "title": "Item",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "section",
+        "item",
+        "reason"
+      ],
+      "title": "Omission",
+      "type": "object"
+    },
+    "ParagraphBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "paragraph",
+          "default": "paragraph",
+          "title": "Type",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "ParagraphBlock",
+      "type": "object"
+    },
+    "RankedBarsBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ranked_bars",
+          "default": "ranked_bars",
+          "title": "Type",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "caption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption"
+        },
+        "axis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChartAxis"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/RankedRow"
+          },
+          "title": "Rows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "title": "RankedBarsBlock",
+      "type": "object"
+    },
+    "RankedRow": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "latin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latin"
+        },
+        "value": {
+          "$ref": "#/$defs/Num"
+        },
+        "tone": {
+          "anyOf": [
+            {
+              "enum": [
+                "good",
+                "neutral",
+                "watch",
+                "consult"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tone"
+        }
+      },
+      "required": [
+        "label",
+        "value"
+      ],
+      "title": "RankedRow",
+      "type": "object"
+    },
+    "Reference": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "Reference",
+      "type": "object"
+    },
+    "Retest": {
+      "additionalProperties": false,
+      "properties": {
+        "months": {
+          "title": "Months",
+          "type": "integer"
+        },
+        "focus": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Focus",
+          "type": "array"
+        }
+      },
+      "required": [
+        "months"
+      ],
+      "title": "Retest",
+      "type": "object"
+    },
+    "SampleMeta": {
+      "additionalProperties": false,
+      "properties": {
+        "sample_id": {
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "alias": {
+          "title": "Alias",
+          "type": "string"
+        },
+        "report_date": {
+          "title": "Report Date",
+          "type": "string"
+        },
+        "generated_at": {
+          "title": "Generated At",
+          "type": "string"
+        },
+        "source_report_sha256": {
+          "title": "Source Report Sha256",
+          "type": "string"
+        },
+        "builder_version": {
+          "title": "Builder Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sample_id",
+        "alias",
+        "report_date",
+        "generated_at",
+        "source_report_sha256",
+        "builder_version"
+      ],
+      "title": "SampleMeta",
+      "type": "object"
+    },
+    "ScatterBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "scatter",
+          "default": "scatter",
+          "title": "Type",
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "you": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "You",
+          "type": "array"
+        },
+        "caption": {
+          "title": "Caption",
+          "type": "string"
+        }
+      },
+      "required": [
+        "points",
+        "you",
+        "caption"
+      ],
+      "title": "ScatterBlock",
+      "type": "object"
+    },
+    "Section": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "nav_label": {
+          "title": "Nav Label",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "intro": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Intro"
+        },
+        "source_chapters": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Source Chapters",
+          "type": "array"
+        },
+        "terms_banner": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Terms Banner",
+          "type": "array"
+        },
+        "subsections": {
+          "items": {
+            "$ref": "#/$defs/Subsection"
+          },
+          "title": "Subsections",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "nav_label",
+        "title"
+      ],
+      "title": "Section",
+      "type": "object"
+    },
+    "StackedBarBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "stacked_bar",
+          "default": "stacked_bar",
+          "title": "Type",
+          "type": "string"
+        },
+        "segments": {
+          "items": {
+            "$ref": "#/$defs/StackedSegment"
+          },
+          "title": "Segments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "segments"
+      ],
+      "title": "StackedBarBlock",
+      "type": "object"
+    },
+    "StackedSegment": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Num"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "color_key": {
+          "title": "Color Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "value",
+        "color_key"
+      ],
+      "title": "StackedSegment",
+      "type": "object"
+    },
+    "Stage": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Members",
+          "type": "array"
+        },
+        "more": {
+          "default": 0,
+          "title": "More",
+          "type": "integer"
+        },
+        "backup_label": {
+          "title": "Backup Label",
+          "type": "string"
+        },
+        "meaning": {
+          "title": "Meaning",
+          "type": "string"
+        },
+        "member_details": {
+          "items": {
+            "$ref": "#/$defs/StageMember"
+          },
+          "title": "Member Details",
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "members",
+        "backup_label",
+        "meaning"
+      ],
+      "title": "Stage",
+      "type": "object"
+    },
+    "StageFlowBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "stage_flow",
+          "default": "stage_flow",
+          "title": "Type",
+          "type": "string"
+        },
+        "stages": {
+          "items": {
+            "$ref": "#/$defs/Stage"
+          },
+          "title": "Stages",
+          "type": "array"
+        },
+        "footnote": {
+          "title": "Footnote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stages",
+        "footnote"
+      ],
+      "title": "StageFlowBlock",
+      "type": "object"
+    },
+    "StageMember": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Num"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "basis": {
+          "default": "gene",
+          "enum": [
+            "gene",
+            "taxonomy"
+          ],
+          "title": "Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "StageMember",
+      "type": "object"
+    },
+    "StatusCard": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "tier_label": {
+          "title": "Tier Label",
+          "type": "string"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "line": {
+          "title": "Line",
+          "type": "string"
+        },
+        "anchor": {
+          "title": "Anchor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "tier_label",
+        "tone",
+        "line",
+        "anchor"
+      ],
+      "title": "StatusCard",
+      "type": "object"
+    },
+    "Subsection": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "blocks": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "callout": "#/$defs/CalloutBlock",
+                "card_grid": "#/$defs/CardGridBlock",
+                "category_cards": "#/$defs/CategoryCardsBlock",
+                "donut": "#/$defs/DonutBlock",
+                "paragraph": "#/$defs/ParagraphBlock",
+                "ranked_bars": "#/$defs/RankedBarsBlock",
+                "scatter": "#/$defs/ScatterBlock",
+                "stacked_bar": "#/$defs/StackedBarBlock",
+                "stage_flow": "#/$defs/StageFlowBlock",
+                "table": "#/$defs/TableBlock",
+                "taxon_cards": "#/$defs/TaxonCardsBlock",
+                "tier_scales": "#/$defs/TierScalesBlock"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ParagraphBlock"
+              },
+              {
+                "$ref": "#/$defs/CalloutBlock"
+              },
+              {
+                "$ref": "#/$defs/StackedBarBlock"
+              },
+              {
+                "$ref": "#/$defs/DonutBlock"
+              },
+              {
+                "$ref": "#/$defs/RankedBarsBlock"
+              },
+              {
+                "$ref": "#/$defs/TierScalesBlock"
+              },
+              {
+                "$ref": "#/$defs/TaxonCardsBlock"
+              },
+              {
+                "$ref": "#/$defs/CategoryCardsBlock"
+              },
+              {
+                "$ref": "#/$defs/StageFlowBlock"
+              },
+              {
+                "$ref": "#/$defs/TableBlock"
+              },
+              {
+                "$ref": "#/$defs/CardGridBlock"
+              },
+              {
+                "$ref": "#/$defs/ScatterBlock"
+              }
+            ]
+          },
+          "title": "Blocks",
+          "type": "array"
+        },
+        "summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Summary"
+        },
+        "summary_source": {
+          "anyOf": [
+            {
+              "enum": [
+                "rule",
+                "llm"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Summary Source"
+        },
+        "graph": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GraphBlock"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "Subsection",
+      "type": "object"
+    },
+    "Summary": {
+      "additionalProperties": false,
+      "properties": {
+        "headline": {
+          "title": "Headline",
+          "type": "string"
+        },
+        "headline_source": {
+          "enum": [
+            "rule",
+            "llm"
+          ],
+          "title": "Headline Source",
+          "type": "string"
+        },
+        "status_cards": {
+          "items": {
+            "$ref": "#/$defs/StatusCard"
+          },
+          "title": "Status Cards",
+          "type": "array"
+        },
+        "key_findings": {
+          "items": {
+            "$ref": "#/$defs/FindingCard"
+          },
+          "title": "Key Findings",
+          "type": "array"
+        },
+        "assessments": {
+          "items": {
+            "$ref": "#/$defs/Assessment"
+          },
+          "title": "Assessments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "headline",
+        "headline_source"
+      ],
+      "title": "Summary",
+      "type": "object"
+    },
+    "TableBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "table",
+          "default": "table",
+          "title": "Type",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "footnote": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Footnote"
+        }
+      },
+      "required": [
+        "columns",
+        "rows"
+      ],
+      "title": "TableBlock",
+      "type": "object"
+    },
+    "TaxonCard": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "latin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latin"
+        },
+        "first_mention": {
+          "default": false,
+          "title": "First Mention",
+          "type": "boolean"
+        },
+        "value": {
+          "$ref": "#/$defs/Num"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        },
+        "evidence_badge": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Badge"
+        },
+        "reliability_badge": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reliability Badge"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "TaxonCard",
+      "type": "object"
+    },
+    "TaxonCardsBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "taxon_cards",
+          "default": "taxon_cards",
+          "title": "Type",
+          "type": "string"
+        },
+        "cards": {
+          "items": {
+            "$ref": "#/$defs/TaxonCard"
+          },
+          "title": "Cards",
+          "type": "array"
+        }
+      },
+      "required": [
+        "cards"
+      ],
+      "title": "TaxonCardsBlock",
+      "type": "object"
+    },
+    "Tier": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "enum": [
+            "very_low",
+            "low",
+            "typical",
+            "high",
+            "very_high"
+          ],
+          "title": "Key",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "percentile": {
+          "title": "Percentile",
+          "type": "number"
+        },
+        "phrase": {
+          "title": "Phrase",
+          "type": "string"
+        },
+        "borderline": {
+          "default": false,
+          "title": "Borderline",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "key",
+        "label",
+        "tone",
+        "percentile",
+        "phrase"
+      ],
+      "title": "Tier",
+      "type": "object"
+    },
+    "TierRow": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Num"
+        },
+        "tier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Tier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "label",
+        "value"
+      ],
+      "title": "TierRow",
+      "type": "object"
+    },
+    "TierScalesBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "tier_scales",
+          "default": "tier_scales",
+          "title": "Type",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/TierRow"
+          },
+          "title": "Rows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "title": "TierScalesBlock",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "consumer-report/1",
+      "default": "consumer-report/1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sample": {
+      "$ref": "#/$defs/SampleMeta"
+    },
+    "summary": {
+      "$ref": "#/$defs/Summary"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/Section"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "actions": {
+      "items": {
+        "$ref": "#/$defs/Action"
+      },
+      "title": "Actions",
+      "type": "array"
+    },
+    "retest": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Retest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "red_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Red Flags",
+      "type": "array"
+    },
+    "glossary": {
+      "items": {
+        "$ref": "#/$defs/GlossaryEntry"
+      },
+      "title": "Glossary",
+      "type": "array"
+    },
+    "references": {
+      "items": {
+        "$ref": "#/$defs/Reference"
+      },
+      "title": "References",
+      "type": "array"
+    },
+    "omissions": {
+      "items": {
+        "$ref": "#/$defs/Omission"
+      },
+      "title": "Omissions",
+      "type": "array"
+    },
+    "methods": {
+      "items": {
+        "$ref": "#/$defs/MethodNote"
+      },
+      "title": "Methods",
+      "type": "array"
+    },
+    "downloads": {
+      "items": {
+        "$ref": "#/$defs/Download"
+      },
+      "title": "Downloads",
+      "type": "array"
+    }
+  },
+  "required": [
+    "sample",
+    "summary"
+  ],
+  "title": "ConsumerReport",
+  "type": "object"
+}

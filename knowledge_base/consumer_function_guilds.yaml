@@ -1,0 +1,66 @@
+{
+  "schema_version": "consumer-function-guilds-v1",
+  "note": "Taxa with a well-documented role in each fermentation stage. Used only to add DETECTED taxa that the stratified gene annotation did not name; such members are labelled as taxonomy-based in the report, never as measured gene contributions.",
+  "references": [
+    "Flint HJ, Scott KP, Duncan SH, Louis P, Forano E. Microbial degradation of complex carbohydrates in the gut. Gut Microbes. 2012.",
+    "Louis P, Flint HJ. Formation of propionate and butyrate by the human colonic microbiota. Environ Microbiol. 2017.",
+    "Duncan SH, Louis P, Flint HJ. Lactate-utilizing bacteria, isolated from human feces, that produce butyrate as a major fermentation product. Appl Environ Microbiol. 2004."
+  ],
+  "guilds": {
+    "fiber": {
+      "title": "拆解膳食纤维和淀粉",
+      "members": [
+        {"name": "Bacteroides", "rank": "genus"},
+        {"name": "Phocaeicola", "rank": "genus"},
+        {"name": "Prevotella", "rank": "genus"},
+        {"name": "Segatella", "rank": "genus"},
+        {"name": "Parabacteroides", "rank": "genus"},
+        {"name": "Bifidobacterium", "rank": "genus"},
+        {"name": "Ruminococcus bromii", "rank": "species"},
+        {"name": "Ruminococcus champanellensis", "rank": "species"},
+        {"name": "Roseburia", "rank": "genus"},
+        {"name": "Agathobacter rectalis", "rank": "species", "aliases": ["Eubacterium rectale", "[Eubacterium] rectale"]}
+      ]
+    },
+    "lactate": {
+      "title": "转化中间产物（乳酸利用）",
+      "members": [
+        {"name": "Veillonella", "rank": "genus"},
+        {"name": "Anaerobutyricum hallii", "rank": "species", "aliases": ["Eubacterium hallii", "[Eubacterium] hallii", "Anaerobutyricum soehngenii"]},
+        {"name": "Anaerostipes", "rank": "genus"},
+        {"name": "Megasphaera", "rank": "genus"},
+        {"name": "Coprococcus catus", "rank": "species"}
+      ]
+    },
+    "propionate": {
+      "title": "生成丙酸",
+      "members": [
+        {"name": "Bacteroides", "rank": "genus"},
+        {"name": "Phocaeicola", "rank": "genus"},
+        {"name": "Prevotella", "rank": "genus"},
+        {"name": "Akkermansia muciniphila", "rank": "species"},
+        {"name": "Veillonella", "rank": "genus"},
+        {"name": "Phascolarctobacterium", "rank": "genus"},
+        {"name": "Dialister", "rank": "genus"},
+        {"name": "Coprococcus catus", "rank": "species"},
+        {"name": "Roseburia inulinivorans", "rank": "species"}
+      ]
+    },
+    "butyrate": {
+      "title": "生成丁酸",
+      "members": [
+        {"name": "Faecalibacterium", "rank": "genus"},
+        {"name": "Roseburia", "rank": "genus"},
+        {"name": "Agathobacter rectalis", "rank": "species", "aliases": ["Eubacterium rectale", "[Eubacterium] rectale"]},
+        {"name": "Anaerostipes", "rank": "genus"},
+        {"name": "Butyricicoccus", "rank": "genus"},
+        {"name": "Anaerobutyricum hallii", "rank": "species", "aliases": ["Eubacterium hallii", "[Eubacterium] hallii", "Anaerobutyricum soehngenii"]},
+        {"name": "Coprococcus", "rank": "genus"},
+        {"name": "Subdoligranulum", "rank": "genus"},
+        {"name": "Butyrivibrio", "rank": "genus"},
+        {"name": "Odoribacter", "rank": "genus"},
+        {"name": "Intestinimonas", "rank": "genus"}
+      ]
+    }
+  }
+}

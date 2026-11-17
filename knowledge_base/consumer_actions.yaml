@@ -1,0 +1,47 @@
+{
+  "schema_version": "consumer-actions-v1",
+  "actions": [
+    {
+      "finding_code": "consult_care",
+      "because": "检出高关注毒素基因",
+      "title": "出现症状时及时就医",
+      "how": "若有持续腹泻、发热或便血，请就医并带上本报告。不要自行使用抗生素。",
+      "examples": []
+    },
+    {
+      "finding_code": "diversity_low",
+      "because": "菌种数偏少",
+      "title": "每周吃够30种植物性食物",
+      "how": "蔬菜、水果、全谷物、豆类、坚果和香草香料各算一种；换着吃比单样吃得多更重要。",
+      "examples": ["深色蔬菜", "豆类", "全谷物", "坚果"]
+    },
+    {
+      "finding_code": "butyrate_ok",
+      "because": "检出主要产丁酸菌",
+      "title": "多吃可发酵的膳食纤维",
+      "how": "全谷物、豆类，以及放凉的米饭和土豆里的抗性淀粉，都可以作为日常来源。",
+      "examples": ["燕麦", "豆类", "放凉的土豆"]
+    },
+    {
+      "finding_code": "opportunist_high",
+      "because": "检出条件致病菌",
+      "title": "记录两周排便次数和形状",
+      "how": "把每天的排便次数和形状记下来；抗生素遵医嘱使用，不要自行服用。",
+      "examples": []
+    },
+    {
+      "finding_code": "fiber_substrate_few",
+      "because": "部分纤维底物只有少数菌具备",
+      "title": "对照着增加相应食物来源",
+      "how": "对照“食物与营养”中较少菌具备的那几类纤维，有意识地增加相应的食物来源。",
+      "examples": ["洋葱", "大蒜", "全谷物麸皮"]
+    },
+    {
+      "finding_code": "retest_general",
+      "because": "需要在3个月后复测",
+      "title": "3个月后复测",
+      "how": "复测时重点看出现需留意或就医提示的指标；如果症状持续，提前就医。",
+      "examples": []
+    }
+  ]
+}

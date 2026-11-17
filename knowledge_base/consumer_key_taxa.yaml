@@ -1,0 +1,98 @@
+{
+  "schema_version": "consumer-key-taxa-v2",
+  "reliability_thresholds": {"high": 1000, "medium": 100},
+  "categories": [
+    {
+      "id": "helpful.bifidobacteria",
+      "display_name": "双歧杆菌",
+      "section": "helpful",
+      "concept_term_id": "bifidobacteria",
+      "members": [
+        {"rank": "genus", "name": "Bifidobacterium"}
+      ]
+    },
+    {
+      "id": "helpful.lactobacilli",
+      "display_name": "乳杆菌类",
+      "section": "helpful",
+      "concept_term_id": "lactobacilli",
+      "members": [
+        {"rank": "genus", "name": "Lactobacillus"},
+        {"rank": "genus", "name": "Lacticaseibacillus"},
+        {"rank": "genus", "name": "Lactiplantibacillus"},
+        {"rank": "genus", "name": "Limosilactobacillus"},
+        {"rank": "genus", "name": "Ligilactobacillus"}
+      ]
+    },
+    {
+      "id": "helpful.butyrate",
+      "display_name": "主要产丁酸菌",
+      "section": "helpful",
+      "concept_term_id": "butyrate_producers",
+      "members": [
+        {"rank": "species", "name": "Faecalibacterium prausnitzii"},
+        {"rank": "genus", "name": "Roseburia"},
+        {"rank": "species", "name": "Agathobacter rectalis", "aliases": ["Eubacterium rectale"]},
+        {"rank": "species", "name": "Anaerostipes hadrus"},
+        {"rank": "genus", "name": "Butyricicoccus"},
+        {"rank": "species", "name": "Eubacterium hallii", "aliases": ["Anaerobutyricum hallii"]}
+      ],
+      "function_tags": ["butyrate_producer"]
+    },
+    {
+      "id": "helpful.akkermansia",
+      "display_name": "阿克曼菌",
+      "section": "helpful",
+      "concept_term_id": "akkermansia",
+      "members": [
+        {"rank": "species", "name": "Akkermansia muciniphila"}
+      ]
+    },
+    {
+      "id": "watch.opportunists",
+      "display_name": "条件致病菌",
+      "section": "watch",
+      "concept_term_id": "opportunists",
+      "members": [
+        {"rank": "genus", "name": "Escherichia"},
+        {"rank": "genus", "name": "Klebsiella"},
+        {"rank": "genus", "name": "Enterobacter"},
+        {"rank": "genus", "name": "Enterococcus"},
+        {"rank": "genus", "name": "Citrobacter"},
+        {"rank": "genus", "name": "Proteus"},
+        {"rank": "species", "name": "Clostridioides difficile", "aliases": ["Clostridium difficile"]},
+        {"rank": "species", "name": "Clostridium perfringens"}
+      ]
+    },
+    {
+      "id": "watch.inflammation_assoc",
+      "display_name": "研究中与肠道炎症相关的菌",
+      "section": "watch",
+      "concept_term_id": "inflammation_associated",
+      "members": [
+        {"rank": "species", "name": "Mediterraneibacter gnavus", "aliases": ["Ruminococcus gnavus"]},
+        {"rank": "species", "name": "Ruminococcus torques"},
+        {"rank": "genus", "name": "Fusobacterium"}
+      ]
+    },
+    {
+      "id": "watch.sulfide",
+      "display_name": "产硫化氢相关菌",
+      "section": "watch",
+      "concept_term_id": "sulfide_related",
+      "members": [
+        {"rank": "genus", "name": "Bilophila"},
+        {"rank": "genus", "name": "Desulfovibrio"}
+      ]
+    },
+    {
+      "id": "watch.conditional_commensal",
+      "display_name": "常见菌、仅特定菌株需关注",
+      "section": "watch",
+      "concept_term_id": "conditional_commensal",
+      "members": [
+        {"rank": "species", "name": "Bacteroides fragilis"}
+      ]
+    }
+  ]
+}

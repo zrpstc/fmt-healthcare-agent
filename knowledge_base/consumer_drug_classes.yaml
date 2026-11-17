@@ -1,0 +1,18 @@
+{
+  "schema_version": "consumer-drug-classes-v1",
+  "classes": [
+    {"english": "Tetracycline", "aliases": ["Tetracycline", "tetracycline"], "name": "四环素类", "examples": ["多西环素", "四环素", "米诺环素"], "mechanism": "target protection"},
+    {"english": "Beta-lactam", "aliases": ["Beta-lactam", "beta-lactam", "Penicillin"], "name": "β-内酰胺类", "examples": ["青霉素", "阿莫西林", "头孢菌素"], "mechanism": "antibiotic inactivation"},
+    {"english": "Carbapenem", "aliases": ["Carbapenem", "carbapenem"], "name": "碳青霉烯类", "examples": ["美罗培南", "亚胺培南", "厄他培南"], "mechanism": "antibiotic inactivation"},
+    {"english": "Macrolide", "aliases": ["Macrolide", "macrolide"], "name": "大环内酯类", "examples": ["阿奇霉素", "克拉霉素", "红霉素"], "mechanism": "target protection"},
+    {"english": "Lincosamide", "aliases": ["Lincosamide", "lincosamide"], "name": "林可酰胺类", "examples": ["克林霉素", "林可霉素"], "mechanism": "target protection"},
+    {"english": "Aminoglycoside", "aliases": ["Aminoglycoside", "aminoglycoside"], "name": "氨基糖苷类", "examples": ["庆大霉素", "阿米卡星", "妥布霉素"], "mechanism": "antibiotic inactivation"},
+    {"english": "Fluoroquinolone", "aliases": ["Fluoroquinolone", "fluoroquinolone", "Quinolone"], "name": "氟喹诺酮类", "examples": ["环丙沙星", "左氧氟沙星"], "mechanism": "target alteration"},
+    {"english": "Sulfonamide", "aliases": ["Sulfonamide", "sulfonamide"], "name": "磺胺类", "examples": ["磺胺甲噁唑", "磺胺嘧啶"], "mechanism": "target replacement"},
+    {"english": "Trimethoprim", "aliases": ["Trimethoprim", "trimethoprim"], "name": "甲氧苄啶", "examples": ["甲氧苄啶"], "mechanism": "target replacement"},
+    {"english": "Glycopeptide", "aliases": ["Glycopeptide", "glycopeptide", "Vancomycin"], "name": "糖肽类", "examples": ["万古霉素", "替考拉宁"], "mechanism": "target alteration"},
+    {"english": "Polymyxin", "aliases": ["Polymyxin", "polymyxin"], "name": "多黏菌素类", "examples": ["多黏菌素B", "多黏菌素E"], "mechanism": "target alteration"},
+    {"english": "Chloramphenicol", "aliases": ["Chloramphenicol", "chloramphenicol"], "name": "氯霉素类", "examples": ["氯霉素"], "mechanism": "target protection"},
+    {"english": "Streptogramin", "aliases": ["Streptogramin", "streptogramin"], "name": "链阳菌素类", "examples": ["奎奴普丁", "达福普丁"], "mechanism": "target alteration"}
+  ]
+}
