@@ -20,19 +20,41 @@ from wgs_agent.reporting.reference import species_key
 from wgs_agent.reporting.population_reference import (
     DEFAULT_AGE_BANDS, age_band, depth_distribution, stratum_counts, validate_stratification,
 )
+from wgs_agent.reporting.population_reference import present as population_present
 
 
-def eligible(row):
+ANTIBIOTICS_POLICIES = {
+    # Strict: only subjects explicitly recorded as not currently using antibiotics.
+    "no": "no",
+    # Larger: also subjects whose study did not record current antibiotic use;
+    # explicit "yes" is still excluded.  Roughly doubles cMD3 healthy adults.
+    "no_or_unrecorded": "no_or_unrecorded",
+}
+
+
+def antibiotics_ok(row, policy="no"):
+    value = str(row.get("antibiotics_current_use", "") or "").strip().casefold()
+    if policy == "no":
+        return value == "no"
+    if policy == "no_or_unrecorded":
+        return value == "no" or not population_present(value)
+    raise ValueError("unknown antibiotics policy")
+
+
+def adult_stool(row):
     try:
         age = float(row.get("age", ""))
     except (ValueError, TypeError):
         return False
     return (math.isfinite(age) and age >= 18 and row.get("body_site") == "stool"
-            and row.get("disease") == "healthy" and row.get("study_condition") == "control"
-            and row.get("antibiotics_current_use") == "no"
             and row.get("subject_id") and row.get("study_name") and row.get("sample_id")
             and str(row.get("pregnant", "")).lower() not in {"yes", "true", "1"}
             and str(row.get("lactating", "")).lower() not in {"yes", "true", "1"})
+
+
+def eligible(row, antibiotics_policy="no"):
+    return bool(adult_stool(row) and row.get("disease") == "healthy" and row.get("study_condition") == "control"
+                and antibiotics_ok(row, antibiotics_policy))
 
 
 def fetch(url, destination):
@@ -100,8 +122,40 @@ for(i in seq_len(nrow(plan))) {
 '''
 
 
+def export_matrices(package, catalog, source_dir, studies, r_library=None):
+    """Download official per-study relative-abundance matrices and export species TSVs.
+
+    Already exported studies in ``source_dir/matrices`` are reused, so the healthy
+    reference and the cohort models share one download cache.
+    """
+    resources = resource_catalog(package, catalog, set(studies))
+    matrix_dir = source_dir/"matrices"
+    matrix_dir.mkdir(parents=True, exist_ok=True)
+
+    def download(item):
+        destination = matrix_dir/(item["title"]+".rda")
+        fetch(item["url"], destination)
+        return {**item, "path": destination, "sha256": hashlib.sha256(destination.read_bytes()).hexdigest(),
+                "bytes": destination.stat().st_size, "export": matrix_dir/(item["title"]+".species.tsv")}
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        downloaded = list(pool.map(download, resources.values()))
+    pending = [r for r in downloaded if not r["export"].is_file()]
+    if pending:
+        plan = source_dir/"matrix-export-plan.tsv"
+        with plan.open("w", newline="") as handle:
+            writer = csv.writer(handle, delimiter="\t")
+            writer.writerow(["input", "output"])
+            writer.writerows((str(r["path"]), str(r["export"])) for r in pending)
+        env = dict(os.environ)
+        if r_library:
+            env["R_LIBS_USER"] = str(r_library)
+        with (source_dir/"matrix-export.log").open("ab") as log:
+            subprocess.run(["Rscript", "-e", R_EXPORT, str(plan)], env=env, stdout=log, stderr=log, check=True)
+    return downloaded
+
+
 def build(package, metadata, catalog, source_dir, output, r_library=None, *,
-          stratify_by=(), age_band_boundaries=DEFAULT_AGE_BANDS):
+          stratify_by=(), age_band_boundaries=DEFAULT_AGE_BANDS, antibiotics_policy="no"):
     validate_stratification(stratify_by, age_band_boundaries)
     if output.exists():
         manifest = cmd.load_bundle(output)[0]
@@ -111,29 +165,10 @@ def build(package, metadata, catalog, source_dir, output, r_library=None, *,
         return {"status": "already_built", "output": str(output)}
     source_dir.mkdir(parents=True, exist_ok=True)
     with metadata.open() as handle:
-        candidates = [r for r in csv.DictReader(handle, delimiter="\t") if eligible(r)]
+        candidates = [r for r in csv.DictReader(handle, delimiter="\t") if eligible(r, antibiotics_policy)]
     if not candidates:
         raise ValueError("no eligible healthy controls")
-    resources = resource_catalog(package, catalog, {r["study_name"] for r in candidates})
-    matrix_dir = source_dir/"matrices"
-    matrix_dir.mkdir(exist_ok=True)
-    def download(item):
-        destination = matrix_dir/(item["title"]+".rda")
-        fetch(item["url"], destination)
-        return {**item, "path": destination, "sha256": hashlib.sha256(destination.read_bytes()).hexdigest(),
-                "bytes": destination.stat().st_size, "export": matrix_dir/(item["study"]+".species.tsv")}
-    with ThreadPoolExecutor(max_workers=6) as pool:
-        downloaded = list(pool.map(download, resources.values()))
-    plan = source_dir/"matrix-export-plan.tsv"
-    with plan.open("w", newline="") as handle:
-        writer = csv.writer(handle, delimiter="\t")
-        writer.writerow(["input", "output"])
-        writer.writerows((str(r["path"]), str(r["export"])) for r in downloaded)
-    env = dict(os.environ)
-    if r_library:
-        env["R_LIBS_USER"] = str(r_library)
-    with (source_dir/"matrix-export.log").open("wb") as log:
-        subprocess.run(["Rscript", "-e", R_EXPORT, str(plan)], env=env, stdout=log, stderr=log, check=True)
+    downloaded = export_matrices(package, catalog, source_dir, {r["study_name"] for r in candidates}, r_library)
     by_study = {}
     for row in candidates:
         by_study.setdefault(row["study_name"], {})[row["sample_id"]] = row
@@ -212,7 +247,7 @@ def build(package, metadata, catalog, source_dir, output, r_library=None, *,
                     "age_band_boundaries": list(age_band_boundaries), "stratum_subject_counts": counts,
                     "depth_distribution": depth_distribution(labels),
                     "selection_criteria": {"minimum_age": 18, "disease": "healthy", "study_condition": "control",
-                        "antibiotics_current_use": "no", "exclude_known_pregnant_or_lactating": True,
+                        "antibiotics_current_use": antibiotics_policy, "exclude_known_pregnant_or_lactating": True,
                         "deduplicate_by": ["study_id", "subject_id"], "repeat_selection": "earliest eligible valid profile then sample_id"},
                     "n_subjects": len(labels), "n_species": len(features), "n_studies": len({r['study_id'] for r in labels}),
                     "n_candidate_records": len(candidates), "n_missing_or_invalid_candidate_profiles": len(candidates)-len(profiles),
@@ -236,11 +271,15 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--r-library", type=Path)
     parser.add_argument("--stratify-by", nargs="+", choices=("country", "sex", "age_band"), default=[])
+    parser.add_argument("--antibiotics-policy", choices=sorted(ANTIBIOTICS_POLICIES), default="no",
+                        help="no: only explicit no (default, original contract); no_or_unrecorded: also include "
+                             "subjects whose study did not record current antibiotic use (larger reference)")
     parser.add_argument("--age-band-boundaries", nargs="+", type=float, default=list(DEFAULT_AGE_BANDS),
                         help="Ascending age-band lower bounds, beginning with 18; final band is open-ended")
     args = parser.parse_args()
     result = build(args.package_dir, args.metadata, args.catalog, args.source_dir, args.output, args.r_library,
-                   stratify_by=args.stratify_by, age_band_boundaries=args.age_band_boundaries)
+                   stratify_by=args.stratify_by, age_band_boundaries=args.age_band_boundaries,
+                   antibiotics_policy=args.antibiotics_policy)
     print(json.dumps(result))
 
 

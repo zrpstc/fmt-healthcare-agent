@@ -47,6 +47,18 @@ def _clear_historical(data):
     if isinstance(diversity, dict):
         diversity["reference_comparisons"] = []
     data.pop("healthy_comparison", None)
+    data.pop("cohort_insights", None)
+
+
+def cohort_insights_for(sample_id: str, metadata: dict) -> dict:
+    """Gut age, enterotype, health index and disease references; never raises."""
+    from . import cohort_insights
+    try:
+        return cohort_insights.analyze(sample_id, metadata)
+    except Exception:  # noqa: BLE001 - an optional module must not block the report
+        logger.exception("cohort insights failed")
+        return {"audit": {"status": "unavailable", "reason": "invalid_bundle",
+                          "reason_cn": cohort_insights.REASONS["invalid_bundle"]}}
 
 
 def refresh_reference_comparisons(data: dict, inputs: dict) -> dict:
@@ -66,6 +78,7 @@ def refresh_reference_comparisons(data: dict, inputs: dict) -> dict:
     else:
         comparison = cmd.compare(str(result.get("sample_id", "")), metadata)
     result["healthy_comparison"] = comparison
+    result["cohort_insights"] = cohort_insights_for(str(result.get("sample_id", "")), metadata)
     metadata["reference_comparison"] = {"version": VERSION, "healthy_population": comparison["audit"]}
     metadata["reference_version"] = comparison["audit"].get("version")
     return result

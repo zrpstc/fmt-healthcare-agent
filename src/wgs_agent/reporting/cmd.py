@@ -34,6 +34,14 @@ REASONS = {**population.REASONS,
 }
 
 
+# "no" is the original strict contract; "no_or_unrecorded" also keeps subjects whose
+# study did not record current antibiotic use (explicit users are still excluded).
+ANTIBIOTICS_POLICIES = ("no", "no_or_unrecorded")
+UNRECORDED_ANTIBIOTICS_LIMITATION = (
+    "参考人群按原研究healthy/control标签和成年筛选；当前使用抗生素者已排除，"
+    "部分原研究未记录抗生素使用情况的个体也被纳入。不等同于经完整临床筛查的正常人群或合格供体。")
+
+
 def reference_dir() -> Path:
     return runtime_path("WGS_CMD_REFERENCE_DIR", "reference", "cmd", "native-v3")
 
@@ -59,15 +67,26 @@ def load_bundle(base: Path):
     if (not isinstance(criteria, dict) or manifest.get("source_package") != "curatedMetagenomicData"
             or not population.present(manifest.get("source_package_version"))
             or criteria.get("minimum_age") != 18 or criteria.get("disease") != "healthy"
-            or criteria.get("study_condition") != "control" or criteria.get("antibiotics_current_use") != "no"
+            or criteria.get("study_condition") != "control"
+            or criteria.get("antibiotics_current_use") not in ANTIBIOTICS_POLICIES
             or criteria.get("deduplicate_by") != ["study_id", "subject_id"]):
         raise population.PopulationReferenceError("invalid_reference")
     return result
 
 
 def compare(sample_id: str, metadata: dict) -> dict:
-    return population.compare(sample_id, metadata, spec=SPEC, loader=load_bundle,
-                              ordination=community_ordination, reasons=REASONS)
+    result = population.compare(sample_id, metadata, spec=SPEC, loader=load_bundle,
+                                ordination=community_ordination, reasons=REASONS)
+    audit = result.get("audit", {})
+    try:
+        criteria = load_bundle(reference_dir())[0].get("selection_criteria", {})
+    except (OSError, ValueError, TypeError, KeyError, UnicodeError):
+        criteria = {}
+    policy = criteria.get("antibiotics_current_use", "no")
+    audit["antibiotics_policy"] = policy
+    if policy == "no_or_unrecorded" and isinstance(audit.get("limitations"), list) and audit["limitations"]:
+        audit["limitations"][0] = UNRECORDED_ANTIBIOTICS_LIMITATION
+    return result
 
 
 def community_ordination(target, matrix, selected, **kwargs):

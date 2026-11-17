@@ -269,4 +269,5 @@ TEMPLATE_INPUT_KEYS = (
     "symptoms",
     "resistance",
     "healthy_comparison",
+    "cohort_insights",
 )

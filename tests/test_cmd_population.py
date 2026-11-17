@@ -286,7 +286,8 @@ def test_builder_cli_parameters_are_forwarded(monkeypatch):
         '--source-dir', 'source', '--output', 'output', '--stratify-by', 'country', 'sex', 'age_band',
         '--age-band-boundaries', '18', '30', '60'])
     module.main()
-    assert calls == [{'stratify_by': ['country', 'sex', 'age_band'], 'age_band_boundaries': [18., 30., 60.]}]
+    assert calls == [{'stratify_by': ['country', 'sex', 'age_band'], 'age_band_boundaries': [18., 30., 60.],
+                      'antibiotics_policy': 'no'}]
 
 
 def test_stratum_and_depth_manifest_summary_round_trip(cohort):

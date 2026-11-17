@@ -134,3 +134,17 @@ def test_cmd_builder_selection_rejects_disease_unknown_age_antibiotics_and_pregn
     for key,value in [("age",""),("age","17"),("disease","T2D"),("antibiotics_current_use",""),
                       ("antibiotics_current_use","yes"),("pregnant","yes"),("lactating","yes")]:
         assert not module.eligible({**row,key:value})
+
+
+def test_antibiotics_policy_widens_healthy_reference_only_for_unrecorded():
+    import importlib.util
+    from pathlib import Path
+    path = Path(__file__).resolve().parents[1] / "scripts/prepare_cmd_reference.py"
+    spec = importlib.util.spec_from_file_location("prepare_cmd_reference_policy", path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    row = {"age": "40", "body_site": "stool", "disease": "healthy", "study_condition": "control",
+           "subject_id": "P", "study_name": "S", "sample_id": "X"}
+    for value, strict, wide in (("no", True, True), ("", False, True), ("NA", False, True), ("yes", False, False)):
+        item = {**row, "antibiotics_current_use": value}
+        assert module.eligible(item, "no") is strict
+        assert module.eligible(item, "no_or_unrecorded") is wide

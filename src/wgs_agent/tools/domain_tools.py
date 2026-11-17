@@ -886,6 +886,10 @@ class ReportGeneratorTool(BaseTool):
                 inputs["healthy_comparison"] = data["healthy_comparison"]
             else:
                 inputs.pop("healthy_comparison", None)
+            if isinstance(data.get("cohort_insights"), dict):
+                inputs["cohort_insights"] = data["cohort_insights"]
+            else:
+                inputs.pop("cohort_insights", None)
             if isinstance(data.get("diversity"), dict):
                 inputs["diversity"] = data["diversity"]
             context = dict(module("metadata"))
