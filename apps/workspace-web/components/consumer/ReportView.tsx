@@ -9,6 +9,8 @@ import ReportHeader from "./ReportHeader";
 import SectionNav from "./SectionNav";
 import StackedBar from "./StackedBar";
 import RankedBars from "./RankedBars";
+import DonutChart from "./DonutChart";
+import OverallAssessment from "./OverallAssessment";
 import TierScale from "./TierScale";
 import TaxonCard from "./TaxonCard";
 import CategoryCard from "./CategoryCard";
@@ -29,13 +31,15 @@ function BlockView({ block, glossary }: { block: Block; glossary: GlossaryEntry[
       return <Callout tone={block.tone} text={block.text} glossary={glossary} />;
     case "stacked_bar":
       return <StackedBar segments={block.segments} glossary={glossary} />;
+    case "donut":
+      return <DonutChart block={block} glossary={glossary} />;
     case "ranked_bars":
-      return <RankedBars rows={block.rows} />;
+      return <RankedBars rows={block.rows} block={block} />;
     case "tier_scales":
       return (
         <div>
           {block.rows.map((row) => (
-            <TierScale key={row.label} label={row.label} value={row.value} tier={row.tier} note={row.note} glossary={glossary} />
+            <TierScale key={row.label} label={row.label} value={row.value} tier={row.tier} note={row.note ?? undefined} glossary={glossary} />
           ))}
         </div>
       );
@@ -108,6 +112,7 @@ export default function ReportView({ data, mode }: { data: ConsumerReport; mode:
           <div className="cr-page">
             <ReportHeader sample={data.sample} mode={mode} />
             <SummaryHero report={data} />
+            <OverallAssessment items={data.summary.assessments ?? []} glossary={data.glossary} />
             <div className="cr-status-grid">
               {data.summary.status_cards.map((card) => (
                 <StatusCard key={card.id} card={card} glossary={data.glossary} />

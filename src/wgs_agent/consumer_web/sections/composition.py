@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..format import pct, tier, latin_for_display
+from ..format import count, pct, tier, latin_for_display
 from .context import Context
 from ..names import canonical
 
@@ -101,11 +101,29 @@ def build(ctx: Context) -> dict[str, Any]:
             }
             for row in species[:5]
         ]
-        blocks = [
-            {"type": "stacked_bar", "segments": segments},
-            {"type": "ranked_bars", "rows": ranked},
-            {"type": "taxon_cards", "cards": cards},
-        ]
+        blocks: list[dict[str, Any]] = []
+        if segments:
+            top = max(segments, key=lambda item: float(item["value"]["value"] or 0))
+            blocks.append({
+                "type": "donut",
+                "title": "图1 门水平组成（各大类细菌占比）",
+                "caption": (
+                    "整个圆环代表本次检出的全部细菌（100%），每段颜色代表一个“门”（细菌分类中很大的一级），"
+                    "弧段越长占比越高。"
+                ),
+                "center_label": f"占比最高：{top['label']}",
+                "center_value": top["value"]["display"],
+                "segments": segments,
+            })
+        if ranked:
+            blocks.append({
+                "type": "ranked_bars",
+                "title": f"图2 占比最高的{count(len(ranked))}种菌",
+                "caption": "条形长度和右侧数字表示该菌占全部细菌的比例（相对丰度）。",
+                "axis": {"category_label": "菌名", "value_label": "占全部细菌的比例（%）", "ticks": []},
+                "rows": ranked,
+            })
+        blocks.append({"type": "taxon_cards", "cards": cards})
         subsections.append({
             "id": "composition-composition",
             "title": "主要由哪些菌组成",

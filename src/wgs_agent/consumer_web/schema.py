@@ -115,6 +115,19 @@ class StackedBarBlock(BaseModel):
     segments: list[StackedSegment]
 
 
+class DonutBlock(BaseModel):
+    """Ring chart of parts of a whole; geometry is drawn by the frontend."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    type: Literal["donut"] = "donut"
+    title: str
+    caption: str | None = None
+    center_label: str | None = None
+    center_value: str | None = None
+    segments: list[StackedSegment]
+
+
 class RankedRow(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -124,10 +137,23 @@ class RankedRow(BaseModel):
     tone: Tone | None = None
 
 
+class ChartAxis(BaseModel):
+    """Axis captions and preformatted tick labels for a bar chart."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    category_label: str
+    value_label: str
+    ticks: list[Num] = Field(default_factory=list)
+
+
 class RankedBarsBlock(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     type: Literal["ranked_bars"] = "ranked_bars"
+    title: str | None = None
+    caption: str | None = None
+    axis: ChartAxis | None = None
     rows: list[RankedRow]
 
 
@@ -136,7 +162,7 @@ class TierRow(BaseModel):
 
     label: str
     value: Num
-    tier: Tier
+    tier: Tier | None = None
     note: str | None = None
 
 
@@ -180,6 +206,15 @@ class CategoryCardsBlock(BaseModel):
     cards: list[CategoryCard]
 
 
+class StageMember(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    value: Num | None = None
+    # gene: stratified functional annotation; taxonomy: known trait of a detected taxon
+    basis: Literal["gene", "taxonomy"] = "gene"
+
+
 class Stage(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -188,6 +223,7 @@ class Stage(BaseModel):
     more: int = 0
     backup_label: str
     meaning: str
+    member_details: list[StageMember] = Field(default_factory=list)
 
 
 class StageFlowBlock(BaseModel):
@@ -207,6 +243,13 @@ class TableBlock(BaseModel):
     footnote: str | None = None
 
 
+class DetailRow(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    label: str
+    text: str
+
+
 class MetaboliteCard(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -216,6 +259,9 @@ class MetaboliteCard(BaseModel):
     tone: Tone
     tier: Tier | None = None
     members: list[str] | None = None
+    score: Num | None = None
+    score_label: str | None = None
+    details: list[DetailRow] | None = None
 
 
 class CardGridBlock(BaseModel):
@@ -239,6 +285,7 @@ Block = Annotated[
         ParagraphBlock,
         CalloutBlock,
         StackedBarBlock,
+        DonutBlock,
         RankedBarsBlock,
         TierScalesBlock,
         TaxonCardsBlock,
@@ -298,6 +345,20 @@ class FindingCard(BaseModel):
     anchor: str
 
 
+class Assessment(BaseModel):
+    """Overall rule-based verdict shown on the overview (pathogen / nutrition)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    title: str
+    verdict: str
+    tone: Tone
+    text: str
+    points: list[str] = Field(default_factory=list)
+    anchor: str
+
+
 class Summary(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -305,6 +366,7 @@ class Summary(BaseModel):
     headline_source: HeadlineSource
     status_cards: list[StatusCard] = Field(default_factory=list)
     key_findings: list[FindingCard] = Field(default_factory=list)
+    assessments: list[Assessment] = Field(default_factory=list)
 
 
 class SampleMeta(BaseModel):

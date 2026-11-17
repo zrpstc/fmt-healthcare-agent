@@ -12,10 +12,21 @@ export default function TierScale({
 }: {
   label: string;
   value: Num;
-  tier: Tier;
-  note?: string;
+  tier?: Tier | null;
+  note?: string | null;
   glossary: GlossaryEntry[];
 }) {
+  if (!tier) {
+    return (
+      <div className="cr-tier-scale">
+        <div className="cr-tier-head">
+          <span><strong><RichText text={label} glossary={glossary} /></strong> {value.display}</span>
+          <span className="cr-tag neutral">暂无参考对照</span>
+        </div>
+        {note && <div className="cr-tier-note"><RichText text={note} glossary={glossary} /></div>}
+      </div>
+    );
+  }
   const position = tierPosition(tier) ?? 50;
   const tone = tier.tone === "watch" ? "#9A5410" : tier.tone === "good" ? "#2E7150" : "#45606A";
   return (

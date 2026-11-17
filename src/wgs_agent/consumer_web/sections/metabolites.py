@@ -7,6 +7,7 @@ from typing import Any
 from ..functions import metabolite_contributors
 from .context import Context
 from .panel import category_rows, load_panel
+from .scoring import potential_score, score_details
 
 
 PRODUCTS = {
@@ -19,11 +20,46 @@ PRODUCTS = {
     "甲烷": ("methane", ["METH-ACETATE-PWY"], []),
 }
 
+# How a stronger potential reads for the consumer: SCFA are welcome, protein
+# fermentation products are a "watch" signal, the rest stay neutral.
+DIRECTION = {
+    "乙酸": "benefit", "丙酸": "benefit", "丁酸": "benefit",
+    "对甲酚与酪胺": "watch",
+}
 
-def _card(ctx: Context, title: str, term_id: str, pathway_ids: list[str], ecs: list[str]) -> dict[str, Any] | None:
+
+def _tone(title: str, level: str) -> str:
+    direction = DIRECTION.get(title)
+    if direction == "benefit":
+        return {"较强": "good", "中等": "neutral", "较弱": "watch"}[level]
+    if direction == "watch":
+        return "watch" if level == "较强" else "neutral"
+    return "neutral"
+
+
+def product_score(ctx: Context, title: str) -> dict[str, Any] | None:
+    """Gene-potential score for one product, or ``None`` when nothing was detected."""
+    _term_id, pathway_ids, ecs = PRODUCTS[title]
     item = metabolite_contributors(ctx.document, pathway_ids, ecs)
     if not item["has_signal"]:
         return None
+    detected = {str(row.get("id") or "").split(":", 1)[0] for row in item["rows"]}
+    result = potential_score(
+        ctx,
+        mapped_pathways=len(pathway_ids),
+        detected_pathways=len(detected & set(pathway_ids)),
+        named=item["named"],
+        enzyme_signal=bool(ecs) and bool(item["named"]),
+    )
+    result["item"] = item
+    return result
+
+
+def _card(ctx: Context, title: str, term_id: str, pathway_ids: list[str], ecs: list[str]) -> dict[str, Any] | None:
+    scored = product_score(ctx, title)
+    if scored is None:
+        return None
+    item = scored["item"]
     members = [ctx.names.plain(row["name"]) for row in item["named"][:5]]
     text = ctx.glossary.one_liner(term_id) if ctx.glossary.is_publishable(term_id) else "相关功能基因被检出。"
     if not members:
@@ -32,9 +68,12 @@ def _card(ctx: Context, title: str, term_id: str, pathway_ids: list[str], ecs: l
         "title": title,
         "text": text,
         "status": "具备相关基因",
-        "tone": "neutral",
+        "tone": _tone(title, scored["level"]),
         "tier": None,
         "members": members or None,
+        "score": {"value": float(scored["score"]), "display": str(scored["score"]), "unit": "分"},
+        "score_label": f"潜力{scored['level']}",
+        "details": score_details(ctx, scored, item["named"]),
     }
 
 
@@ -62,7 +101,7 @@ def build(ctx: Context) -> dict[str, Any]:
             "id": "metabolites-scfa",
             "title": "短链脂肪酸",
             "blocks": [{"type": "card_grid", "cards": scfa}],
-            "summary": "这些产物与膳食纤维发酵有关；基因潜力不代表体内产量。",
+            "summary": "这些产物与膳食纤维发酵有关；评分只反映基因潜力，不代表体内产量。点开卡片可以看评分依据。",
             "summary_source": "rule",
             "graph": ctx.graph_for(["metabolites.scfa"], ["乙酸", "丙酸", "丁酸"]),
         })
@@ -113,7 +152,7 @@ def build(ctx: Context) -> dict[str, Any]:
         "id": "metabolites",
         "nav_label": "代谢产物",
         "title": "菌群能产生哪些物质",
-        "intro": f"这一部分按产物主题展示基因层面的{ctx.term('functional_potential', '功能潜力')}，不代表体内实际浓度。",
+        "intro": f"这一部分按产物主题展示基因层面的{ctx.term('functional_potential', '功能潜力')}，并给出0–100分的潜力评分（看通路是否齐全、参与的菌多不多、是否由多种菌分担）；评分不代表体内实际浓度。",
         "source_chapters": [8],
         "terms_banner": ["short_chain_fatty_acid", "indole", "protein_fermentation", "methane"],
         "subsections": subsections,

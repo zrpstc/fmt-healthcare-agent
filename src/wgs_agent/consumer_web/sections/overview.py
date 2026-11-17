@@ -4,19 +4,20 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..format import count, pct, tier
+from ..format import count, number, pct, tier
 from ..narrative import headline
+from . import assessment
 from .context import Context
 from .panel import category_total, load_panel
 from .resistance import resistance_genes
 from .virulence import high_concern_results
 
 
-def _diversity_row(ctx: Context) -> dict | None:
+def _diversity_row(ctx: Context, metric: str = "richness") -> dict | None:
     rows = ctx.healthy_comparison.get("diversity", [])
     if isinstance(rows, list):
         for row in rows:
-            if row.get("metric") == "richness":
+            if row.get("metric") == metric:
                 return row
     return None
 
@@ -37,12 +38,16 @@ def build(ctx: Context) -> dict[str, Any]:
     if diversity and diversity.get("percentile") is not None:
         t = tier(diversity["percentile"], metric="richness", borderline=bool(diversity.get("borderline")))
         value = float(diversity.get("value") or 0)
+        shannon = _diversity_row(ctx, "shannon")
+        shannon_text = ""
+        if shannon and shannon.get("value") is not None:
+            shannon_text = f"香农指数{number(float(shannon['value']))}；"
         cards.append({
             "id": "diversity",
             "label": "菌群多样性",
             "tier_label": t.label,
             "tone": t.tone,
-            "line": f"检出{count(value)}种菌，{t.phrase}。",
+            "line": f"检出{count(value)}种菌，{shannon_text}菌种数{t.phrase}。",
             "anchor": "#diversity",
         })
     elif ctx.species_rows:
@@ -119,16 +124,18 @@ def build(ctx: Context) -> dict[str, Any]:
         })
 
     # Nutrition potential: count substrate and vitamin signals.
-    from ..functions import fiber_contributors, vitamin_table
+    from ..functions import fiber_contributors, load_substrate_map, load_vitamin_map, vitamin_table
     fibers = fiber_contributors(ctx.document)
     vitamins = vitamin_table(ctx.document)
     fiber_count = sum(1 for item in fibers.values() if item["has_signal"])
     vitamin_count = sum(1 for item in vitamins if item["has_signal"])
+    fiber_total = len(load_substrate_map().get("substrates", []))
+    vitamin_total = len(load_vitamin_map().get("vitamins", []))
     if fiber_count or vitamin_count:
         cards.append({
             "id": "nutrition",
             "label": "营养潜力",
-            "tier_label": "具备相关基因",
+            "tier_label": f"纤维{count(fiber_count)}/{count(fiber_total)} · 维生素{count(vitamin_count)}/{count(vitamin_total)}",
             "tone": "neutral",
             "line": f"{count(fiber_count)}类纤维和{count(vitamin_count)}种维生素显示相关基因潜力。",
             "anchor": "#nutrition",
@@ -193,5 +200,6 @@ def build(ctx: Context) -> dict[str, Any]:
             "headline_source": "rule",
             "status_cards": cards[:6],
             "key_findings": findings,
+            "assessments": assessment.build(ctx),
         }
     }

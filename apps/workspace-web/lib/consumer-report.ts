@@ -18,9 +18,12 @@ export interface StatusCard {
 export interface FindingCard {
   rank: number; tone: Tone; title: string; big: Num; compare: string; meaning: RichText; anchor: string;
 }
+export interface Assessment {
+  id: string; title: string; verdict: string; tone: Tone; text: RichText; points: string[]; anchor: string;
+}
 export interface Summary {
   headline: RichText; headline_source: "rule" | "llm";
-  status_cards: StatusCard[]; key_findings: FindingCard[];
+  status_cards: StatusCard[]; key_findings: FindingCard[]; assessments?: Assessment[];
 }
 export interface TaxonCard {
   name: string; latin?: string; first_mention: boolean; value: Num; text?: RichText;
@@ -40,9 +43,16 @@ export interface ParagraphBlock extends BlockBase { type: "paragraph"; text: Ric
 export interface CalloutBlock extends BlockBase { type: "callout"; tone: Tone; text: RichText }
 export interface StackedSegment { label: string; value: Num; note?: RichText; color_key: string }
 export interface StackedBarBlock extends BlockBase { type: "stacked_bar"; segments: StackedSegment[] }
+export interface DonutBlock extends BlockBase {
+  type: "donut"; title: string; caption?: string | null; center_label?: string | null; center_value?: string | null;
+  segments: StackedSegment[];
+}
 export interface RankedRow { label: string; latin?: string; value: Num; tone?: Tone }
-export interface RankedBarsBlock extends BlockBase { type: "ranked_bars"; rows: RankedRow[] }
-export interface TierRow { label: string; value: Num; tier: Tier; note?: RichText }
+export interface ChartAxis { category_label: string; value_label: string; ticks: Num[] }
+export interface RankedBarsBlock extends BlockBase {
+  type: "ranked_bars"; title?: string | null; caption?: string | null; axis?: ChartAxis | null; rows: RankedRow[];
+}
+export interface TierRow { label: string; value: Num; tier?: Tier | null; note?: RichText }
 export interface TierScalesBlock extends BlockBase { type: "tier_scales"; rows: TierRow[] }
 export interface TaxonCardsBlock extends BlockBase { type: "taxon_cards"; cards: TaxonCard[] }
 export interface CategoryCallout { tone: Tone; text: RichText }
@@ -51,20 +61,25 @@ export interface CategoryCard {
   absent_text?: string; callout?: CategoryCallout;
 }
 export interface CategoryCardsBlock extends BlockBase { type: "category_cards"; cards: CategoryCard[] }
-export interface Stage { title: string; members: string[]; more: number; backup_label: string; meaning: RichText }
+export interface StageMember { name: string; value?: Num | null; basis: "gene" | "taxonomy" }
+export interface Stage {
+  title: string; members: string[]; more: number; backup_label: string; meaning: RichText; member_details?: StageMember[];
+}
 export interface StageFlowBlock extends BlockBase { type: "stage_flow"; stages: Stage[]; footnote: string }
 export interface TableBlock extends BlockBase {
   type: "table"; columns: string[]; rows: RichText[][]; footnote?: string;
 }
+export interface DetailRow { label: string; text: string }
 export interface MetaboliteCard {
   title: string; text: RichText; status: string; tone: Tone; tier?: Tier; members?: string[];
+  score?: Num | null; score_label?: string | null; details?: DetailRow[] | null;
 }
 export interface CardGridBlock extends BlockBase { type: "card_grid"; cards: MetaboliteCard[] }
 export interface ScatterBlock extends BlockBase {
   type: "scatter"; points: [number, number][]; you: [number, number]; caption: string;
 }
 export type Block =
-  | ParagraphBlock | CalloutBlock | StackedBarBlock | RankedBarsBlock | TierScalesBlock
+  | ParagraphBlock | CalloutBlock | StackedBarBlock | DonutBlock | RankedBarsBlock | TierScalesBlock
   | TaxonCardsBlock | CategoryCardsBlock | StageFlowBlock | TableBlock | CardGridBlock | ScatterBlock;
 
 export interface Subsection {

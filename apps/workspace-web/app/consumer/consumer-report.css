@@ -141,7 +141,7 @@
 .cr-legend-item strong { color: var(--cr-ink); font-size: 12px; }
 
 .cr-bars { background: var(--cr-card); border: 1px solid var(--cr-line); border-radius: 16px; padding: 18px; }
-.cr-bar-row { display: grid; grid-template-columns: minmax(100px, 1fr) 2fr auto; gap: 8px; align-items: center; margin: 8px 0; font-size: 13px; }
+.cr-bar-row { display: grid; grid-template-columns: minmax(100px, 1fr) 2fr 56px; gap: 8px; align-items: center; margin: 8px 0; font-size: 13px; }
 .cr-bar-row .cr-bar-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cr-bar-track { height: 10px; border-radius: 8px; background: var(--cr-track); overflow: hidden; }
 .cr-bar-fill { height: 100%; border-radius: 8px; background: var(--cr-brand); }
@@ -149,6 +149,35 @@
 .cr-bar-fill.watch { background: var(--cr-watch-fg); }
 .cr-bar-fill.neutral { background: var(--cr-neutral-fg); }
 .cr-bar-value { font-weight: 700; white-space: nowrap; color: var(--cr-ink); }
+.cr-chart { margin: 0; }
+.cr-chart-title { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: var(--cr-ink); }
+.cr-chart-caption { margin: 10px 0 0; font-size: 12px; color: var(--cr-sub); line-height: 1.6; }
+.cr-bar-axis-head { margin: 0 0 2px; font-size: 11px; font-weight: 700; color: var(--cr-sub); }
+.cr-bar-ticks { margin: 2px 0 0; }
+.cr-bar-tick-track { position: relative; height: 16px; border-top: 1px solid var(--cr-line); }
+.cr-bar-tick-track span { position: absolute; top: 2px; transform: translateX(-50%); font-size: 11px; color: var(--cr-sub); }
+.cr-bar-tick-track span::before { content: ""; position: absolute; left: 50%; top: -6px; height: 4px; border-left: 1px solid var(--cr-line); }
+.cr-bar-axis-title { margin: 2px 0 0; font-size: 11px; color: var(--cr-sub); }
+.cr-bar-axis-title span:nth-child(2) { text-align: center; }
+.cr-donut { background: var(--cr-card); border: 1px solid var(--cr-line); border-radius: 16px; padding: 18px; }
+.cr-donut-body { display: grid; grid-template-columns: minmax(150px, 210px) 1fr; gap: 20px; align-items: center; }
+.cr-donut-svg { width: 100%; height: auto; display: block; }
+.cr-donut-value { font-size: 13px; font-weight: 800; fill: var(--cr-ink); }
+.cr-donut-label { font-size: 5.2px; fill: var(--cr-sub); }
+.cr-donut-legend { display: grid; gap: 10px; }
+.cr-assessments { margin: 0 0 22px; }
+.cr-assessments h3 { margin: 0 0 10px; font-size: 16px; }
+.cr-assessment-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+.cr-assessment { background: var(--cr-card); border: 1px solid var(--cr-line); border-left-width: 4px; border-radius: 16px; padding: 18px; min-width: 0; }
+.cr-assessment.good { border-left-color: var(--cr-good-fg); }
+.cr-assessment.neutral { border-left-color: var(--cr-neutral-fg); }
+.cr-assessment.watch { border-left-color: var(--cr-watch-fg); }
+.cr-assessment.consult { border-left-color: var(--cr-consult-fg); }
+.cr-assessment-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+.cr-assessment-head .cr-kicker { font-size: 14px; font-weight: 800; color: var(--cr-ink); }
+.cr-assessment-text { margin: 0 0 8px; font-size: 13px; color: var(--cr-sub); }
+.cr-assessment ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--cr-ink); display: grid; gap: 4px; }
+.cr-assessment-link { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700; }
 
 .cr-table-wrap { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid var(--cr-line); border-radius: 14px; background: var(--cr-card); }
 .cr-table { width: 100%; border-collapse: collapse; min-width: 520px; font-size: 13px; }
@@ -162,13 +191,33 @@
 .cr-product-card { background: var(--cr-card); border: 1px solid var(--cr-line); border-radius: 16px; padding: 18px; }
 .cr-product-card h4 { margin: 0 0 6px; font-size: 15px; }
 .cr-product-card p { margin: 0 0 8px; font-size: 13px; color: var(--cr-sub); }
-.cr-product-card .cr-product-status { font-size: 12px; font-weight: 800; color: var(--cr-brand); }
+.cr-product-card .cr-product-status { font-size: 12px; font-weight: 800; color: var(--cr-brand); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cr-product-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.cr-product-score { display: flex; align-items: baseline; gap: 2px; color: var(--cr-neutral-fg); }
+.cr-product-score strong { font-size: 22px; line-height: 1; }
+.cr-product-score span { font-size: 11px; color: var(--cr-sub); }
+.cr-product-score.good { color: var(--cr-good-fg); }
+.cr-product-score.watch { color: var(--cr-watch-fg); }
+.cr-product-meter { height: 6px; border-radius: 6px; background: var(--cr-track); overflow: hidden; margin: 8px 0 2px; }
+.cr-product-meter span { display: block; height: 100%; background: var(--cr-neutral-fg); }
+.cr-product-meter span.good { background: var(--cr-good-fg); }
+.cr-product-meter span.watch { background: var(--cr-watch-fg); }
+.cr-product-toggle { margin-top: 10px; min-height: 36px; padding: 0 12px; border: 1px solid var(--cr-line); border-radius: 10px; background: var(--cr-bg); color: var(--cr-brand); font-size: 12px; font-weight: 700; cursor: pointer; }
+.cr-product-details { display: none; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--cr-line); }
+.cr-product-card.is-open .cr-product-details { display: grid; gap: 8px; }
+.cr-product-details dt { font-size: 12px; font-weight: 800; color: var(--cr-ink); }
+.cr-product-details dd { margin: 2px 0 0; font-size: 12px; color: var(--cr-sub); }
 .cr-product-card .cr-product-members { margin-top: 8px; font-size: 12px; color: var(--cr-sub); }
 
-.cr-stage-flow { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+.cr-stage-flow { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
 .cr-stage { background: var(--cr-card); border: 1px solid var(--cr-line); border-radius: 16px; padding: 16px; min-width: 0; }
 .cr-stage h4 { margin: 0 0 8px; font-size: 14px; line-height: 1.35; }
-.cr-stage .cr-stage-members { font-size: 13px; font-weight: 700; margin-bottom: 6px; overflow-wrap: anywhere; }
+.cr-stage .cr-stage-members { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 4px; font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+.cr-stage .cr-stage-members li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.cr-stage .cr-stage-value { font-size: 12px; font-weight: 600; color: var(--cr-brand); }
+.cr-stage .cr-stage-basis { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px; background: var(--cr-track); color: var(--cr-sub); }
+.cr-stage .cr-stage-members li.is-taxonomy > span:first-child { font-weight: 600; color: var(--cr-sub); }
+.cr-stage .cr-stage-more { font-size: 12px; color: var(--cr-sub); margin-bottom: 6px; }
 .cr-stage .cr-stage-backup { display: inline-block; font-size: 12px; padding: 3px 7px; border-radius: 999px; background: var(--cr-brand-tint); color: var(--cr-brand); }
 .cr-stage p { margin: 6px 0 0; font-size: 12px; color: var(--cr-sub); }
 .cr-stage-footnote { margin-top: 8px; font-size: 12px; color: var(--cr-sub); }
@@ -263,6 +312,10 @@
   .cr-stage-flow { grid-template-columns: 1fr; }
   .cr-timeline { grid-template-columns: 1fr; }
   .cr-legend { grid-template-columns: 1fr; }
+  .cr-assessment-grid { grid-template-columns: 1fr; }
+  .cr-donut-body { grid-template-columns: 1fr; }
+  .cr-donut-svg { max-width: 200px; margin: 0 auto; }
+  .cr-bar-row { grid-template-columns: minmax(80px, 1fr) 1.6fr 48px; }
   .cr-section { padding-top: 38px; }
   .cr-table { min-width: 520px; }
 }
@@ -297,6 +350,10 @@
   .cr-learn summary { min-height: 0; padding: 4pt 0; }
   .cr-learn details > .cr-learn-body { display: block; }
   .cr-tag { border: 1px solid #ccc; background: #fff !important; color: #333 !important; }
+  /* Paper has no click: print the score basis expanded, without the toggle. */
+  .cr-product-details { display: grid !important; gap: 6pt; }
+  .cr-product-toggle { display: none !important; }
+  .cr-assessment, .cr-donut, .cr-bars { break-inside: avoid; }
 
   /* Print as a normal paper document: all appendix sections visible. */
   .cr-learn details { display: block; }

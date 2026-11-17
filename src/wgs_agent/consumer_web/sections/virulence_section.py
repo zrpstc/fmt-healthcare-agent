@@ -82,6 +82,18 @@ def _source_rows(ctx: Context) -> list[list[str]]:
     return rows
 
 
+def count_ticks(maximum: int) -> list[dict[str, Any]]:
+    """0 and up to four evenly spaced integer ticks covering ``maximum``."""
+    maximum = max(1, int(maximum))
+    step = 1
+    for candidate in (1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000):
+        step = candidate
+        if maximum / candidate <= 4:
+            break
+    top = -(-maximum // step) * step
+    return [{"value": float(value), "display": count(value), "unit": "个"} for value in range(0, top + 1, step)]
+
+
 def build(ctx: Context) -> dict[str, Any]:
     subsections = []
     strain_rows = _strain_rows(ctx)
@@ -108,22 +120,34 @@ def build(ctx: Context) -> dict[str, Any]:
                 })
             groups = virulence_gene_groups(ctx)
             if groups:
+                total = sum(value for _label, value in groups)
                 blocks.append({
                     "type": "ranked_bars",
+                    "title": "检出的全部毒力相关基因，按功能分类",
+                    "caption": (
+                        f"共检出{count(total)}个毒力相关基因（不只上表的重点毒素）。"
+                        "每根条代表一类功能，长度和右侧数字是这一类检出的基因个数；"
+                        "数量多少不代表危险程度。"
+                    ),
+                    "axis": {
+                        "category_label": "功能类别",
+                        "value_label": "基因个数（个）",
+                        "ticks": count_ticks(max(value for _label, value in groups)),
+                    },
                     "rows": [
-                        {"label": label, "value": {"value": float(count_value), "display": count(count_value), "unit": "项"}, "tone": "neutral"}
+                        {"label": label, "value": {"value": float(count_value), "display": count(count_value), "unit": "个"}, "tone": "neutral"}
                         for label, count_value in groups
                     ],
                 })
                 blocks.append({
                     "type": "paragraph",
-                    "text": "除毒素外，这些基因多数是肠道菌适应环境、获取营养的常见基因。",
+                    "text": "除毒素外，这些基因多数是肠道菌适应环境、获取营养的常见基因，例如帮助细菌贴附肠壁的黏附基因、从环境中摄取铁的基因。",
                 })
             subsections.append({
                 "id": "virulence-genes",
                 "title": "检出了哪些致病相关基因",
                 "blocks": blocks,
-                "summary": "重点毒素是本节最需要看的部分；其他毒力基因更多反映细菌的适应能力。",
+                "summary": "重点毒素是这一部分最需要看的内容；其他毒力基因更多反映细菌的适应能力。",
                 "summary_source": "rule",
                 "graph": ctx.graph_for(["key_taxa.opportunists", "diseases.gastrointestinal"], ["毒素", "毒力", "艰难梭菌"]),
             })

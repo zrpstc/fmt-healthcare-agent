@@ -44,6 +44,59 @@
       "title": "Action",
       "type": "object"
     },
+    "Assessment": {
+      "additionalProperties": false,
+      "description": "Overall rule-based verdict shown on the overview (pathogen / nutrition).",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "verdict": {
+          "title": "Verdict",
+          "type": "string"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "anchor": {
+          "title": "Anchor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "verdict",
+        "tone",
+        "text",
+        "anchor"
+      ],
+      "title": "Assessment",
+      "type": "object"
+    },
     "CalloutBlock": {
       "additionalProperties": false,
       "properties": {
@@ -215,6 +268,117 @@
         "cards"
       ],
       "title": "CategoryCardsBlock",
+      "type": "object"
+    },
+    "ChartAxis": {
+      "additionalProperties": false,
+      "description": "Axis captions and preformatted tick labels for a bar chart.",
+      "properties": {
+        "category_label": {
+          "title": "Category Label",
+          "type": "string"
+        },
+        "value_label": {
+          "title": "Value Label",
+          "type": "string"
+        },
+        "ticks": {
+          "items": {
+            "$ref": "#/$defs/Num"
+          },
+          "title": "Ticks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "category_label",
+        "value_label"
+      ],
+      "title": "ChartAxis",
+      "type": "object"
+    },
+    "DetailRow": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "text"
+      ],
+      "title": "DetailRow",
+      "type": "object"
+    },
+    "DonutBlock": {
+      "additionalProperties": false,
+      "description": "Ring chart of parts of a whole; geometry is drawn by the frontend.",
+      "properties": {
+        "type": {
+          "const": "donut",
+          "default": "donut",
+          "title": "Type",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "caption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption"
+        },
+        "center_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Center Label"
+        },
+        "center_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Center Value"
+        },
+        "segments": {
+          "items": {
+            "$ref": "#/$defs/StackedSegment"
+          },
+          "title": "Segments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "segments"
+      ],
+      "title": "DonutBlock",
       "type": "object"
     },
     "Download": {
@@ -529,6 +693,44 @@
           ],
           "default": null,
           "title": "Members"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Num"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "score_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score Label"
+        },
+        "details": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/DetailRow"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Details"
         }
       },
       "required": [
@@ -654,6 +856,41 @@
           "default": "ranked_bars",
           "title": "Type",
           "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "caption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption"
+        },
+        "axis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChartAxis"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "rows": {
           "items": {
@@ -1026,6 +1263,13 @@
         "meaning": {
           "title": "Meaning",
           "type": "string"
+        },
+        "member_details": {
+          "items": {
+            "$ref": "#/$defs/StageMember"
+          },
+          "title": "Member Details",
+          "type": "array"
         }
       },
       "required": [
@@ -1063,6 +1307,40 @@
         "footnote"
       ],
       "title": "StageFlowBlock",
+      "type": "object"
+    },
+    "StageMember": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Num"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "basis": {
+          "default": "gene",
+          "enum": [
+            "gene",
+            "taxonomy"
+          ],
+          "title": "Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "StageMember",
       "type": "object"
     },
     "StatusCard": {
@@ -1128,6 +1406,7 @@
                 "callout": "#/$defs/CalloutBlock",
                 "card_grid": "#/$defs/CardGridBlock",
                 "category_cards": "#/$defs/CategoryCardsBlock",
+                "donut": "#/$defs/DonutBlock",
                 "paragraph": "#/$defs/ParagraphBlock",
                 "ranked_bars": "#/$defs/RankedBarsBlock",
                 "scatter": "#/$defs/ScatterBlock",
@@ -1148,6 +1427,9 @@
               },
               {
                 "$ref": "#/$defs/StackedBarBlock"
+              },
+              {
+                "$ref": "#/$defs/DonutBlock"
               },
               {
                 "$ref": "#/$defs/RankedBarsBlock"
@@ -1252,6 +1534,13 @@
             "$ref": "#/$defs/FindingCard"
           },
           "title": "Key Findings",
+          "type": "array"
+        },
+        "assessments": {
+          "items": {
+            "$ref": "#/$defs/Assessment"
+          },
+          "title": "Assessments",
           "type": "array"
         }
       },
@@ -1465,7 +1754,15 @@
           "$ref": "#/$defs/Num"
         },
         "tier": {
-          "$ref": "#/$defs/Tier"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Tier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "note": {
           "anyOf": [
@@ -1482,8 +1779,7 @@
       },
       "required": [
         "label",
-        "value",
-        "tier"
+        "value"
       ],
       "title": "TierRow",
       "type": "object"

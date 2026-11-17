@@ -36,7 +36,7 @@ from .sections import (
 from .sections.context import Context
 from .sections.panel import watch_species
 
-BUILDER_VERSION = "consumer-web-builder-v2"
+BUILDER_VERSION = "consumer-web-builder-v3"
 SCHEMA_VERSION = "consumer-report/1"
 
 
@@ -125,8 +125,14 @@ def _block_texts(block: Any) -> list[str]:
         return [block.text]
     if kind == "stacked_bar":
         return [segment.label for segment in block.segments] + [segment.note or "" for segment in block.segments]
+    if kind == "donut":
+        values = [block.title, block.caption or "", block.center_label or "", block.center_value or ""]
+        return values + [segment.label for segment in block.segments] + [segment.note or "" for segment in block.segments]
     if kind == "ranked_bars":
-        return [row.label for row in block.rows]
+        values = [row.label for row in block.rows] + [block.title or "", block.caption or ""]
+        if block.axis:
+            values.extend([block.axis.category_label, block.axis.value_label])
+        return values
     if kind == "tier_scales":
         return [row.label for row in block.rows] + [row.note or "" for row in block.rows]
     if kind == "taxon_cards":
@@ -145,6 +151,7 @@ def _block_texts(block: Any) -> list[str]:
         for stage in block.stages:
             values.extend([stage.title, stage.backup_label, stage.meaning])
             values.extend(stage.members)
+            values.extend(member.name for member in stage.member_details)
         return values
     if kind == "table":
         values = list(block.columns)
@@ -156,8 +163,10 @@ def _block_texts(block: Any) -> list[str]:
     if kind == "card_grid":
         values = []
         for card in block.cards:
-            values.extend([card.title, card.text, card.status])
+            values.extend([card.title, card.text, card.status, card.score_label or ""])
             values.extend(str(name) for name in (card.members or []))
+            for row in card.details or []:
+                values.extend([row.label, row.text])
         return values
     if kind == "scatter":
         return [block.caption]
@@ -211,6 +220,14 @@ def _validate_and_clean(report: ConsumerReport, ctx: Context) -> None:
             continue
         findings.append(finding)
     report.summary.key_findings = findings
+    assessments = []
+    for item in report.summary.assessments:
+        values = [item.title, item.verdict, item.text, *item.points]
+        if any(text_violations(value) or business_number_violations(value) for value in values):
+            ctx.omit("overview", f"总体评价 {item.id}", "正文或数字校验未通过，已隐藏该条")
+            continue
+        assessments.append(item)
+    report.summary.assessments = assessments
     report.actions = [
         action for action in report.actions
         if not text_violations(action.because)
