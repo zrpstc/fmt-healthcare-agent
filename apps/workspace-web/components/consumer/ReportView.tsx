@@ -11,6 +11,7 @@ import StackedBar from "./StackedBar";
 import RankedBars from "./RankedBars";
 import DonutChart from "./DonutChart";
 import OverallAssessment from "./OverallAssessment";
+import HealthScore from "./HealthScore";
 import TierScale from "./TierScale";
 import TaxonCard from "./TaxonCard";
 import CategoryCard from "./CategoryCard";
@@ -112,6 +113,7 @@ export default function ReportView({ data, mode }: { data: ConsumerReport; mode:
           <div className="cr-page">
             <ReportHeader sample={data.sample} mode={mode} />
             <SummaryHero report={data} />
+            <HealthScore score={data.summary.health_score} />
             <OverallAssessment items={data.summary.assessments ?? []} glossary={data.glossary} />
             <div className="cr-status-grid">
               {data.summary.status_cards.map((card) => (

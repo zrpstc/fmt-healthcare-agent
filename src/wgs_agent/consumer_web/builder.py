@@ -24,6 +24,7 @@ from .sections import (
     beyond as beyond_section,
     composition as composition_section,
     diversity as diversity_section,
+    gut_profile as gut_profile_section,
     key_taxa as key_taxa_section,
     learn as learn_section,
     metabolites as metabolites_section,
@@ -36,7 +37,7 @@ from .sections import (
 from .sections.context import Context
 from .sections.panel import watch_species
 
-BUILDER_VERSION = "consumer-web-builder-v4"
+BUILDER_VERSION = "consumer-web-builder-v5"
 SCHEMA_VERSION = "consumer-report/1"
 
 
@@ -99,6 +100,15 @@ def _report_date(document: dict, analysis: dict) -> str:
     meta = analysis.get("metadata") if isinstance(analysis.get("metadata"), dict) else {}
     raw = str(meta.get("generated_at") or "")
     return raw[:10] if raw else datetime.now(UTC).date().isoformat()
+
+
+def _cohort_bundle_hash() -> str:
+    """Rebuild cached consumer reports when the cohort-model bundle changes."""
+    from wgs_agent.reporting.cohort_insights import bundle_dir
+    try:
+        return hashlib.sha256((bundle_dir() / "manifest.json").read_bytes()).hexdigest()
+    except OSError:
+        return "no-cohort-bundle"
 
 
 # --------------------------------------------------------------------- blocks
@@ -169,7 +179,8 @@ def _block_texts(block: Any) -> list[str]:
                 values.extend([row.label, row.text])
         return values
     if kind == "scatter":
-        return [block.caption]
+        return [block.caption, block.title or "", block.x_label or "", block.y_label or ""] + [
+            group.label for group in block.groups]
     return []
 
 
@@ -220,6 +231,14 @@ def _validate_and_clean(report: ConsumerReport, ctx: Context) -> None:
             continue
         findings.append(finding)
     report.summary.key_findings = findings
+    score = report.summary.health_score
+    if score is not None:
+        values = [score.grade, score.text, score.note]
+        for component in score.components:
+            values.extend([component.label, component.text])
+        if any(text_violations(value) or business_number_violations(value) for value in values):
+            ctx.omit("overview", "总体健康得分", "正文或数字校验未通过，已隐藏")
+            report.summary.health_score = None
     assessments = []
     for item in report.summary.assessments:
         values = [item.title, item.verdict, item.text, *item.points]
@@ -393,7 +412,7 @@ def build_report(
     cache_key = hashlib.sha256(
         "|".join([
             source_hash, BUILDER_VERSION, "1", glossary.version,
-            glossary.review_version(), str(glossary.allow_pending),
+            glossary.review_version(), str(glossary.allow_pending), _cohort_bundle_hash(),
         ]).encode()
     ).hexdigest()
     output_path = results_dir / f"{sample_id}_consumer_report.json"
@@ -411,13 +430,13 @@ def build_report(
     graph = GraphBuilder(document, refs)
     ctx = Context(document, analysis, glossary, names, refs, graph)
     ctx.omit("overview", "疾病风险模型分数", "产品要求不展示疾病风险模型分数")
-    ctx.omit("overview", "综合健康分与肠龄", "产品要求不使用单一综合分数")
     ctx.omit("symptoms", "症状推断", "本次报告不把症状与菌群做因果推断")
 
     overview = overview_section.build(ctx)
     sections = [
         composition_section.build(ctx),
         diversity_section.build(ctx),
+        gut_profile_section.build(ctx),
         key_taxa_section.build(ctx),
         virulence_section.build(ctx),
         resistance_section.build(ctx),
@@ -474,7 +493,10 @@ def build_report(
 
     # Methods are top-level, not a body block.
     report.methods = [
-        MethodNote(section="参考人群", title="参考数据与对照", body="curatedMetagenomicData 健康标签成人粪便对照，n=3,537；MetaPhlAn 3 / v30，目标谱 MetaPhlAn 3.0.14；已分类物种内归一化；P5–P95 与 bootstrap 经验百分位不是疾病概率。"),
+        MethodNote(section="参考人群", title="参考数据与对照", body=(
+            "curatedMetagenomicData 健康标签成人粪便对照"
+            + (f"，n={ctx.reference_n:,}" if ctx.reference_n else "")
+            + "；MetaPhlAn 3 / v30，目标谱 MetaPhlAn 3.0.14；已分类物种内归一化；P5–P95 与 bootstrap 经验百分位不是疾病概率。")),
         MethodNote(section="分档", title="分档规则", body="P5/P25/P75/P95 切分；置信区间跨越档位边界时降一档，不使用“明显”。"),
         MethodNote(section="口径", title="两套口径", body="主分析物种谱与 cMD 独立对照谱分开使用，不能相加；组成比较使用对照谱重新归一化数值。"),
         MethodNote(section="典型度", title="组成典型度", body="样本与参考个体的 Bray-Curtis 距离，换算为留一法参考分布中的百分位。"),
@@ -483,6 +505,8 @@ def build_report(
         MethodNote(section="耐药", title="耐药筛查", body="ResFinder 获得性耐药参考序列 reads 筛查；不覆盖点突变、完整质粒或药敏表型。"),
         MethodNote(section="子图", title="知识子图清洗", body="删除研究分组、探针、编号、测定方法、仪器和样本类型节点；删除“位于”“靶向”“测定方法为”等关系；清洗后少于两条关系不展示。"),
     ]
+    from .sections.gut_profile import method_rows
+    report.methods.extend(MethodNote(section=title, title=title, body=body) for title, body in method_rows(ctx))
     report.references = refs.references
     report.omissions = [Omission(**row) for row in ctx.omissions]
     report.glossary = [GlossaryEntry(**row) for row in ctx.glossary.used_entries()]

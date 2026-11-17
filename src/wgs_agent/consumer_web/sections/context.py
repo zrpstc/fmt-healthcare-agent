@@ -28,6 +28,7 @@ class Context:
     first_graph_shown: bool = False
     # (canonical latin, field) -> displayed taxon that has no reviewable text yet
     glossary_needs: dict[tuple[str, str], dict] = field(default_factory=dict)
+    _cohort: dict | None = None
 
     # -------------------------------------------------------- taxon texts
     def taxon_text(self, raw: str, field: str = "one_liner") -> str | None:
@@ -116,6 +117,38 @@ class Context:
             if name:
                 result[canonical(str(name))] = row
         return result
+
+    @property
+    def reference_n(self) -> int | None:
+        """Number of healthy reference subjects actually used for this sample."""
+        audit = self.healthy_comparison.get("audit")
+        value = audit.get("n_subjects") if isinstance(audit, dict) else None
+        if not value:
+            value = next((row.get("n_reference") for row in self.healthy_rows if row.get("n_reference")), None)
+        try:
+            return int(value) if value else None
+        except (TypeError, ValueError):
+            return None
+
+    @property
+    def cohort(self) -> dict:
+        """Cohort-model results (gut age, enterotype, health index, disease references).
+
+        Prefer the copy saved with the professional report; older reports are
+        analysed on the fly from the same independent profile and bundle.
+        """
+        if self._cohort is None:
+            value = self.template_inputs.get("cohort_insights")
+            if not (isinstance(value, dict) and isinstance(value.get("audit"), dict)):
+                from wgs_agent.reporting.reference import cohort_insights_for
+                value = cohort_insights_for(self.sample_id, self.metadata) if self.sample_id else {}
+            self._cohort = value if isinstance(value, dict) else {}
+        return self._cohort
+
+    @property
+    def cohort_available(self) -> bool:
+        audit = self.cohort.get("audit")
+        return isinstance(audit, dict) and audit.get("status") == "available"
 
     def module(self, name: str) -> dict:
         value = self.template_inputs.get(name)

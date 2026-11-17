@@ -643,6 +643,102 @@
       "title": "GraphNode",
       "type": "object"
     },
+    "HealthScore": {
+      "additionalProperties": false,
+      "description": "Transparent weighted overall score (0-100) shown at the top of the overview.",
+      "properties": {
+        "score": {
+          "$ref": "#/$defs/Num"
+        },
+        "grade": {
+          "title": "Grade",
+          "type": "string"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "components": {
+          "items": {
+            "$ref": "#/$defs/HealthScoreComponent"
+          },
+          "title": "Components",
+          "type": "array"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "grade",
+        "tone",
+        "text",
+        "note"
+      ],
+      "title": "HealthScore",
+      "type": "object"
+    },
+    "HealthScoreComponent": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "score": {
+          "$ref": "#/$defs/Num"
+        },
+        "weight": {
+          "title": "Weight",
+          "type": "integer"
+        },
+        "tone": {
+          "enum": [
+            "good",
+            "neutral",
+            "watch",
+            "consult"
+          ],
+          "title": "Tone",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "anchor": {
+          "title": "Anchor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "score",
+        "weight",
+        "tone",
+        "text",
+        "anchor"
+      ],
+      "title": "HealthScoreComponent",
+      "type": "object"
+    },
     "MetaboliteCard": {
       "additionalProperties": false,
       "properties": {
@@ -1096,30 +1192,124 @@
           "type": "array"
         },
         "you": {
-          "maxItems": 2,
-          "minItems": 2,
-          "prefixItems": [
+          "anyOf": [
             {
-              "type": "number"
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
             },
             {
-              "type": "number"
+              "type": "null"
             }
           ],
-          "title": "You",
-          "type": "array"
+          "default": null,
+          "title": "You"
         },
         "caption": {
           "title": "Caption",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "x_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X Label"
+        },
+        "y_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y Label"
+        },
+        "diagonal": {
+          "default": false,
+          "title": "Diagonal",
+          "type": "boolean"
+        },
+        "groups": {
+          "items": {
+            "$ref": "#/$defs/ScatterGroup"
+          },
+          "title": "Groups",
+          "type": "array"
+        },
+        "point_groups": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Point Groups"
+        },
+        "you_label": {
+          "default": "您",
+          "title": "You Label",
           "type": "string"
         }
       },
       "required": [
         "points",
-        "you",
         "caption"
       ],
       "title": "ScatterBlock",
+      "type": "object"
+    },
+    "ScatterGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label"
+      ],
+      "title": "ScatterGroup",
       "type": "object"
     },
     "Section": {
@@ -1521,6 +1711,17 @@
           ],
           "title": "Headline Source",
           "type": "string"
+        },
+        "health_score": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HealthScore"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "status_cards": {
           "items": {

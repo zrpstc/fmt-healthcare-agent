@@ -51,6 +51,10 @@ def pathogen_assessment(ctx: Context) -> dict[str, Any] | None:
     if genes:
         extra = "，其中包含需重点关注的类型" if high_resistance else ""
         points.append(f"耐药基因：检出{count(len(genes))}种{extra}；不等同于药敏试验。")
+    from .disease_reference import assessment_point
+    reference = assessment_point(ctx)
+    if reference:
+        points.append(reference)
 
     if not completed:
         verdict, tone = "不能完整评价", "neutral"
@@ -72,6 +76,30 @@ def pathogen_assessment(ctx: Context) -> dict[str, Any] | None:
         "text": text,
         "points": points,
         "anchor": "#virulence",
+    }
+
+
+def nutrition_metrics(ctx: Context) -> dict[str, Any] | None:
+    """Coverage of fibre / vitamin / short-chain fatty acid potential; shared with the health score."""
+    from .metabolites import product_score
+
+    fibers = fiber_contributors(ctx.document)
+    vitamins = vitamin_table(ctx.document)
+    fiber_total = len(load_substrate_map().get("substrates", []))
+    vitamin_total = len(load_vitamin_map().get("vitamins", []))
+    fiber_count = sum(1 for item in fibers.values() if item["has_signal"])
+    vitamin_count = sum(1 for item in vitamins if item["has_signal"])
+    scfa = {title: product_score(ctx, title) for title in ("乙酸", "丙酸", "丁酸")}
+    scfa_found = {title: item for title, item in scfa.items() if item is not None}
+    if not (fiber_count or vitamin_count or scfa_found):
+        return None
+    covered = fiber_count + vitamin_count + len(scfa_found)
+    total = fiber_total + vitamin_total + len(scfa)
+    return {
+        "ratio": covered / total if total else 0.0,
+        "scfa_mean": sum(item["score"] for item in scfa_found.values()) / len(scfa_found) if scfa_found else 0.0,
+        "fiber_count": fiber_count, "fiber_total": fiber_total,
+        "vitamin_count": vitamin_count, "vitamin_total": vitamin_total,
     }
 
 

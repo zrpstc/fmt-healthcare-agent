@@ -21,8 +21,14 @@ export interface FindingCard {
 export interface Assessment {
   id: string; title: string; verdict: string; tone: Tone; text: RichText; points: string[]; anchor: string;
 }
+export interface HealthScoreComponent {
+  id: string; label: string; score: Num; weight: number; tone: Tone; text: string; anchor: string;
+}
+export interface HealthScore {
+  score: Num; grade: string; tone: Tone; text: string; components: HealthScoreComponent[]; note: string;
+}
 export interface Summary {
-  headline: RichText; headline_source: "rule" | "llm";
+  headline: RichText; headline_source: "rule" | "llm"; health_score?: HealthScore | null;
   status_cards: StatusCard[]; key_findings: FindingCard[]; assessments?: Assessment[];
 }
 export interface TaxonCard {
@@ -75,8 +81,11 @@ export interface MetaboliteCard {
   score?: Num | null; score_label?: string | null; details?: DetailRow[] | null;
 }
 export interface CardGridBlock extends BlockBase { type: "card_grid"; cards: MetaboliteCard[] }
+export interface ScatterGroup { id: string; label: string }
 export interface ScatterBlock extends BlockBase {
-  type: "scatter"; points: [number, number][]; you: [number, number]; caption: string;
+  type: "scatter"; points: [number, number][]; you?: [number, number] | null; caption: string;
+  title?: string | null; x_label?: string | null; y_label?: string | null; diagonal?: boolean;
+  groups?: ScatterGroup[]; point_groups?: number[] | null; you_label?: string;
 }
 export type Block =
   | ParagraphBlock | CalloutBlock | StackedBarBlock | DonutBlock | RankedBarsBlock | TierScalesBlock

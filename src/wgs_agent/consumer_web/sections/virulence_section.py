@@ -167,11 +167,20 @@ def build(ctx: Context) -> dict[str, Any]:
     else:
         ctx.omit("virulence", "毒力基因结果", "毒力筛查尚未完成或没有通过校验")
 
+    from .disease_reference import subsection as disease_subsection
+    reference = disease_subsection(ctx)
+    if reference:
+        subsections.append(reference)
+    elif not ctx.cohort_available:
+        reason = (ctx.cohort.get("audit") or {}).get("reason_cn") or "人群模型不可用"
+        ctx.omit("virulence", "患病人群参考", reason)
+
     return {
         "id": "virulence",
         "nav_label": "致病基因",
         "title": "需留意的菌是否带有致病相关基因",
-        "intro": f"这一部分回答两个问题：能不能区分到{ctx.term('strain', '菌株')}，以及检出了哪些与致病相关的基因。",
+        "intro": (f"这一部分回答三个问题：能不能区分到{ctx.term('strain', '菌株')}，检出了哪些与致病相关的基因，"
+                  "以及与公开的患病人群数据相比您的菌群更像哪一组。"),
         "source_chapters": [4],
         "terms_banner": ["virulence_factor", "toxin_gene", "source_attribution"],
         "subsections": subsections,

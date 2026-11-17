@@ -182,7 +182,8 @@ def build(ctx: Context) -> dict[str, Any]:
         blocks = [
             {
                 "type": "paragraph",
-                "text": "对照人群：3,537名来自公开研究的健康成人（未按年龄、性别、地区匹配）。",
+                "text": (f"对照人群：{count(ctx.reference_n)}名来自公开研究的健康成人（未按年龄、性别、地区匹配）。"
+                         if ctx.reference_n else "对照人群：来自公开研究的健康成人（未按年龄、性别、地区匹配）。"),
             },
             {"type": "tier_scales", "rows": rows},
             {"type": "paragraph", "text": difference},
@@ -206,7 +207,8 @@ def build(ctx: Context) -> dict[str, Any]:
     else:
         ctx.omit("composition", "与健康人相比的组成比较", "缺少可用于该样本的同口径参考分布")
 
-    ctx.omit("composition", "肠型", "没有经过验证的参考聚类资产，不能根据优势菌推断肠型")
+    if not (ctx.cohort_available and (ctx.cohort.get("enterotype") or {}).get("id")):
+        ctx.omit("composition", "肠型", "没有经过验证的参考聚类资产，不能根据优势菌推断肠型")
     ctx.omit("composition", "核心菌群", "本次报告没有定义核心菌群；不以优势菌代替")
 
     return {

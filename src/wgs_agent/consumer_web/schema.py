@@ -271,13 +271,29 @@ class CardGridBlock(BaseModel):
     cards: list[MetaboliteCard]
 
 
+class ScatterGroup(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    label: str
+
+
 class ScatterBlock(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     type: Literal["scatter"] = "scatter"
     points: list[tuple[float, float]]
-    you: tuple[float, float]
+    you: tuple[float, float] | None = None
     caption: str
+    title: str | None = None
+    x_label: str | None = None
+    y_label: str | None = None
+    # Draw y = x (e.g. predicted vs. actual age).
+    diagonal: bool = False
+    # Optional colour groups: ``point_groups[i]`` indexes ``groups``.
+    groups: list[ScatterGroup] = Field(default_factory=list)
+    point_groups: list[int] | None = None
+    you_label: str = "您"
 
 
 Block = Annotated[
@@ -359,11 +375,37 @@ class Assessment(BaseModel):
     anchor: str
 
 
+class HealthScoreComponent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    label: str
+    score: Num
+    weight: int
+    tone: Tone
+    text: str
+    anchor: str
+
+
+class HealthScore(BaseModel):
+    """Transparent weighted overall score (0-100) shown at the top of the overview."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    score: Num
+    grade: str
+    tone: Tone
+    text: str
+    components: list[HealthScoreComponent] = Field(default_factory=list)
+    note: str
+
+
 class Summary(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     headline: str
     headline_source: HeadlineSource
+    health_score: HealthScore | None = None
     status_cards: list[StatusCard] = Field(default_factory=list)
     key_findings: list[FindingCard] = Field(default_factory=list)
     assessments: list[Assessment] = Field(default_factory=list)

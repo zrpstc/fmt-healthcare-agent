@@ -6,7 +6,7 @@ from typing import Any
 
 from ..format import count, number, pct, tier
 from ..narrative import headline
-from . import assessment
+from . import assessment, health_score
 from .context import Context
 from .panel import category_total, load_panel
 from .resistance import resistance_genes
@@ -123,6 +123,9 @@ def build(ctx: Context) -> dict[str, Any]:
             "anchor": "#resistance",
         })
 
+    from .gut_profile import status_cards as gut_cards
+    cards.extend(gut_cards(ctx))
+
     # Nutrition potential: count substrate and vitamin signals.
     from ..functions import fiber_contributors, load_substrate_map, load_vitamin_map, vitamin_table
     fibers = fiber_contributors(ctx.document)
@@ -198,7 +201,8 @@ def build(ctx: Context) -> dict[str, Any]:
         "summary": {
             "headline": text,
             "headline_source": "rule",
-            "status_cards": cards[:6],
+            "health_score": health_score.build(ctx),
+            "status_cards": cards[:8],
             "key_findings": findings,
             "assessments": assessment.build(ctx),
         }
