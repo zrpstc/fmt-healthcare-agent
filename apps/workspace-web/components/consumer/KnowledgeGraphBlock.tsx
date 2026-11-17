@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import type { Network, Options, Node as VisNode, Edge as VisEdge } from "vis-network";
 import { ENTITY_COLORS } from "@/components/evidence-graph";
-import { graphTextSummary } from "@/lib/consumer-pure.mjs";
+import { drawableGraph, graphTextSummary } from "@/lib/consumer-pure.mjs";
 import type { GraphBlock, Reference, GlossaryEntry } from "@/lib/consumer-report";
 
 function edgeColor(edge: GraphBlock["edges"][number]) {
@@ -12,7 +12,7 @@ function edgeColor(edge: GraphBlock["edges"][number]) {
 }
 
 export default function KnowledgeGraphBlock({
-  graph,
+  graph: rawGraph,
   references,
   glossary,
 }: {
@@ -24,13 +24,15 @@ export default function KnowledgeGraphBlock({
   const networkRef = useRef<Network | null>(null);
   const [mounted, setMounted] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState<GraphBlock["edges"][number] | null>(null);
+  const [failed, setFailed] = useState(false);
+  const graph = useMemo(() => drawableGraph(rawGraph), [rawGraph]);
   const refMap = new Map(references.map((item) => [item.id, item]));
   const note = glossary.find((entry) => entry.term_id === "knowledge_subgraph");
   const fallback = graphTextSummary(graph);
 
   useEffect(() => {
     const element = containerRef.current;
-    if (!element) return;
+    if (!element || !graph) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) setMounted(true);
@@ -39,10 +41,10 @@ export default function KnowledgeGraphBlock({
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [graph]);
 
   useEffect(() => {
-    if (!mounted || !containerRef.current) return;
+    if (!mounted || !containerRef.current || !graph) return;
     let cancelled = false;
     import("vis-network/standalone").then(({ Network: NetworkClass }) => {
       if (cancelled || !containerRef.current) return;
@@ -76,7 +78,14 @@ export default function KnowledgeGraphBlock({
         nodes: { shapeProperties: { borderRadius: 8 }, widthConstraint: { maximum: 180 } },
         edges: { smooth: false, arrowStrikethrough: false },
       };
-      const network = new NetworkClass(containerRef.current, { nodes, edges }, options);
+      let network: Network;
+      try {
+        network = new NetworkClass(containerRef.current, { nodes, edges }, options);
+      } catch (error) {
+        console.error("knowledge subgraph render failed", error);
+        setFailed(true);
+        return;
+      }
       networkRef.current = network;
       network.on("selectEdge", (params) => {
         if (!params.edges.length) return;
@@ -87,6 +96,10 @@ export default function KnowledgeGraphBlock({
       network.once("stabilizationIterationsDone", () => {
         network.setOptions({ physics: { enabled: false } });
       });
+    }).catch((error) => {
+      if (cancelled) return;
+      console.error("knowledge subgraph render failed", error);
+      setFailed(true);
     });
     return () => {
       cancelled = true;
@@ -94,6 +107,10 @@ export default function KnowledgeGraphBlock({
       networkRef.current = null;
     };
   }, [mounted, graph]);
+
+  // A subgraph with nothing drawable (or one the graph library rejected) is
+  // hidden entirely: no heading, empty canvas or legend.
+  if (!graph || failed) return null;
 
   const firstEvidence = selectedEdge?.evidence?.[0];
   const reference = firstEvidence ? refMap.get(firstEvidence.ref_id) : undefined;

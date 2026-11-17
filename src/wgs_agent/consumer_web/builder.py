@@ -36,7 +36,7 @@ from .sections import (
 from .sections.context import Context
 from .sections.panel import watch_species
 
-BUILDER_VERSION = "consumer-web-builder-v3"
+BUILDER_VERSION = "consumer-web-builder-v4"
 SCHEMA_VERSION = "consumer-report/1"
 
 

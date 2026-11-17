@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseRichText, buildNavItems, tierPosition, graphTextSummary, plainRichText } from "../lib/consumer-pure.mjs";
+import { parseRichText, buildNavItems, tierPosition, graphTextSummary, plainRichText, drawableGraph } from "../lib/consumer-pure.mjs";
 
 test("rich text splits glossary terms and italic Latin names", () => {
   const tokens = parseRichText("菌群[[reference_population|参考人群]]中有*Faecalibacterium prausnitzii*。");
@@ -43,4 +43,24 @@ test("graph print summary uses Chinese endpoints and relation labels", () => {
   });
   assert.deepEqual(lines, ["研究提示：普拉梭菌 — 产生 → 丁酸"]);
   assert.deepEqual(graphTextSummary(null), []);
+});
+
+test("drawableGraph drops dangling edges, duplicate ids and orphan nodes", () => {
+  const graph = drawableGraph({
+    nodes: [{ id: "a", label: "丁酸" }, { id: "b", label: "普拉梭菌" }, { id: "c", label: "孤立节点" }],
+    edges: [
+      { id: "e1", from: "b", to: "a", label: "产生" },
+      { id: "e1", from: "a", to: "b", label: "相关" },
+      { id: "e2", from: "b", to: "missing", label: "相关" },
+    ],
+  });
+  assert.equal(graph.edges.length, 2);
+  assert.equal(new Set(graph.edges.map((edge) => edge.id)).size, 2);
+  assert.deepEqual(graph.nodes.map((node) => node.id).sort(), ["a", "b"]);
+});
+
+test("drawableGraph returns null when nothing can be drawn", () => {
+  assert.equal(drawableGraph(null), null);
+  assert.equal(drawableGraph({ nodes: [{ id: "a", label: "丁酸" }], edges: [] }), null);
+  assert.equal(drawableGraph({ nodes: [], edges: [{ id: "e1", from: "a", to: "b", label: "产生" }] }), null);
 });

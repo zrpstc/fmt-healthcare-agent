@@ -39,6 +39,32 @@ export function tierPosition(tier) {
   return Math.max(0, Math.min(100, value));
 }
 
+/**
+ * Keep only drawable parts of a knowledge subgraph: edges with a unique id whose
+ * both ends exist, and nodes that still have at least one edge.  Returns null
+ * when nothing drawable remains, so the caller can hide the whole widget.
+ */
+export function drawableGraph(graph) {
+  if (!graph) return null;
+  const nodeById = new Map();
+  for (const node of graph.nodes || []) {
+    if (node && node.id && String(node.label || "").trim() && !nodeById.has(node.id)) nodeById.set(node.id, node);
+  }
+  const edgeIds = new Set();
+  const edges = [];
+  for (const edge of graph.edges || []) {
+    if (!edge || !nodeById.has(edge.from) || !nodeById.has(edge.to)) continue;
+    let id = String(edge.id || "");
+    if (!id || edgeIds.has(id)) id = `${id || "edge"}#${edges.length}`;
+    edgeIds.add(id);
+    edges.push({ ...edge, id });
+  }
+  if (!edges.length) return null;
+  const linked = new Set(edges.flatMap((edge) => [edge.from, edge.to]));
+  const nodes = [...nodeById.values()].filter((node) => linked.has(node.id));
+  return { ...graph, nodes, edges };
+}
+
 export function graphTextSummary(graph) {
   if (!graph) return [];
   const nodes = new Map((graph.nodes || []).map((node) => [node.id, node.label]));

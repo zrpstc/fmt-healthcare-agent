@@ -7,9 +7,11 @@ nodes, 6 edges) and is rendered interactively by vis-network in the browser.
 
 from __future__ import annotations
 
+import hashlib
 import html
 import re
 
+from .names import GENUS_FALLBACK, TAXON_CN, canonical
 from .schema import GraphBlock, GraphEdge, GraphEvidence, GraphNode, Reference
 
 PREDICATE_CN = {
@@ -46,6 +48,7 @@ IDENTIFIER_RE = re.compile(
     r"\b(?:SGB|GGB)\d+|数据库编号|本体编号",
     re.I,
 )
+TAXON_TYPES = {"MicrobialTaxon", "MicrobialStrain", "Organism", "Microbiome"}
 GROUP_WORDS = ("研究分组", "队列", "受试者", "病例组", "对照组", "健康组", "干预组")
 CHINESE_RE = re.compile(r"[\u4e00-\u9fff]")
 
@@ -170,16 +173,47 @@ def _clean_nodes(nodes: list[dict]) -> tuple[dict[str, dict], set[str], dict[str
     return keep, removed, reasons
 
 
+def _taxon_label(node: dict) -> str:
+    """Exact Chinese name for a taxon node that the graph translation left in Latin."""
+    if str(node.get("type") or "") not in TAXON_TYPES:
+        return ""
+    key = canonical(str(node.get("label") or ""))
+    return TAXON_CN.get(key) or GENUS_FALLBACK.get(key, "")
+
+
+def _edge_key(edge: dict) -> str:
+    return "|".join(str(edge.get(field) or "") for field in ("source", "target", "predicate", "claim_id"))
+
+
 def _merge_topics(topics: list[dict]) -> dict:
+    """Union topic subgraphs.
+
+    Node ids are global hashes, but edge ids are numbered per topic (e1, e2, ...),
+    so two topics routinely reuse the same edge id.  Duplicate ids make the
+    browser graph library refuse the whole graph, so merged edges get an id
+    derived from their identity instead.
+    """
     nodes: dict[str, dict] = {}
     edges: dict[str, dict] = {}
     for topic in topics:
         graph = topic.get("knowledge_subgraph") or {}
         for node in graph.get("nodes", []):
-            nodes.setdefault(str(node["id"]), node)
+            key = str(node["id"])
+            if key in nodes:
+                continue
+            node = dict(node)
+            if not _node_label(node):
+                label = _taxon_label(node)
+                if label:
+                    node["display_label"] = label
+            nodes[key] = node
         for edge in graph.get("edges", []):
-            key = "|".join(str(edge.get(field) or "") for field in ("source", "target", "predicate", "claim_id"))
-            edges.setdefault(key, edge)
+            key = _edge_key(edge)
+            if key in edges:
+                continue
+            edge = dict(edge)
+            edge["id"] = "e" + hashlib.sha256(key.encode()).hexdigest()[:12]
+            edges[key] = edge
     return {"nodes": list(nodes.values()), "edges": list(edges.values())}
 
 
@@ -218,7 +252,9 @@ def _bounded_components(nodes: dict[str, dict], edges: list[dict], seeds: set[st
     kept_edges = [edge for edge in kept_edges if str(edge["source"]) in keep and str(edge["target"]) in keep]
     kept_edges.sort(key=lambda edge: (-(1 if str(edge["source"]) in seed_keys or str(edge["target"]) in seed_keys else 0), -float(edge.get("confidence") or 0), str(edge.get("id"))))
     kept_edges = kept_edges[:max_edges]
-    return {key: nodes[key] for key in keep}, kept_edges
+    # Nodes whose only edges fell past the edge ceiling would float unconnected.
+    linked = {str(edge["source"]) for edge in kept_edges} | {str(edge["target"]) for edge in kept_edges}
+    return {key: nodes[key] for key in keep if key in linked}, kept_edges
 
 
 class GraphBuilder:
@@ -277,14 +313,19 @@ class GraphBuilder:
                 for node in keep.values()
             ]
             edge_rows: list[GraphEdge] = []
+            edge_ids: set[str] = set()
             for edge in edges:
+                edge_id = str(edge.get("id") or "")
+                if not edge_id or edge_id in edge_ids:
+                    edge_id = f"e{len(edge_rows) + 1}_{len(edge_ids)}"
+                edge_ids.add(edge_id)
                 claim = dict(edge)
                 ref_id = self.refs.add_claim(claim)
                 sentence = re.sub(r"\s+", " ", str(edge.get("evidence_text") or "")).strip()
                 if not sentence:
                     sentence = _edge_label(edge) + "；证据句未收录"
                 edge_rows.append(GraphEdge(
-                    id=str(edge.get("id") or f"e{len(edge_rows)+1}"),
+                    id=edge_id,
                     from_=str(edge["source"]),
                     to=str(edge["target"]),
                     label=_edge_label(edge),
