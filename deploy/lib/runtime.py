@@ -25,6 +25,7 @@ from dotenv import dotenv_values
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'src'))
 from wgs_fmt_platform.process_identity import ProcessIdentity, application_owned_filesystem
+from wgs_fmt_platform import cmd_data
 ROLES = ('workspace-api', 'workspace-web', 'agent-daemon')
 
 class RuntimeFailure(Exception):
@@ -564,6 +565,32 @@ def start_process(config, role, dist):
     wait_ready(config, role, proc)
     return proc.pid
 
+def launch_cmd_preparation(config):
+    """Start cMD data preparation in the background when WGS_CMD_DATA_ROOT is set and incomplete.
+
+    Never blocks or fails the service start: the services keep using the previous
+    reference until the new bundles are published, then switch automatically.
+    The detached process is not a project role, so stop/restart leave a running
+    download alone; a second launch exits at once on the preparation lock.
+    """
+    root = cmd_data.data_root(config.env)
+    if root is None:
+        return {'state': 'disabled'}
+    paths = cmd_data.layout(root)
+    if cmd_data.ready(paths['healthy']) and cmd_data.ready(paths['cohort']):
+        return {'state': 'ready', 'root': str(root)}
+    try:
+        path = log_path(config, 'cmd-data')
+        with application_user(config):
+            handle = path.open('ab')
+        with handle:
+            proc = subprocess.Popen([str(config.python), str(config.root / 'scripts/prepare_cmd_data.py'), '--log', str(path)],
+                cwd=config.root, env=config.env, stdin=subprocess.DEVNULL, stdout=handle, stderr=subprocess.STDOUT,
+                start_new_session=True, preexec_fn=config.drop_privilege if 0 in os.getresuid() else None)
+    except OSError:
+        return {'state': 'launch_failed', 'root': str(root)}
+    return {'state': 'preparing', 'root': str(root), 'pid': proc.pid, 'log': str(path)}
+
 def status(config):
     found = discover(config.root)
     result = {}
@@ -581,6 +608,8 @@ def status(config):
         'mode': 'managed' if config.managed_search else 'external'}
     result['ready'] = (all(result[role]['state'] in {'running', 'disabled'} for role in ROLES)
                        and result['elasticsearch']['state'] == 'running')
+    # Informational only: reports work with the previous reference while preparing.
+    result['cmd_data'] = cmd_data.summary(config.env)
     return result
 
 @application_operation
@@ -654,7 +683,10 @@ def start(config, component='all', force_build=False):
             if role == 'agent-daemon' and not config.agent_enabled:
                 continue
             started[role] = start_process(config, role, dist)
-        return {'services': started, 'build_rebuilt': rebuilt, 'ports': {'web': config.web_port, 'api': config.api_port}}
+        result = {'services': started, 'build_rebuilt': rebuilt, 'ports': {'web': config.web_port, 'api': config.api_port}}
+        if 'workspace-api' in roles:
+            result['cmd_data'] = launch_cmd_preparation(config)
+        return result
     except BaseException:
         stop_processes(config, roles)
         if dependency_started:

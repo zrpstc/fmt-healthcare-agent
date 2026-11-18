@@ -43,62 +43,46 @@ bash deploy/restart-report-api.sh
 生产配置使用项目 `.env`；环境示例、前端 API 代理及辅助工具的默认值均使用新端口。历史备份与旧构建产物不作为当前部署配置，正常部署会按源代码指纹重新构建前端。
 
 
-## 上线人群模型与扩大健康参考（2026-11）
+## cMD参考数据自动准备（扩大健康参考与人群模型）
 
-以下在项目根目录、以应用账号执行；路径按实际部署替换。旧参考包不覆盖，全部写入新目录，回退只需改回 `.env`。
-
-```bash
-cd /home/zhanghaiyang/fmt-healthcare-agent
-git pull --ff-only origin main
-.venv/bin/python -m pip install -r requirements.txt   # 无新增依赖，scipy/scikit-learn 已在清单内
-```
-
-1. 导出 cMD 3.18.0 元数据（新目录），并解压同版本源码供建包读取资源清单：
-
-```bash
-SRC=/path/to/cmd-source-3.22            # 新目录
-Rscript scripts/export_cmd_metadata.R --output-dir "$SRC" --bioc-release 3.22
-mkdir -p "$SRC/package" && tar -xzf "$SRC/source/curatedMetagenomicData_3.18.0.tar.gz" -C "$SRC/package"
-```
-
-2. 建扩大后的健康参考（约7,000人，新目录）：
-
-```bash
-PYTHONPATH=src .venv/bin/python scripts/prepare_cmd_reference.py \
-  --package-dir "$SRC/package/curatedMetagenomicData" \
-  --metadata "$SRC/sample_metadata.tsv" \
-  --catalog /path/to/ExperimentHub.sqlite \
-  --source-dir /path/to/cmd-source-cache \
-  --output var/reference/cmd/native-v3-bioc322-wide \
-  --antibiotics-policy no_or_unrecorded
-```
-
-3. 建人群模型包（复用同一下载缓存）：
-
-```bash
-PYTHONPATH=src .venv/bin/python scripts/prepare_cmd_cohort_models.py \
-  --package-dir "$SRC/package/curatedMetagenomicData" \
-  --metadata "$SRC/sample_metadata.tsv" \
-  --catalog /path/to/ExperimentHub.sqlite \
-  --source-dir /path/to/cmd-source-cache \
-  --output var/reference/cmd/cohort-models-v1
-```
-
-4. 在 `.env` 中指向新包后重启：
+只需在项目 `.env` 中指定存放新数据库的父目录，例如：
 
 ```dotenv
-WGS_CMD_REFERENCE_DIR=/home/zhanghaiyang/fmt-healthcare-agent/var/reference/cmd/native-v3-bioc322-wide
-WGS_CMD_COHORT_DIR=/home/zhanghaiyang/fmt-healthcare-agent/var/reference/cmd/cohort-models-v1
+WGS_CMD_DATA_ROOT=/storageB/zhanghaiyang/fmtha-data/fmt-databases
 ```
+
+该目录（或其上级）需对应用账号可写，其余目录和文件全部自动生成。之后照常执行：
 
 ```bash
-bash deploy/restart.sh && bash deploy/status.sh
+git pull --ff-only origin main
+bash deploy/restart.sh      # 首次部署用 start.sh
 ```
 
-5. 刷新已有样本：专业版报告在下次生成时重算健康对照和人群模型；消费者版构建器版本已升级，打开即自动重建，也可手动：
+`start`/`restart` 在服务就绪后，若数据尚未齐备，会在后台启动 `scripts/prepare_cmd_data.py`，不阻塞、也不影响服务启动。它在 `<WGS_CMD_DATA_ROOT>/cmd/` 下依次完成：
+
+| 步骤 | 产物 |
+|---|---|
+| 下载 ExperimentHub 官方资源目录（约10 MB） | `cmd/catalog/experimenthub.sqlite3` |
+| 导出 cMD 3.18.0（Bioconductor 3.22）元数据，按官方MD5校验源码包 | `cmd/metadata-bioc3.22/` |
+| 解压源码包并核对版本 | `cmd/metadata-bioc3.22/package/curatedMetagenomicData/` |
+| 下载并导出各研究物种丰度矩阵 | `cmd/cache/` |
+| 建扩大后的健康参考（约7,000人） | `cmd/healthy-cmd3.18.0-no_or_unrecorded/` |
+| 建人群模型包（肠龄、肠型、健康指数、患病人群参考） | `cmd/cohort-models-v1-cmd3.18.0/` |
+
+每步已完成就跳过；中断或失败后，下次 `start`/`restart` 会从未完成的步骤继续。同一时间只运行一个准备进程（`cmd/prepare.lock`），`stop`/`restart` 不会打断正在进行的下载。进度和日志：
 
 ```bash
-.venv/bin/python scripts/build_consumer_report.py SAMPLE_ID --refresh
+bash deploy/status.sh        # result.cmd_data：state 为 preparing/running/failed/interrupted/ready，含 step、error、log
 ```
 
-回退：把 `WGS_CMD_REFERENCE_DIR` 改回原目录、删除 `WGS_CMD_COHORT_DIR` 行，再 `bash deploy/restart.sh`；肠龄肠型和患病人群参考会自动隐藏。
+准备期间报告继续使用原健康参考（`var/reference/cmd/native-v3`），肠龄肠型与患病人群参考暂不显示；新包发布后，运行中的服务自动切换，无需重启。消费者版报告随后打开即重建；专业版报告在下次生成时使用新参考。
+
+前提：服务器能访问 `bioconductor.org`、`experimenthub.bioconductor.org` 及其数据存储地址，`PATH` 中有 `Rscript`（只用 base R；私有R库可设 `WGS_CMD_R_LIBRARY`）。常见错误码：`RSCRIPT_MISSING`、`CATALOG_DOWNLOAD_FAILED`、`METADATA_EXPORT_FAILED`、`MATRIX_EXPORT_FAILED`、`DATA_ROOT_NOT_WRITABLE`，详情见 `log` 指向的文件。
+
+优先级：`.env` 中显式设置的 `WGS_CMD_REFERENCE_DIR`、`WGS_CMD_COHORT_DIR` 始终优先；要使用自动准备的数据，请删除这两行。回退：删除 `WGS_CMD_DATA_ROOT` 后 `bash deploy/restart.sh`，即恢复原参考，肠龄肠型和患病人群参考自动隐藏；已准备的数据保留在原处。
+
+也可以手动运行同一流程（前台、输出到终端）：
+
+```bash
+.venv/bin/python scripts/prepare_cmd_data.py
+```

@@ -72,6 +72,10 @@ PYTHONPATH=src .venv/bin/python -m wgs_agent.pipeline.cmd_workflow \
 
 postfmt直接调用该入口。报告生成只读取本地参考与既有待测谱，不启动profiling、下载或重建参考。
 
+## 自动准备（推荐）
+
+在`.env`设置`WGS_CMD_DATA_ROOT=<新数据库父目录>`后，`deploy/start.sh`/`restart.sh`会在后台依次完成资源目录下载、cMD 3.18.0元数据导出、源码解压、健康参考与人群模型建包，均写在`<root>/cmd/`下，步骤可续跑、互斥执行，进度见`deploy/status.sh`的`cmd_data`。新包发布前沿用原参考；显式设置的`WGS_CMD_REFERENCE_DIR`/`WGS_CMD_COHORT_DIR`优先。下面各节的手动命令仍可单独使用。详见[部署说明](../deploy/README.md)。
+
 ## 扩大健康参考（抗生素口径）
 
 `prepare_cmd_reference.py --antibiotics-policy no_or_unrecorded` 在原有筛选之外，纳入原研究**未记录**当前抗生素使用的健康成人；明确记录为在用（yes）者仍排除。默认值`no`保持原严格契约，旧包继续有效；加载器同时接受两种口径，manifest的`selection_criteria.antibiotics_current_use`记录实际口径，报告局限性第一条随之改写。
@@ -122,7 +126,9 @@ PYTHONPATH=src .venv/bin/python scripts/prepare_cmd_cohort_models.py \
 | `WGS_REFERENCE_CACHE_DIR` | 保留，仅通路工具 | 既有公共HUMAnN通路缓存，不是健康物种来源 |
 | `WGS_CMD_REFERENCE_DIR` | 保留 | 默认工作区`reference/cmd/native-v3` |
 | `WGS_CMD_PROFILES_DIR` | 保留 | 默认工作区`reference-targets/cmd` |
-| `WGS_CMD_COHORT_DIR` | 新增 | 人群模型包，默认工作区`reference/cmd/cohort-models-v1` |
+| `WGS_CMD_DATA_ROOT` | 新增，推荐 | 新数据库父目录；`deploy/start.sh`后台运行`scripts/prepare_cmd_data.py`自动准备`<root>/cmd/`下的全部数据，完成后健康参考与人群模型自动切换到新包 |
+| `WGS_CMD_COHORT_DIR` | 新增，可选 | 固定人群模型包位置（优先于`WGS_CMD_DATA_ROOT`），默认工作区`reference/cmd/cohort-models-v1` |
+| `WGS_CMD_R_LIBRARY` | 新增，可选 | 自动准备时R导出使用的私有库目录 |
 | `--antibiotics-policy` | 新增CLI参数 | `no`（默认，原契约）或`no_or_unrecorded`（扩大健康参考） |
 | `export_cmd_metadata.R --bioc-release` | 新增CLI参数 | `3.20`（默认，cMD 3.14.0）或`3.22`（cMD 3.18.0，元数据更完整） |
 | `WGS_CMD_AUTO_PROFILE` | 保留 | 默认true；false/0/no/off关闭自动准备，报告仍可读既有谱 |

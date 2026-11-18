@@ -43,7 +43,12 @@ class IncompatiblePipeline(Exception):
 
 
 def bundle_dir() -> Path:
-    return runtime_path("WGS_CMD_COHORT_DIR", "reference", "cmd", "cohort-models-v1")
+    """Explicit setting, else the bundle prepared under WGS_CMD_DATA_ROOT once complete, else default."""
+    import os
+    from wgs_fmt_platform.cmd_data import prepared_dir
+    if os.environ.get("WGS_CMD_COHORT_DIR", "").strip():
+        return runtime_path("WGS_CMD_COHORT_DIR", "reference", "cmd", "cohort-models-v1")
+    return prepared_dir("cohort") or runtime_path("WGS_CMD_COHORT_DIR", "reference", "cmd", "cohort-models-v1")
 
 
 def load_bundle(base: Path) -> tuple[dict, dict, dict]:
