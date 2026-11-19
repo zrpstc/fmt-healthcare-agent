@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import type { Network, Options, Node as VisNode, Edge as VisEdge } from "vis-network";
 import { ENTITY_COLORS } from "@/components/evidence-graph";
 import { drawableGraph, graphTextSummary } from "@/lib/consumer-pure.mjs";
+import { useDismiss } from "./useDismiss";
 import type { GraphBlock, Reference, GlossaryEntry } from "@/lib/consumer-report";
 
 function edgeColor(edge: GraphBlock["edges"][number]) {
@@ -25,6 +26,15 @@ export default function KnowledgeGraphBlock({
   const [mounted, setMounted] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState<GraphBlock["edges"][number] | null>(null);
   const [failed, setFailed] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  // Clicks on the graph canvas pick another edge, so they do not count as outside.
+  // Closing also clears the edge selection, otherwise clicking the same edge
+  // again would not fire a new selectEdge event and the drawer would not reopen.
+  const closeDrawer = () => {
+    setSelectedEdge(null);
+    networkRef.current?.unselectAll();
+  };
+  useDismiss(selectedEdge !== null, [drawerRef, containerRef], closeDrawer);
   const graph = useMemo(() => drawableGraph(rawGraph), [rawGraph]);
   const refMap = new Map(references.map((item) => [item.id, item]));
   const note = glossary.find((entry) => entry.term_id === "knowledge_subgraph");
@@ -93,6 +103,8 @@ export default function KnowledgeGraphBlock({
         const edge = graph.edges.find((item) => item.id === id) || null;
         setSelectedEdge(edge);
       });
+      // Clicking empty canvas deselects the edge; close its evidence drawer too.
+      network.on("deselectEdge", () => setSelectedEdge(null));
       network.once("stabilizationIterationsDone", () => {
         network.setOptions({ physics: { enabled: false } });
       });
@@ -133,8 +145,8 @@ export default function KnowledgeGraphBlock({
         <ul>{fallback.map((line) => <li key={line}>{line}</li>)}</ul>
       </div>
       {selectedEdge && (
-        <div className="cr-graph-drawer" role="dialog" aria-label="关系证据">
-          <button type="button" className="cr-drawer-close" onClick={() => setSelectedEdge(null)} aria-label="关闭">
+        <div ref={drawerRef} className="cr-graph-drawer" role="dialog" aria-label="关系证据">
+          <button type="button" className="cr-drawer-close" onClick={closeDrawer} aria-label="关闭">
             <X size={18} />
           </button>
           <h4>{selectedEdge.label}</h4>

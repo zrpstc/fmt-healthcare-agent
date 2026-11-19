@@ -257,7 +257,7 @@
 .cr-term-popover { position: fixed; z-index: 80; max-width: 320px; padding: 14px 16px; border-radius: 14px; background: var(--cr-card); border: 1px solid var(--cr-line); box-shadow: 0 12px 36px rgba(20,38,41,.18); font-size: 13px; }
 .cr-term-popover .cr-popover-title { font-weight: 800; margin-bottom: 6px; }
 .cr-term-drawer { position: fixed; z-index: 80; left: 0; right: 0; bottom: 0; max-height: 55vh; overflow: auto; padding: 18px 20px 22px; border-radius: 18px 18px 0 0; background: var(--cr-card); border-top: 1px solid var(--cr-line); box-shadow: 0 -12px 36px rgba(20,38,41,.18); }
-.cr-term-drawer .cr-drawer-close { position: absolute; right: 12px; top: 12px; background: transparent; border: 0; color: var(--cr-sub); }
+.cr-term-drawer .cr-drawer-close, .cr-graph-drawer .cr-drawer-close { position: absolute; right: 12px; top: 12px; background: transparent; border: 0; color: var(--cr-sub); }
 .cr-term-drawer h4 { margin: 0 0 8px; font-size: 16px; }
 .cr-term-drawer p { margin: 0; font-size: 13px; color: var(--cr-sub); }
 
