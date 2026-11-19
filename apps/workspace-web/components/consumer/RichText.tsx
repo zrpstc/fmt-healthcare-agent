@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { parseRichText } from "@/lib/consumer-pure.mjs";
 import type { GlossaryEntry } from "@/lib/consumer-report";
+import { useDismiss } from "./useDismiss";
 
 interface GlossaryProps {
   glossary: GlossaryEntry[];
@@ -26,25 +27,25 @@ export function GlossaryTerm({
   const entry = map.get(termId);
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-        buttonRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  // Clicking elsewhere, Escape, or (for the desktop popover pinned beside the
+  // word) scrolling closes it; previously only Escape did.
+  useDismiss(open, [buttonRef, panelRef], (reason) => {
+    setOpen(false);
+    if (reason === "escape") buttonRef.current?.focus();
+  }, { closeOnScroll: position !== null });
 
   if (!entry) {
     return <span>{label}</span>;
   }
 
   const onOpen = () => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
     setOpen(true);
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -61,11 +62,12 @@ export function GlossaryTerm({
 
   return (
     <>
-      <button ref={buttonRef} type="button" className="cr-term" onClick={onOpen} aria-label={`解释：${entry.name}`}>
+      <button ref={buttonRef} type="button" className="cr-term" onClick={onOpen} aria-label={`解释：${entry.name}`} aria-expanded={open}>
         {label}
       </button>
       {open && (
         <div
+          ref={panelRef}
           className={position ? "cr-term-popover" : "cr-term-drawer"}
           style={position ? { left: position.left, top: position.top } : undefined}
           role="dialog"

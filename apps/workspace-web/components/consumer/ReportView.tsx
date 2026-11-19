@@ -20,6 +20,7 @@ import ReportTable from "./ReportTable";
 import CardGrid from "./CardGrid";
 import ScatterPlot from "./ScatterPlot";
 import KnowledgeGraphBlock from "./KnowledgeGraphBlock";
+import RiskDistribution from "./RiskDistribution";
 import ActionCard from "./ActionCard";
 import RetestTimeline from "./RetestTimeline";
 import LearnMore from "./LearnMore";
@@ -64,6 +65,8 @@ function BlockView({ block, glossary }: { block: Block; glossary: GlossaryEntry[
       return <CardGrid cards={block.cards} glossary={glossary} />;
     case "scatter":
       return <ScatterPlot block={block} />;
+    case "risk_distribution":
+      return <RiskDistribution block={block} glossary={glossary} />;
     default:
       return null;
   }

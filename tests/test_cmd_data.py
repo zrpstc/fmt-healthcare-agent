@@ -45,6 +45,14 @@ def test_bundle_dirs_follow_data_root_only_when_complete(tmp_path, monkeypatch):
     publish(paths["healthy"]); publish(paths["cohort"])
     assert cmd.reference_dir() == paths["healthy"]
     assert cohort_insights.bundle_dir() == paths["cohort"]
+    # The MR disease-risk bundle is the third prepared artifact; until it exists the state is not ready.
+    assert cmd_data.summary()["state"] != "ready"
+    assert paths["disease_risk"].name.startswith("disease-risk-v1-cmd")
+    assert paths["disease_risk"].name.endswith(cmd_data.weights_tag())
+    monkeypatch.delenv("WGS_CMD_DISEASE_RISK_DIR", raising=False)
+    publish(paths["disease_risk"])
+    from wgs_agent.reporting import disease_risk
+    assert disease_risk.bundle_dir() == paths["disease_risk"]
     # An explicit setting always wins.
     monkeypatch.setenv("WGS_CMD_REFERENCE_DIR", str(tmp_path / "pinned"))
     assert cmd.reference_dir() == tmp_path / "pinned"
@@ -170,7 +178,10 @@ def test_start_launches_background_preparation_once_until_ready(runtime_config, 
     assert args[1].endswith("scripts/prepare_cmd_data.py") and kwargs["start_new_session"] is True
     paths = cmd_data.layout(tmp_path / "dbs")
     publish(paths["healthy"]); publish(paths["cohort"])
-    assert runtime.launch_cmd_preparation(config)["state"] == "ready" and len(launched) == 1
+    # Still missing the disease-risk bundle: preparation is launched again (it skips finished steps).
+    assert runtime.launch_cmd_preparation(config)["state"] == "preparing" and len(launched) == 2
+    publish(paths["disease_risk"])
+    assert runtime.launch_cmd_preparation(config)["state"] == "ready" and len(launched) == 2
 
 
 def test_start_without_data_root_is_unchanged(runtime_config, monkeypatch):

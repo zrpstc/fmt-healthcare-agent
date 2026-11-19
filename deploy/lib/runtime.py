@@ -577,7 +577,7 @@ def launch_cmd_preparation(config):
     if root is None:
         return {'state': 'disabled'}
     paths = cmd_data.layout(root)
-    if cmd_data.ready(paths['healthy']) and cmd_data.ready(paths['cohort']):
+    if cmd_data.ready(paths['healthy']) and cmd_data.ready(paths['cohort']) and cmd_data.ready(paths['disease_risk']):
         return {'state': 'ready', 'root': str(root)}
     try:
         path = log_path(config, 'cmd-data')

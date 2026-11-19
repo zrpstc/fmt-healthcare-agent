@@ -1126,6 +1126,175 @@
       "title": "Retest",
       "type": "object"
     },
+    "RiskBand": {
+      "additionalProperties": false,
+      "description": "A coloured stretch of the score axis (healthy-population percentile bands).",
+      "properties": {
+        "key": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Key",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "start": {
+          "title": "Start",
+          "type": "number"
+        },
+        "end": {
+          "title": "End",
+          "type": "number"
+        }
+      },
+      "required": [
+        "key",
+        "label",
+        "start",
+        "end"
+      ],
+      "title": "RiskBand",
+      "type": "object"
+    },
+    "RiskDistributionBlock": {
+      "additionalProperties": false,
+      "description": "Score of one disease against healthy (and patient) population densities.",
+      "properties": {
+        "type": {
+          "const": "risk_distribution",
+          "default": "risk_distribution",
+          "title": "Type",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "level_label": {
+          "title": "Level Label",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "score": {
+          "$ref": "#/$defs/Num"
+        },
+        "percentile": {
+          "$ref": "#/$defs/Num"
+        },
+        "grid": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Grid",
+          "type": "array"
+        },
+        "healthy": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Healthy",
+          "type": "array"
+        },
+        "healthy_label": {
+          "title": "Healthy Label",
+          "type": "string"
+        },
+        "patients": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Patients"
+        },
+        "patients_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Patients Label"
+        },
+        "you": {
+          "title": "You",
+          "type": "number"
+        },
+        "bands": {
+          "items": {
+            "$ref": "#/$defs/RiskBand"
+          },
+          "title": "Bands",
+          "type": "array"
+        },
+        "x_label": {
+          "title": "X Label",
+          "type": "string"
+        },
+        "drivers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Drivers",
+          "type": "array"
+        },
+        "caption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption"
+        }
+      },
+      "required": [
+        "title",
+        "level",
+        "level_label",
+        "text",
+        "score",
+        "percentile",
+        "grid",
+        "healthy",
+        "healthy_label",
+        "you",
+        "bands",
+        "x_label"
+      ],
+      "title": "RiskDistributionBlock",
+      "type": "object"
+    },
     "SampleMeta": {
       "additionalProperties": false,
       "properties": {
@@ -1599,6 +1768,7 @@
                 "donut": "#/$defs/DonutBlock",
                 "paragraph": "#/$defs/ParagraphBlock",
                 "ranked_bars": "#/$defs/RankedBarsBlock",
+                "risk_distribution": "#/$defs/RiskDistributionBlock",
                 "scatter": "#/$defs/ScatterBlock",
                 "stacked_bar": "#/$defs/StackedBarBlock",
                 "stage_flow": "#/$defs/StageFlowBlock",
@@ -1644,6 +1814,9 @@
               },
               {
                 "$ref": "#/$defs/ScatterBlock"
+              },
+              {
+                "$ref": "#/$defs/RiskDistributionBlock"
               }
             ]
           },

@@ -13,6 +13,7 @@ SECTION_NAMES = {
     "gut-profile": "肠龄肠型",
     "key-taxa": "重点菌",
     "virulence": "致病基因",
+    "disease-risk": "疾病风险",
     "resistance": "耐药基因",
     "beyond": "细菌以外",
     "nutrition": "食物与营养",
@@ -51,6 +52,8 @@ def build(ctx: Context, downloads: list[dict]) -> dict[str, Any]:
     ]
     from .gut_profile import method_rows
     methods.extend(method_rows(ctx))
+    from .disease_risk import method_rows as risk_method_rows
+    methods.extend(risk_method_rows(ctx))
     for title, body in methods:
         subsections.append({
             "id": "learn-method-" + title,

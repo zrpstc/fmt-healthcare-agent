@@ -152,6 +152,39 @@
 .cr-chart { margin: 0; }
 .cr-chart-title { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: var(--cr-ink); }
 .cr-chart-caption { margin: 10px 0 0; font-size: 12px; color: var(--cr-sub); line-height: 1.6; }
+/* Disease risk: healthy vs patient score densities with the sample's position */
+.cr-risk { background: var(--cr-card); border: 1px solid var(--cr-line); border-radius: 16px; padding: 16px 16px 14px; }
+.cr-risk + .cr-risk, .cr-block + .cr-block .cr-risk { margin-top: 0; }
+.cr-risk-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.cr-risk-head .cr-chart-title { margin: 0; font-size: 15px; }
+.cr-risk-text { margin: 8px 0 6px; font-size: 13px; line-height: 1.7; color: var(--cr-ink); }
+.cr-risk-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--cr-sub); margin: 4px 0 2px; }
+.cr-risk-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.cr-risk-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.cr-risk-legend b { width: 0; height: 12px; border-left: 2px dashed var(--cr-ink); display: inline-block; }
+.cr-risk-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.cr-risk-grid { stroke: var(--cr-line); stroke-width: 1; }
+.cr-risk-axis { stroke: #B9B3A7; stroke-width: 1; }
+.cr-risk-tick { font-size: 11px; fill: var(--cr-sub); }
+.cr-risk-band.good { fill: var(--cr-good-bg); }
+.cr-risk-band.watch { fill: var(--cr-watch-bg); }
+.cr-risk-band.consult { fill: var(--cr-consult-bg); }
+.cr-risk-band-label { font-size: 12px; font-weight: 700; fill: var(--cr-ink); }
+.cr-risk-you { stroke: var(--cr-ink); stroke-width: 2; stroke-dasharray: 5 4; }
+.cr-risk-you-label { font-size: 12px; font-weight: 800; fill: var(--cr-ink); }
+.cr-risk-cross { stroke: var(--cr-sub); stroke-width: 1; }
+.cr-risk-tip { fill: var(--cr-card); stroke: var(--cr-line); }
+.cr-risk-tip-text { font-size: 12px; font-weight: 700; fill: var(--cr-ink); }
+.cr-risk-tip-sub { font-size: 11px; fill: var(--cr-sub); }
+.cr-risk-axis-title { text-align: center; font-size: 12px; color: var(--cr-sub); margin-top: 2px; }
+.cr-risk-drivers { margin: 8px 0 0; font-size: 12px; color: var(--cr-sub); line-height: 1.6; }
+/* The chart scales down to ~55% on phones; enlarge its text so it still reads at ~10px. */
+@media (max-width: 767px) {
+  .cr-risk { padding: 14px 12px 12px; }
+  .cr-risk-tick { font-size: 19px; }
+  .cr-risk-band-label, .cr-risk-you-label { font-size: 20px; }
+  .cr-risk-hover { display: none; }
+}
 .cr-bar-axis-head { margin: 0 0 2px; font-size: 11px; font-weight: 700; color: var(--cr-sub); }
 .cr-bar-ticks { margin: 2px 0 0; }
 .cr-bar-tick-track { position: relative; height: 16px; border-top: 1px solid var(--cr-line); }
@@ -257,7 +290,7 @@
 .cr-term-popover { position: fixed; z-index: 80; max-width: 320px; padding: 14px 16px; border-radius: 14px; background: var(--cr-card); border: 1px solid var(--cr-line); box-shadow: 0 12px 36px rgba(20,38,41,.18); font-size: 13px; }
 .cr-term-popover .cr-popover-title { font-weight: 800; margin-bottom: 6px; }
 .cr-term-drawer { position: fixed; z-index: 80; left: 0; right: 0; bottom: 0; max-height: 55vh; overflow: auto; padding: 18px 20px 22px; border-radius: 18px 18px 0 0; background: var(--cr-card); border-top: 1px solid var(--cr-line); box-shadow: 0 -12px 36px rgba(20,38,41,.18); }
-.cr-term-drawer .cr-drawer-close { position: absolute; right: 12px; top: 12px; background: transparent; border: 0; color: var(--cr-sub); }
+.cr-term-drawer .cr-drawer-close, .cr-graph-drawer .cr-drawer-close { position: absolute; right: 12px; top: 12px; background: transparent; border: 0; color: var(--cr-sub); }
 .cr-term-drawer h4 { margin: 0 0 8px; font-size: 16px; }
 .cr-term-drawer p { margin: 0; font-size: 13px; color: var(--cr-sub); }
 
@@ -370,6 +403,8 @@
   .cr-section { padding-top: 18pt; break-inside: avoid; }
   .cr-section-head h2 { font-size: 16pt; }
   .cr-graph { border: 0; padding: 0; }
+  .cr-risk { break-inside: avoid; border-color: #ccc; }
+  .cr-risk-band.good, .cr-risk-band.watch, .cr-risk-band.consult { stroke: #999; stroke-width: 0.5; }
   .cr-graph-stage { display: none; }
   .cr-graph-fallback { display: block; font-size: 10pt; color: #444; }
   .cr-graph-fallback ul { margin: 6pt 0; padding-left: 16pt; }
