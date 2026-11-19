@@ -90,11 +90,9 @@ def read_matrices(downloaded, wanted):
     return profiles, genus_of
 
 
-def build(package, metadata, catalog, source_dir, output, r_library=None, *,
-          antibiotics_policy="no_or_unrecorded", diseases=tuple(DISEASES)):
-    if output.exists():
-        manifest = json.loads((output / "manifest.json").read_text())
-        return {"status": "already_built", "output": str(output), "cohort_version": manifest.get("cohort_version")}
+def load_cohort(package, metadata, catalog, source_dir, r_library=None, *,
+                antibiotics_policy="no_or_unrecorded", diseases=tuple(DISEASES)):
+    """Selected adults as a Cohort, plus the downloaded resources (shared with disease-risk)."""
     with metadata.open() as handle:
         rows = list(csv.DictReader(handle, delimiter="\t"))
     selected = select(rows, antibiotics_policy, set(diseases))
@@ -117,6 +115,17 @@ def build(package, metadata, catalog, source_dir, output, r_library=None, *,
     labels = [{"sample_id": r["study_name"] + "::" + r["sample_id"], "study_id": r["study_name"],
                "subject_id": r["subject_id"], "group": r["_group"], "age": r.get("age", "")} for r in selected]
     cohort = Cohort(species=species, values=values, genus_of=genus_of, labels=labels)
+    return cohort, downloaded, species
+
+
+def build(package, metadata, catalog, source_dir, output, r_library=None, *,
+          antibiotics_policy="no_or_unrecorded", diseases=tuple(DISEASES)):
+    if output.exists():
+        manifest = json.loads((output / "manifest.json").read_text())
+        return {"status": "already_built", "output": str(output), "cohort_version": manifest.get("cohort_version")}
+    cohort, downloaded, species = load_cohort(package, metadata, catalog, source_dir, r_library,
+                                              antibiotics_policy=antibiotics_policy, diseases=diseases)
+    labels = cohort.labels
     models = train_all(cohort, list(diseases))
     counts = {}
     for row in labels:

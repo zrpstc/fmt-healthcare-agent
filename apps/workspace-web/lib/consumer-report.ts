@@ -87,9 +87,18 @@ export interface ScatterBlock extends BlockBase {
   title?: string | null; x_label?: string | null; y_label?: string | null; diagonal?: boolean;
   groups?: ScatterGroup[]; point_groups?: number[] | null; you_label?: string;
 }
+export type RiskLevel = "low" | "medium" | "high";
+export interface RiskBand { key: RiskLevel; label: string; start: number; end: number }
+export interface RiskDistributionBlock extends BlockBase {
+  type: "risk_distribution"; title: string; level: RiskLevel; level_label: string; text: RichText;
+  score: Num; percentile: Num; grid: number[]; healthy: number[]; healthy_label: string;
+  patients?: number[] | null; patients_label?: string | null; you: number; bands: RiskBand[];
+  x_label: string; drivers?: string[]; caption?: string | null;
+}
 export type Block =
   | ParagraphBlock | CalloutBlock | StackedBarBlock | DonutBlock | RankedBarsBlock | TierScalesBlock
-  | TaxonCardsBlock | CategoryCardsBlock | StageFlowBlock | TableBlock | CardGridBlock | ScatterBlock;
+  | TaxonCardsBlock | CategoryCardsBlock | StageFlowBlock | TableBlock | CardGridBlock | ScatterBlock
+  | RiskDistributionBlock;
 
 export interface Subsection {
   id: string; title: string; blocks: Block[]; summary?: RichText; summary_source?: "rule" | "llm"; graph?: GraphBlock;

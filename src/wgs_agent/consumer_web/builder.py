@@ -23,6 +23,7 @@ from .sections import (
     actions as actions_section,
     beyond as beyond_section,
     composition as composition_section,
+    disease_risk as disease_risk_section,
     diversity as diversity_section,
     gut_profile as gut_profile_section,
     key_taxa as key_taxa_section,
@@ -37,7 +38,7 @@ from .sections import (
 from .sections.context import Context
 from .sections.panel import watch_species
 
-BUILDER_VERSION = "consumer-web-builder-v5"
+BUILDER_VERSION = "consumer-web-builder-v6"
 SCHEMA_VERSION = "consumer-report/1"
 
 
@@ -103,12 +104,16 @@ def _report_date(document: dict, analysis: dict) -> str:
 
 
 def _cohort_bundle_hash() -> str:
-    """Rebuild cached consumer reports when the cohort-model bundle changes."""
+    """Rebuild cached consumer reports when the cohort-model or disease-risk bundle changes."""
+    from wgs_agent.reporting import disease_risk
     from wgs_agent.reporting.cohort_insights import bundle_dir
-    try:
-        return hashlib.sha256((bundle_dir() / "manifest.json").read_bytes()).hexdigest()
-    except OSError:
-        return "no-cohort-bundle"
+    parts = []
+    for directory, missing in ((bundle_dir, "no-cohort-bundle"), (disease_risk.bundle_dir, "no-disease-risk-bundle")):
+        try:
+            parts.append(hashlib.sha256((directory() / "manifest.json").read_bytes()).hexdigest())
+        except OSError:
+            parts.append(missing)
+    return "|".join(parts)
 
 
 # --------------------------------------------------------------------- blocks
@@ -124,6 +129,7 @@ TEXT_FIELDS = {
     "table": ("columns", "rows", "footnote"),
     "card_grid": ("cards",),
     "scatter": ("caption",),
+    "risk_distribution": ("title", "text", "drivers", "caption"),
 }
 
 
@@ -181,6 +187,10 @@ def _block_texts(block: Any) -> list[str]:
     if kind == "scatter":
         return [block.caption, block.title or "", block.x_label or "", block.y_label or ""] + [
             group.label for group in block.groups]
+    if kind == "risk_distribution":
+        return [block.title, block.text, block.level_label, block.healthy_label, block.patients_label or "",
+                block.x_label, block.caption or "", block.score.display, block.percentile.display,
+                *block.drivers, *(band.label for band in block.bands)]
     return []
 
 
@@ -429,7 +439,6 @@ def build_report(
     from .graph import GraphBuilder
     graph = GraphBuilder(document, refs)
     ctx = Context(document, analysis, glossary, names, refs, graph)
-    ctx.omit("overview", "疾病风险模型分数", "产品要求不展示疾病风险模型分数")
     ctx.omit("symptoms", "症状推断", "本次报告不把症状与菌群做因果推断")
 
     overview = overview_section.build(ctx)
@@ -439,6 +448,7 @@ def build_report(
         gut_profile_section.build(ctx),
         key_taxa_section.build(ctx),
         virulence_section.build(ctx),
+        disease_risk_section.build(ctx),
         resistance_section.build(ctx),
         beyond_section.build(ctx),
         nutrition_section.build(ctx),

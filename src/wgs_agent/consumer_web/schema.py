@@ -296,6 +296,41 @@ class ScatterBlock(BaseModel):
     you_label: str = "您"
 
 
+class RiskBand(BaseModel):
+    """A coloured stretch of the score axis (healthy-population percentile bands)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    key: Literal["low", "medium", "high"]
+    label: str
+    start: float
+    end: float
+
+
+class RiskDistributionBlock(BaseModel):
+    """Score of one disease against healthy (and patient) population densities."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    type: Literal["risk_distribution"] = "risk_distribution"
+    title: str
+    level: Literal["low", "medium", "high"]
+    level_label: str
+    text: str
+    score: Num
+    percentile: Num
+    grid: list[float]
+    healthy: list[float]
+    healthy_label: str
+    patients: list[float] | None = None
+    patients_label: str | None = None
+    you: float
+    bands: list[RiskBand]
+    x_label: str
+    drivers: list[str] = Field(default_factory=list)
+    caption: str | None = None
+
+
 Block = Annotated[
     Union[
         ParagraphBlock,
@@ -310,6 +345,7 @@ Block = Annotated[
         TableBlock,
         CardGridBlock,
         ScatterBlock,
+        RiskDistributionBlock,
     ],
     Field(discriminator="type"),
 ]

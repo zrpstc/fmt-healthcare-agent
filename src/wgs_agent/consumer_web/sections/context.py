@@ -29,6 +29,7 @@ class Context:
     # (canonical latin, field) -> displayed taxon that has no reviewable text yet
     glossary_needs: dict[tuple[str, str], dict] = field(default_factory=dict)
     _cohort: dict | None = None
+    _disease_risk: dict | None = None
 
     # -------------------------------------------------------- taxon texts
     def taxon_text(self, raw: str, field: str = "one_liner") -> str | None:
@@ -144,6 +145,28 @@ class Context:
                 value = cohort_insights_for(self.sample_id, self.metadata) if self.sample_id else {}
             self._cohort = value if isinstance(value, dict) else {}
         return self._cohort
+
+    @property
+    def disease_risk(self) -> dict:
+        """MR disease-risk scores: saved with the report if present, else scored on the fly."""
+        if self._disease_risk is None:
+            value = self.template_inputs.get("disease_risk")
+            if not (isinstance(value, dict) and isinstance(value.get("audit"), dict)):
+                value = {}
+                if self.sample_id:
+                    from wgs_agent.reporting import disease_risk
+                    try:
+                        value = disease_risk.analyze(self.sample_id, self.metadata)
+                    except Exception:  # noqa: BLE001 - an optional module must not block the report
+                        value = {"audit": {"status": "unavailable", "reason": "invalid_bundle",
+                                           "reason_cn": disease_risk.REASONS["invalid_bundle"]}}
+            self._disease_risk = value if isinstance(value, dict) else {}
+        return self._disease_risk
+
+    @property
+    def disease_risk_available(self) -> bool:
+        audit = self.disease_risk.get("audit")
+        return isinstance(audit, dict) and audit.get("status") == "available" and bool(self.disease_risk.get("diseases"))
 
     @property
     def cohort_available(self) -> bool:

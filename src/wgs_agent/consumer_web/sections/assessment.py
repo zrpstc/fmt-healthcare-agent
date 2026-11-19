@@ -159,4 +159,6 @@ def nutrition_assessment(ctx: Context) -> dict[str, Any] | None:
 
 
 def build(ctx: Context) -> list[dict[str, Any]]:
-    return [item for item in (pathogen_assessment(ctx), nutrition_assessment(ctx)) if item]
+    from .disease_risk import assessment as disease_risk_assessment
+    items = (pathogen_assessment(ctx), nutrition_assessment(ctx), disease_risk_assessment(ctx))
+    return [item for item in items if item]
