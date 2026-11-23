@@ -35,8 +35,7 @@
     ".next-knowledge/types/**/*.ts",
     ".next-preview/types/**/*.ts",
     ".next/types/**/*.ts",
-    "next-env.d.ts",
-    ".next-project-1793847297898352056/types/**/*.ts"
+    "next-env.d.ts"
   ],
   "exclude": [
     "node_modules"

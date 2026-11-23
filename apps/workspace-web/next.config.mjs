@@ -1,3 +1,5 @@
+import { writeFileSync } from "node:fs";
+import nextConstants from "next/constants.js";
 import { fileURLToPath } from "node:url";
 import nextEnv from "@next/env";
 
@@ -21,4 +23,21 @@ const nextConfig = {
     return [{ source: "/backend/:path*", destination: `http://127.0.0.1:${apiPort}/:path*` }];
   },
 };
-export default nextConfig;
+export default function getNextConfig(phase) {
+  const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD } = nextConstants;
+  if (
+    (phase !== PHASE_PRODUCTION_BUILD && phase !== PHASE_DEVELOPMENT_SERVER) ||
+    !/^\.next-project-[0-9]+$/.test(nextConfig.distDir)
+  ) {
+    return nextConfig;
+  }
+
+  // Next appends the current build's route types to its TypeScript configuration.
+  const tsconfigPath = `${nextConfig.distDir}.tsconfig.json`;
+  try {
+    writeFileSync(new URL(tsconfigPath, import.meta.url), '{"extends":"./tsconfig.json"}\n', { flag: "wx" });
+  } catch (error) {
+    if (error.code !== "EEXIST") throw error;
+  }
+  return { ...nextConfig, typescript: { tsconfigPath } };
+}
