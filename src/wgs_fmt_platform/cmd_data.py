@@ -13,6 +13,8 @@ everything below ``<root>/cmd`` in the background (``scripts/prepare_cmd_data.py
     <root>/cmd/disease-risk-v1-cmd3.18.0-<weights>/ MR disease-risk reference
                                                    (named after the MR weights file hash,
                                                    so new weights rebuild automatically)
+    <root>/cmd/diet-nutrition-v1-cmd3.18.0-<weights>/ MR dietary-nutrient reference (same rule,
+                                                   named after knowledge_base/diet_mr weights)
     <root>/cmd/prepare-state.json, prepare.lock, logs/
 
 A bundle is used only once its ``manifest.json`` exists (bundles are published
@@ -36,6 +38,8 @@ ANTIBIOTICS_POLICY = "no_or_unrecorded"
 COHORT_MODEL_VERSION = "cohort-models-v1"
 DISEASE_RISK_VERSION = "disease-risk-v1"
 DISEASE_WEIGHTS = Path(__file__).resolve().parents[2] / "knowledge_base" / "disease_mr" / "disease_mr_weights.json"
+DIET_NUTRITION_VERSION = "diet-nutrition-v1"
+DIET_WEIGHTS = Path(__file__).resolve().parents[2] / "knowledge_base" / "diet_mr" / "diet_mr_weights.json"
 CATALOG_URL = "https://experimenthub.bioconductor.org/metadata/experimenthub.sqlite3"
 
 
@@ -67,6 +71,7 @@ def layout(root: Path) -> dict[str, Path]:
         "healthy": base / f"healthy-cmd{CMD_VERSION}-{ANTIBIOTICS_POLICY}",
         "cohort": base / f"{COHORT_MODEL_VERSION}-cmd{CMD_VERSION}",
         "disease_risk": base / f"{DISEASE_RISK_VERSION}-cmd{CMD_VERSION}-{weights_tag()}",
+        "diet_nutrition": base / f"{DIET_NUTRITION_VERSION}-cmd{CMD_VERSION}-{weights_tag(DIET_WEIGHTS)}",
         "state": base / "prepare-state.json",
         "lock": base / "prepare.lock",
         "logs": base / "logs",
@@ -81,7 +86,7 @@ def ready(path: Path) -> bool:
 
 
 def prepared_dir(kind: str, env: Mapping[str, str] | None = None) -> Path | None:
-    """The prepared ``healthy``, ``cohort`` or ``disease_risk`` bundle below the data root, if complete."""
+    """The prepared ``healthy``, ``cohort``, ``disease_risk`` or ``diet_nutrition`` bundle, if complete."""
     root = data_root(env)
     if root is None:
         return None
@@ -97,7 +102,8 @@ def summary(env: Mapping[str, str] | None = None) -> dict:
     paths = layout(root)
     result = {"state": "pending", "root": str(root),
               "healthy_ready": ready(paths["healthy"]), "cohort_ready": ready(paths["cohort"]),
-              "disease_risk_ready": ready(paths["disease_risk"])}
+              "disease_risk_ready": ready(paths["disease_risk"]),
+              "diet_nutrition_ready": ready(paths["diet_nutrition"])}
     try:
         recorded = json.loads(paths["state"].read_text())
         if isinstance(recorded, dict):
@@ -106,7 +112,7 @@ def summary(env: Mapping[str, str] | None = None) -> dict:
         pass
     if result["state"] == "running" and not _locked(paths["lock"]):
         result["state"] = "interrupted"  # process ended without recording; the next start resumes
-    if result["healthy_ready"] and result["cohort_ready"] and result["disease_risk_ready"]:
+    if all(result[k] for k in ("healthy_ready", "cohort_ready", "disease_risk_ready", "diet_nutrition_ready")):
         result["state"] = "ready"
     return result
 

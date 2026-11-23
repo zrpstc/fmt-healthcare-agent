@@ -23,6 +23,7 @@ from .sections import (
     actions as actions_section,
     beyond as beyond_section,
     composition as composition_section,
+    diet_nutrition as diet_nutrition_section,
     disease_risk as disease_risk_section,
     diversity as diversity_section,
     gut_profile as gut_profile_section,
@@ -38,7 +39,7 @@ from .sections import (
 from .sections.context import Context
 from .sections.panel import watch_species
 
-BUILDER_VERSION = "consumer-web-builder-v6"
+BUILDER_VERSION = "consumer-web-builder-v7"
 SCHEMA_VERSION = "consumer-report/1"
 
 
@@ -104,11 +105,12 @@ def _report_date(document: dict, analysis: dict) -> str:
 
 
 def _cohort_bundle_hash() -> str:
-    """Rebuild cached consumer reports when the cohort-model or disease-risk bundle changes."""
-    from wgs_agent.reporting import disease_risk
+    """Rebuild cached consumer reports when the cohort-model, disease-risk or diet bundle changes."""
+    from wgs_agent.reporting import diet_nutrition, disease_risk
     from wgs_agent.reporting.cohort_insights import bundle_dir
     parts = []
-    for directory, missing in ((bundle_dir, "no-cohort-bundle"), (disease_risk.bundle_dir, "no-disease-risk-bundle")):
+    for directory, missing in ((bundle_dir, "no-cohort-bundle"), (disease_risk.bundle_dir, "no-disease-risk-bundle"),
+                               (diet_nutrition.bundle_dir, "no-diet-nutrition-bundle")):
         try:
             parts.append(hashlib.sha256((directory() / "manifest.json").read_bytes()).hexdigest())
         except OSError:
@@ -452,6 +454,7 @@ def build_report(
         resistance_section.build(ctx),
         beyond_section.build(ctx),
         nutrition_section.build(ctx),
+        diet_nutrition_section.build(ctx),
         metabolites_section.build(ctx),
         more_section.build(ctx),
     ]

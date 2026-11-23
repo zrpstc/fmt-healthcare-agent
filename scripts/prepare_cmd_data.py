@@ -8,7 +8,8 @@ Steps (each skipped when its output already exists; outputs are published atomic
 4. build the larger healthy reference (antibiotics policy ``no_or_unrecorded``);
 5. build the cohort-model bundle (gut age, enterotype, health index, disease references);
 6. build the MR disease-risk reference (named after the MR weights hash, so new
-   weights in ``knowledge_base/disease_mr`` are picked up at the next start).
+   weights in ``knowledge_base/disease_mr`` are picked up at the next start);
+7. build the MR dietary-nutrient reference (same rule, ``knowledge_base/diet_mr``).
 
 ``deploy/start.sh`` launches this in the background; it holds ``prepare.lock`` so
 concurrent starts never run it twice, and records progress in
@@ -165,8 +166,21 @@ def step_disease_risk(paths: dict) -> None:
     print(json.dumps({"disease_risk": result}, ensure_ascii=False), flush=True)
 
 
+def step_diet_nutrition(paths: dict) -> None:
+    if cmd_data.ready(paths["diet_nutrition"]):
+        return
+    import prepare_cmd_diet_nutrition as diet
+    try:
+        result = diet.build(paths["package"], paths["metadata"], paths["catalog"], paths["cache"],
+                            paths["diet_nutrition"], _r_library(), antibiotics_policy=cmd_data.ANTIBIOTICS_POLICY)
+    except subprocess.CalledProcessError as exc:
+        raise StepFailure("MATRIX_EXPORT_FAILED", str(exc)) from exc
+    print(json.dumps({"diet_nutrition": result}, ensure_ascii=False), flush=True)
+
+
 STEPS = (("catalog", step_catalog), ("metadata", step_metadata), ("package", step_package),
-         ("healthy", step_healthy), ("cohort", step_cohort), ("disease_risk", step_disease_risk))
+         ("healthy", step_healthy), ("cohort", step_cohort), ("disease_risk", step_disease_risk),
+         ("diet_nutrition", step_diet_nutrition))
 
 
 def prepare(root: Path, *, steps=STEPS, log: str | None = None) -> dict:
@@ -200,7 +214,7 @@ def prepare(root: Path, *, steps=STEPS, log: str | None = None) -> dict:
             state["completed"].append(name)
         state.update(state="ready", step=None, error=None, message=None,
                      healthy=str(paths["healthy"]), cohort=str(paths["cohort"]),
-                     disease_risk=str(paths["disease_risk"]))
+                     disease_risk=str(paths["disease_risk"]), diet_nutrition=str(paths["diet_nutrition"]))
         _write_state(paths["state"], state)
         return state
     finally:

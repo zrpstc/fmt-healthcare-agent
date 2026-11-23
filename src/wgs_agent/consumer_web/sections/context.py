@@ -30,6 +30,7 @@ class Context:
     glossary_needs: dict[tuple[str, str], dict] = field(default_factory=dict)
     _cohort: dict | None = None
     _disease_risk: dict | None = None
+    _diet_nutrition: dict | None = None
 
     # -------------------------------------------------------- taxon texts
     def taxon_text(self, raw: str, field: str = "one_liner") -> str | None:
@@ -167,6 +168,29 @@ class Context:
     def disease_risk_available(self) -> bool:
         audit = self.disease_risk.get("audit")
         return isinstance(audit, dict) and audit.get("status") == "available" and bool(self.disease_risk.get("diseases"))
+
+    @property
+    def diet_nutrition(self) -> dict:
+        """MR dietary-nutrient tendency scores: saved with the report if present, else scored on the fly."""
+        if self._diet_nutrition is None:
+            value = self.template_inputs.get("diet_nutrition")
+            if not (isinstance(value, dict) and isinstance(value.get("audit"), dict)):
+                value = {}
+                if self.sample_id:
+                    from wgs_agent.reporting import diet_nutrition
+                    try:
+                        value = diet_nutrition.analyze(self.sample_id, self.metadata)
+                    except Exception:  # noqa: BLE001 - an optional module must not block the report
+                        value = {"audit": {"status": "unavailable", "reason": "invalid_bundle",
+                                           "reason_cn": diet_nutrition.REASONS["invalid_bundle"]}}
+            self._diet_nutrition = value if isinstance(value, dict) else {}
+        return self._diet_nutrition
+
+    @property
+    def diet_nutrition_available(self) -> bool:
+        audit = self.diet_nutrition.get("audit")
+        return (isinstance(audit, dict) and audit.get("status") == "available"
+                and bool(self.diet_nutrition.get("nutrients")))
 
     @property
     def cohort_available(self) -> bool:
