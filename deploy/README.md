@@ -20,6 +20,19 @@ bash deploy/status.sh      # 只读状态检查
 
 当前 gpu02 复用已运行的 Elasticsearch，采用 `WGS_ELASTICSEARCH_MANAGED=false`。启动时验证认证连接；应用停止、重启不会停止该外部依赖。若外部依赖不可用，返回 `EXTERNAL_ELASTICSEARCH_UNAVAILABLE`，先恢复 Elasticsearch 后再启动应用。项目内部仍支持受管 Elasticsearch，供明确配置独立实例的安装使用。
 
+### 单独重启 Elasticsearch
+
+```bash
+bash deploy/restart-elasticsearch.sh                  # 自动找到发布 WGS_ELASTICSEARCH_URL 端口的本机容器
+bash deploy/restart-elasticsearch.sh --container NAME # 或指定容器名（必须发布同一端口）
+```
+
+只重启 Elasticsearch，不停、不重启应用进程；`start`/`stop`/`restart` 的行为不变。容器在运行则 `docker restart`，已停止则 `docker start`，然后等待集群变为 green/yellow（最长 `WGS_ELASTICSEARCH_START_TIMEOUT` 秒，默认120，可用 `--timeout` 覆盖）。操作 Docker 需要管理员权限，交互终端会自动 sudo。受管模式下等同于 `restart --component elasticsearch`。
+
+安全边界：只操作本机（URL 为 127.0.0.1/localhost）且端口与 `WGS_ELASTICSEARCH_URL` 一致的唯一容器；找不到、有多个或指定的容器端口不符时直接报错（`ELASTICSEARCH_CONTAINER_NOT_FOUND`、`ELASTICSEARCH_CONTAINER_AMBIGUOUS`、`ELASTICSEARCH_CONTAINER_PORT_MISMATCH`），不重启任何容器。重启后仍不健康时返回 `ELASTICSEARCH_UNHEALTHY_AFTER_RESTART` 及当前 health：磁盘水位、分片损坏等导致的 red 无法靠重启恢复，需按 `_cluster/allocation/explain` 的原因处理。该实例若还被其他项目使用，重启期间它们也会短暂不可用。
+
+恢复健康后再执行 `bash deploy/restart.sh` 应用代码或配置变更。
+
 以应用账号运行即可。需要管理员权限时，交互终端会由 sudo 直接认证；也可使用 `sudo bash deploy/start.sh` 等同一套入口。NFS 上的锁、日志、PID 和状态文件均以配置的应用用户身份访问。命令不输出凭据，不修改 NFS 导出规则。
 
 `deploy/lib/` 是四个入口共用的实现，不是另一套日常命令。历史脚本完整保存在本机 Git 忽略的 `deploy-backup/` 中，保留原始相对路径，不能直接在备份位置运行。新克隆仓库不包含本机备份。逐项用途和处置见 [部署脚本核查表](../docs/DEPLOY_SCRIPT_AUDIT.md)。

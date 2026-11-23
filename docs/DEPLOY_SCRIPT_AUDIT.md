@@ -15,7 +15,7 @@
 | `project_ownership.py` | 目录属主、权限与硬链接修复 | 必要内部辅助；原件归档，维护版本移至 `lib/project_ownership.py` |
 | `reload.sh` | 与 restart 相同的停止再启动动作 | 重复入口，归档；统一使用 restart |
 | `restart-agent.sh` | 按组件重启 agent | 有效但非整项目入口，归档 |
-| `restart-elasticsearch.sh` | 按组件重启受管搜索服务 | 不适用于当前外部依赖模式，归档 |
+| `restart-elasticsearch.sh` | 按组件重启受管搜索服务 | 不适用于当前外部依赖模式，归档；现由新的 `deploy/restart-elasticsearch.sh` 取代（同时支持外部容器，见 deploy/README.md） |
 | `restart-report-api.sh` | 按组件重启 workspace-api | 有效但重复管理入口，归档 |
 | `restart-web.sh` | 按组件重启 workspace-web | 有效但重复管理入口，归档 |
 | `activate-agent-runtime.sh` | 实际已是整项目 restart 的兼容别名 | 名称与实际用途不符，归档 |
