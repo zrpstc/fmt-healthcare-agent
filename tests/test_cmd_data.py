@@ -53,6 +53,14 @@ def test_bundle_dirs_follow_data_root_only_when_complete(tmp_path, monkeypatch):
     publish(paths["disease_risk"])
     from wgs_agent.reporting import disease_risk
     assert disease_risk.bundle_dir() == paths["disease_risk"]
+    # The MR dietary-nutrient bundle is the fourth; still not ready without it.
+    assert cmd_data.summary()["state"] != "ready"
+    assert paths["diet_nutrition"].name.startswith("diet-nutrition-v1-cmd")
+    assert paths["diet_nutrition"].name.endswith(cmd_data.weights_tag(cmd_data.DIET_WEIGHTS))
+    monkeypatch.delenv("WGS_CMD_DIET_NUTRITION_DIR", raising=False)
+    publish(paths["diet_nutrition"])
+    from wgs_agent.reporting import diet_nutrition
+    assert diet_nutrition.bundle_dir() == paths["diet_nutrition"]
     # An explicit setting always wins.
     monkeypatch.setenv("WGS_CMD_REFERENCE_DIR", str(tmp_path / "pinned"))
     assert cmd.reference_dir() == tmp_path / "pinned"
@@ -181,7 +189,10 @@ def test_start_launches_background_preparation_once_until_ready(runtime_config, 
     # Still missing the disease-risk bundle: preparation is launched again (it skips finished steps).
     assert runtime.launch_cmd_preparation(config)["state"] == "preparing" and len(launched) == 2
     publish(paths["disease_risk"])
-    assert runtime.launch_cmd_preparation(config)["state"] == "ready" and len(launched) == 2
+    # ... and the dietary-nutrient bundle.
+    assert runtime.launch_cmd_preparation(config)["state"] == "preparing" and len(launched) == 3
+    publish(paths["diet_nutrition"])
+    assert runtime.launch_cmd_preparation(config)["state"] == "ready" and len(launched) == 3
 
 
 def test_start_without_data_root_is_unchanged(runtime_config, monkeypatch):

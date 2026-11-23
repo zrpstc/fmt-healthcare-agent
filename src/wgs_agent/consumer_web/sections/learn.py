@@ -17,6 +17,7 @@ SECTION_NAMES = {
     "resistance": "耐药基因",
     "beyond": "细菌以外",
     "nutrition": "食物与营养",
+    "diet-nutrition": "膳食营养",
     "metabolites": "代谢产物",
     "more": "更多线索",
     "actions": "行动建议",
@@ -48,12 +49,14 @@ def build(ctx: Context, downloads: list[dict]) -> dict[str, Any]:
         ("功能潜力", "功能结果来自 HUMAnN 通路和分层贡献。同一功能类别会汇总该类别下所有已观测通路；EC 注释仅作为补充贡献证据，不加入通路丰度或占比分母。功能潜力不等于实际产量。"),
         ("毒力与耐药", "毒力结果来自 VFDB core 参考序列筛查，耐药结果来自 ResFinder 获得性耐药参考序列筛查。阈值、参考覆盖广度和序列一致性均按模块输出记录；reads 筛查不等同于药敏试验，也不覆盖点突变或完整质粒。"),
         ("知识子图", "子图只保留与本节展示实体相连、已发表研究报道过的关系；删除研究分组、探针、编号、测定方法和样本类型节点，删除“位于”“靶向”“测定方法为”等关系。清洗后不足两条关系时不展示。虚线表示尚待人工核对的研究结论。"),
-        ("未纳入", "疾病风险模型分数、无症状推断、用药建议和个体营养摄入评估不在消费者版中；它们也不代表正常或异常。患病人群参考只描述菌群特征与公开患者群体的相似程度，不是患病概率。"),
+        ("未纳入", "无症状推断、用药建议和实际营养摄入量的测定不在消费者版中；它们也不代表正常或异常。患病人群参考只描述菌群特征与公开患者群体的相似程度，不是患病概率。"),
     ]
     from .gut_profile import method_rows
     methods.extend(method_rows(ctx))
     from .disease_risk import method_rows as risk_method_rows
     methods.extend(risk_method_rows(ctx))
+    from .diet_nutrition import method_rows as diet_method_rows
+    methods.extend(diet_method_rows(ctx))
     for title, body in methods:
         subsections.append({
             "id": "learn-method-" + title,

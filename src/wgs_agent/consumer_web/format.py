@@ -26,6 +26,11 @@ METRIC_LABELS: dict[str, tuple[str, str, str, str, str]] = {
     "watch": ("较少", "略少", "常见", "略多", "明显偏多"),
     "species_diff": ("明显偏低", "略低", "常见", "略高", "明显偏高"),
     "typicality": ("很典型", "较典型", "略少见", "少见", "很少见"),
+    # Microbiome-suggested intake tendency of one nutrient (not a measured intake).
+    "diet_encourage": ("明显偏低", "偏低", "常见", "偏高", "明显偏高"),
+    "diet_limit": ("明显偏低", "偏低", "常见", "偏高", "明显偏高"),
+    "diet_neutral": ("明显偏低", "偏低", "常见", "偏高", "明显偏高"),
+    "diet_overall": ("需要关注", "略低", "中等", "较好", "很好"),
 }
 METRIC_TONES: dict[str, tuple[str, str, str, str, str]] = {
     "richness": ("watch", "watch", "neutral", "good", "good"),
@@ -35,6 +40,10 @@ METRIC_TONES: dict[str, tuple[str, str, str, str, str]] = {
     "watch": ("good", "good", "neutral", "watch", "watch"),
     "species_diff": ("watch", "watch", "neutral", "watch", "watch"),
     "typicality": ("good", "good", "neutral", "watch", "watch"),
+    "diet_encourage": ("watch", "watch", "neutral", "good", "good"),
+    "diet_limit": ("good", "good", "neutral", "watch", "watch"),
+    "diet_neutral": ("neutral", "neutral", "neutral", "neutral", "neutral"),
+    "diet_overall": ("watch", "watch", "neutral", "good", "good"),
 }
 
 

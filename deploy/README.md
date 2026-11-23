@@ -69,6 +69,7 @@ bash deploy/restart.sh      # 首次部署用 start.sh
 | 建扩大后的健康参考（约7,000人） | `cmd/healthy-cmd3.18.0-no_or_unrecorded/` |
 | 建人群模型包（肠龄、肠型、健康指数、患病人群参考） | `cmd/cohort-models-v1-cmd3.18.0/` |
 | 建疾病风险参考（孟德尔随机化权重 × 健康/患者人群评分分布） | `cmd/disease-risk-v1-cmd3.18.0-<权重哈希>/` |
+| 建膳食营养参考（孟德尔随机化权重 × 健康人群评分分布） | `cmd/diet-nutrition-v1-cmd3.18.0-<权重哈希>/` |
 
 每步已完成就跳过；中断或失败后，下次 `start`/`restart` 会从未完成的步骤继续。同一时间只运行一个准备进程（`cmd/prepare.lock`），`stop`/`restart` 不会打断正在进行的下载。进度和日志：
 
@@ -76,13 +77,13 @@ bash deploy/restart.sh      # 首次部署用 start.sh
 bash deploy/status.sh        # result.cmd_data：state 为 preparing/running/failed/interrupted/ready，含 step、error、log
 ```
 
-准备期间报告继续使用原健康参考（`var/reference/cmd/native-v3`），肠龄肠型、患病人群参考与疾病风险评估暂不显示；新包发布后，运行中的服务自动切换，无需重启。消费者版报告随后打开即重建；专业版报告在下次生成时使用新参考。
+准备期间报告继续使用原健康参考（`var/reference/cmd/native-v3`），肠龄肠型、患病人群参考、疾病风险评估与膳食营养评分暂不显示；新包发布后，运行中的服务自动切换，无需重启。消费者版报告随后打开即重建；专业版报告在下次生成时使用新参考。
 
 前提：服务器能访问 `bioconductor.org`、`experimenthub.bioconductor.org` 及其数据存储地址，`PATH` 中有 `Rscript`（只用 base R；私有R库可设 `WGS_CMD_R_LIBRARY`）。常见错误码：`RSCRIPT_MISSING`、`CATALOG_DOWNLOAD_FAILED`、`METADATA_EXPORT_FAILED`、`MATRIX_EXPORT_FAILED`、`DATA_ROOT_NOT_WRITABLE`，详情见 `log` 指向的文件。
 
-疾病风险参考的目录名带 `knowledge_base/disease_mr/disease_mr_weights.json` 的哈希：更新权重文件并重启后会自动建新包，不影响已有的健康参考和人群模型包（这一步复用 `cmd/cache/` 中已下载的矩阵，不重复下载）。
+疾病风险参考的目录名带 `knowledge_base/disease_mr/disease_mr_weights.json` 的哈希，膳食营养参考带 `knowledge_base/diet_mr/diet_mr_weights.json` 的哈希：更新权重文件并重启后会自动建新包，不影响已有的健康参考和人群模型包（这一步复用 `cmd/cache/` 中已下载的矩阵，不重复下载）。
 
-优先级：`.env` 中显式设置的 `WGS_CMD_REFERENCE_DIR`、`WGS_CMD_COHORT_DIR`、`WGS_CMD_DISEASE_RISK_DIR` 始终优先；要使用自动准备的数据，请删除这两行。回退：删除 `WGS_CMD_DATA_ROOT` 后 `bash deploy/restart.sh`，即恢复原参考，肠龄肠型和患病人群参考自动隐藏；已准备的数据保留在原处。
+优先级：`.env` 中显式设置的 `WGS_CMD_REFERENCE_DIR`、`WGS_CMD_COHORT_DIR`、`WGS_CMD_DISEASE_RISK_DIR`、`WGS_CMD_DIET_NUTRITION_DIR` 始终优先；要使用自动准备的数据，请删除这两行。回退：删除 `WGS_CMD_DATA_ROOT` 后 `bash deploy/restart.sh`，即恢复原参考，肠龄肠型和患病人群参考自动隐藏；已准备的数据保留在原处。
 
 也可以手动运行同一流程（前台、输出到终端）：
 
